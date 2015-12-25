@@ -1,5 +1,34 @@
 module BSP
 
-# package code goes here
+import ComputeFramework: ComputeNode, compute, Context, distribute, gather
+import BSPWorker: Message, MessageAggregate, bspIteration
+
+export
+
+# ComputeFramework essentials
+compute, Context,
+
+# BSP main
+bsp,
+
+# Iteration function for workers
+bspIteration,
+
+# auxillary indexing functions for workers
+getParentProc, getLocalIndex, getGlobalVertex, getRanges,
+
+# Message passing for main and workers
+Message, ActivateMessage, MessageAggregate, processMessage, push!, generateMQ
+
+
+
+### ComputeNode for Bulk Syncrhonous Parallel processing ###
+immutable BSPNode <: ComputeNode
+    seed::Int
+    graph::Any
+end
+bsp(seed,graph) = BSPNode(seed,graph)
+
+
 
 end # module
