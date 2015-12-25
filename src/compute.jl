@@ -28,7 +28,7 @@ function compute(ctx, node::BSPNode)
     MQ = generateMQ(n_workers)
     dMQ = compute(ctx, distribute(MQ))
 
-    while true
+    for i in 1:10
         taskRefs = []
         # Iterate over workers
         println("--------------------------------------------------")
@@ -47,15 +47,11 @@ function compute(ctx, node::BSPNode)
 
         # Exit if 0 vertices are active
         num_active = mapreduce(fetch, +, 0, taskRefs)
-        num_active == 0 && break
+        # num_active == 0 && break
 
         println("++++++++++++++++++++++++++++++++++++++++++++++++++")
-        println(gather(ctx,dMQ))
-
-        println()
         # Compute Transpose of MQ to move messages around
         dMQ = compute(ctx, distribute(gather(ctx, transpose(dMQ))))
-        println(gather(ctx,dMQ))
     end
     gather(ctx, ddists)
 end
@@ -72,12 +68,17 @@ function bspIteration(visitorFunction, lvrange, lactive, lgraph, lMQ, ldists)
     dists = take!(ldists)
 
     n, = size(graph)
+    println("Active:",active)
 
     # Process incoming messages
     println("Incoming Messages:", MQ)
     for source in workers()
         for message::Message in getMessages(MQ[source-1])
-            processMessage(vrange, active, message)
+            i = getLocalIndex(vrange, message.target)
+            if dists[i] < 0
+                active[i] = true
+                dists[i] = message.data
+            end
         end
         empty!(MQ[source-1])
     end

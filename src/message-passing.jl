@@ -1,36 +1,32 @@
 abstract Message
 
 type MessageAggregate
-    mlist
+    mset::Set{Any}
 end
 
 immutable ActivateMessage <: Message
     target::Int
+    data::Int
 end
-
 
 ### Auxillary function ###
-function processMessage(vrange, active, message::ActivateMessage)
-    active[getLocalIndex(vrange, message.target)] = true
-end
-
 function push!(ma::MessageAggregate, m::Message)
-    push!(ma.mlist,m)
+    union!(ma.mset,[m])
 end
 
 function getMessages(ma::MessageAggregate)
-    ma.mlist
+    ma.mset
 end
 
 function empty!(ma::MessageAggregate)
-    empty!(ma.mlist)
+    empty!(ma.mset)
 end
 # Need to fix this
 function generateMQ(n)
     MQ = Array{MessageAggregate,2}(n,n)
     for i in 1:n
         for j in 1:n
-            MQ[i,j] = MessageAggregate([])
+            MQ[i,j] = MessageAggregate(Set{Any}())
         end
     end
     MQ
