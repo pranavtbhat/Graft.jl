@@ -1,7 +1,6 @@
 module BSP
 
 import ComputeFramework: ComputeNode, compute, Context, distribute, gather
-import BSPWorker: Message, MessageAggregate, bspIteration
 
 export
 
@@ -29,6 +28,8 @@ immutable BSPNode <: ComputeNode
 end
 bsp(seed,graph) = BSPNode(seed,graph)
 
-
+include("indexing.jl")
+include("message-passing.jl")
+include("compute.jl")
 
 end # module
