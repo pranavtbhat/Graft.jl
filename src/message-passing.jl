@@ -8,14 +8,23 @@ immutable ActivateMessage <: Message
     target::Int
 end
 
-function processMessage(vrange, active, messge::ActivateMessage)
-    active[localIndex(vrange, message.target)] = true
+
+### Auxillary function ###
+function processMessage(vrange, active, message::ActivateMessage)
+    active[getLocalIndex(vrange, message.target)] = true
 end
 
 function push!(ma::MessageAggregate, m::Message)
     push!(ma.mlist,m)
 end
 
+function getMessages(ma::MessageAggregate)
+    ma.mlist
+end
+
+function empty!(ma::MessageAggregate)
+    empty!(ma.mlist)
+end
 # Need to fix this
 function generateMQ(n)
     MQ = Array{MessageAggregate,2}(n,n)
