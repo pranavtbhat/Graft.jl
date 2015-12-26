@@ -28,10 +28,9 @@ function compute(ctx, node::BSPNode)
     MQ = generateMQ(n_workers)
     dMQ = compute(ctx, distribute(MQ))
 
-    for i in 1:10
+    while true
         taskRefs = []
         # Iterate over workers
-        println("--------------------------------------------------")
         for wid in workers()
             # Fetch RemoteRefs of distributed data
             lvrange = getRemoteRef(dvrange, wid)
@@ -47,9 +46,8 @@ function compute(ctx, node::BSPNode)
 
         # Exit if 0 vertices are active
         num_active = mapreduce(fetch, +, 0, taskRefs)
-        # num_active == 0 && break
+        num_active == 0 && break
 
-        println("++++++++++++++++++++++++++++++++++++++++++++++++++")
         # Compute Transpose of MQ to move messages around
         dMQ = compute(ctx, distribute(gather(ctx, transpose(dMQ))))
     end
@@ -68,10 +66,8 @@ function bspIteration(visitorFunction, lvrange, lactive, lgraph, lMQ, ldists)
     dists = take!(ldists)
 
     n, = size(graph)
-    println("Active:",active)
 
     # Process incoming messages
-    println("Incoming Messages:", MQ)
     for source in workers()
         for message::Message in getMessages(MQ[source-1])
             i = getLocalIndex(vrange, message.target)
@@ -83,18 +79,20 @@ function bspIteration(visitorFunction, lvrange, lactive, lgraph, lMQ, ldists)
         empty!(MQ[source-1])
     end
 
+    # Store number of active vertices at the beginning of compute phase
+    num_active = length(find(active))
     # Compute phase
     for i in find(active)
         visitorFunction(i, vrange, active, graph, MQ, dists)
         active[i] = false
     end
 
-    println("Outgoing Messages:", MQ)
     # write outputs to remote references
     put!(lactive, active)
     put!(lMQ, MQ)
     put!(ldists, dists)
 
-    # return the number of active vertices at the end of the iteration.
-    length(find(active))
+    # return the number of active vertices at the beginning of compute phase
+    num_active
+
 end
