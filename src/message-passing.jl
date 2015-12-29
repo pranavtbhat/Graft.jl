@@ -1,3 +1,5 @@
+import Base: push!, empty!
+
 abstract Message
 
 type MessageAggregate
