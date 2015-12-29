@@ -24,7 +24,6 @@ Message, ActivateMessage, MessageAggregate, processMessage, push!, generateMQ,
 DistGraph, GraphLayout, slice
 
 include("compute-node.jl")
-include("graph-layouts.jl")
 include("indexing.jl")
 include("message-passing.jl")
 include("compute.jl")
