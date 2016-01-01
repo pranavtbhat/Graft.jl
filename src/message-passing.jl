@@ -109,7 +109,7 @@ end
 """ Redistribute messages. (Should be called only in the main process)"""
 function transmit()
     new_layout = _mint.dmgrid.layout == cutdim(2)? cutdim(1) : cutdim(2)
-    dmgrid = compute(_mint.ctx, redistribute(_mint.dmgrid, cutdim(1)))
+    dmgrid = compute(_mint.ctx, redistribute(_mint.dmgrid, new_layout))
     for p in procs()
         @spawnat p (global _mint;_mint.dmgrid = dmgrid)
     end
@@ -123,11 +123,11 @@ function receive_messages(w::Int=myid())
     mlist = getMessageQueueList(w)
     for mq in mlist
         for m in mq
-            push!(vmq[dest(m)], m)
+            push!(vmq[dest(m)-start(vrange)+1], m)
         end
+        empty!(mq)
     end
-    # set a new empty mlist
-    mlist = generate_mgrid(length(procs()), 1)
+    # set the empty mlist
     setMessageQueueList(mlist, w)
     vmq
 end
