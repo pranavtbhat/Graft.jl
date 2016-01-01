@@ -18,7 +18,7 @@ Core graph representation.
 type DistGraph{S<:GraphStruct}
     nv::Int                            # Number of vertices
     vertices::Vector                   # Need to change this to UnitRange eventually
-    adj::S
+    adj::S                             # Graph data structure indicating adjacencies
 end
 
 """
@@ -35,7 +35,7 @@ vertices(x::DistGraph) = x.vertices
 adj(x::DistGraph) = x.adj
 
 """
-Methods to get the layout required to get a graph
+Methods to get the layout required to distribute a graph
 """
 function getlayout{S<:AdjacencyList}(::DistGraph{S})
     typelayout(DistGraph{S}, [Bcast(), cutdim(1), cutdim(1)])
@@ -62,4 +62,3 @@ abstract AuxStruct
 """All implementations of AuxStruct should define the following methods."""
 getlayout(::AuxStruct) = error("No layouts defined")
 distribute(::AuxStruct) = error("Distribute not defined")
-redistribute(::AuxStruct) = error("redistribute not defined")

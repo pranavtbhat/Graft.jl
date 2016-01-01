@@ -78,31 +78,31 @@ function mint_init(nv::Int)
 end
 
 """Get the parent process of a vertex. (Called from worker process)"""
-function getParent(v::Int)
+function get_parent(v::Int)
     _mint.vdist[v]
 end
 
 """Get a worker's local vertices"""
-function getLocal(w::Int=myid())
+function get_local_vertices(w::Int=myid())
     _mint.wdist[w]
 end
 
 """Get a process's message list."""
-function getMessageQueueList(w::Int=myid())
+function get_message_queue_list(w::Int=myid())
     take!(_mint.dmgrid.refs[w][2])
 end
 
 """Set a process's message list"""
-function setMessageQueueList(mlist::MessageQueueGrid, w::Int = myid())
+function get_message_queue_list(mlist::MessageQueueGrid, w::Int = myid())
     put!(_mint.dmgrid.refs[w][2], mlist)
     nothing
 end
 
 """ Send a message to the target vertex """
-function sendMessage(m::Message)
-    mlist = getMessageQueueList()
-    push!(mlist[getParent(dest(m))], m)
-    setMessageQueueList(mlist)
+function send_message(m::Message)
+    mlist = get_message_queue_list()
+    push!(mlist[get_parent(dest(m))], m)
+    get_message_queue_list(mlist)
     nothing
 end
 
@@ -118,9 +118,9 @@ end
 
 """Receive all messages sent to process."""
 function receive_messages(w::Int=myid())
-    vrange = getLocal(w)
+    vrange = get_local_vertices(w)
     vmq = generate_mlist(length(vrange))
-    mlist = getMessageQueueList(w)
+    mlist = get_message_queue_list(w)
     for mq in mlist
         for m in mq
             push!(vmq[dest(m)-start(vrange)+1], m)
@@ -128,6 +128,6 @@ function receive_messages(w::Int=myid())
         empty!(mq)
     end
     # set the empty mlist
-    setMessageQueueList(mlist, w)
+    get_message_queue_list(mlist, w)
     vmq
 end

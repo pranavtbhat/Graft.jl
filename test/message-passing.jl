@@ -26,18 +26,18 @@ target_proc = 2
 
 @test BSP.mint_init(nv) == nothing
 @test length(BSP._mint.dmgrid.refs) == num_procs
-@test BSP.getParent(test_vertex) == test_vertex_parent
-@test BSP.getLocal() == local_range
+@test BSP.get_parent(test_vertex) == test_vertex_parent
+@test BSP.get_local_vertices() == local_range
 
-@test BSP.sendMessage(m) == nothing
-mlist = BSP.getMessageQueueList()
+@test BSP.send_message(m) == nothing
+mlist = BSP.get_message_queue_list()
 @test typeof(mlist) == BSP.MessageQueueGrid
 @test length(mlist[target_proc]) == 1
-@test BSP.setMessageQueueList(mlist) == nothing
+@test BSP.get_message_queue_list(mlist) == nothing
 
 @test BSP.transmit() == nothing
 @test length(BSP._mint.dmgrid.refs) == num_procs
 
 messages = BSP.receive_messages(target_proc)
-@test length(messages) == length(BSP.getLocal(target_proc))
+@test length(messages) == length(BSP.get_local_vertices(target_proc))
 @test length(messages[1]) == 1

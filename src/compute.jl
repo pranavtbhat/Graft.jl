@@ -1,5 +1,9 @@
 import ComputeFramework: Context, distribute, compute
 
+"""
+Bulk Synchronous Parallel processing. Applies iterations of Super Steps on
+the input graph and auxiliary structure.
+"""
 function bsp(ctx, visitor::Function, graph::DistGraph, aux::AuxStruct)
     visitors = distribute(visitor, Bcat())
     dgraph = compute(ctx, distribute(graph))
@@ -11,15 +15,14 @@ function bsp(ctx, visitor::Function, graph::DistGraph, aux::AuxStruct)
     gather(ctx, daux)
 end
 
+"""
+Bulk Synchronous Parallel iterations. Sorts out incoming messages and runs
+the visitor function on each active vertex.
+"""
 function bsp_iterate(visitor::Function, graph::DistGraph, aux::AuxStruct)
-    for w in workers() .- 1
-        for m in getmlist(aux)[w]
-            process_message(m, aux)
-        end
-    end
-    setmlist(aux, generate_mqlist(length(workers)))
-    for i in find(active)
-        visitor(graph, aux)
+    messages = receive_messages()
+    for i in eachindex(vertices(graph))
+        visitor(i, graph, aux, messages)
     end
     aux
 end
