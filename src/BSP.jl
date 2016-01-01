@@ -1,14 +1,15 @@
 module BSP
 
 using LightGraphs
-import ComputeFramework: ComputeNode, compute, Context, distribute, gather
+import ComputeFramework: ComputeNode, compute, Context, distribute, gather, redistribute
 
 export
 
 # ComputeFramework essentials
-compute, Context, gather, distribute
+compute, Context, gather, distribute, redistribute
 
 include("graph.jl")
+include("message.jl")
 include("message-passing.jl")
 include("compute.jl")
 include("show.jl")

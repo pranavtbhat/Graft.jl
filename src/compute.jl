@@ -17,7 +17,7 @@ function bsp_iterate(visitor::Function, graph::DistGraph, aux::AuxStruct)
             process_message(m, aux)
         end
     end
-    setmlist(aux, generate_mlist(length(workers)))
+    setmlist(aux, generate_mqlist(length(workers)))
     for i in find(active)
         visitor(graph, aux)
     end

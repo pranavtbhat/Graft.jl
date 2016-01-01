@@ -1,37 +1,133 @@
-"""
-Abstract Message type. All subtypes should implement process_message.
-"""
-abstract Message
-process_message(::Message, ::AuxStruct) = error("No process method defined for this type")
-
-# Some typealiases to make life easier
-typealias MessageQueue Array{Message, 1}
-typealias MessageList Array{MessageQueue, 1}
-typealias MessageGrid Array{MessageQueue, 2}
+import ComputeFramework: complement
+###
+# This file contains a message pasing interface. It uses a global variable and is Therefore
+# likely to be messy and slow :(
+###
 
 """
-Generates a two dimensional matrix of MessageQueues.
+# Message Passing between processes.
+An interface for passing messages between ALL processes including the main process.
+Message Passing has to be separated from the BSP implementation to simplify
+the development of algorithms. Therefore the following interface is offered.
+- `mint_init(nv)` : Initialize the message passsing interface for `nv` vertices.
+- `send_message(targetVertex, message)` : Send a message to a vertex.
+- `transmit()` : Redistribute messages.
+- `receive_messages(w)` : Recieve all messages sent to a worker. Returns a MessageQueueList
 """
-function generate_mlist(n::Int)
-    mlist = Array{MessageQueue, 1}(n)
-    for iter in eachindex(mlist)
-        mlist[iter] = MessageQueue()
+
+type MessageInterface
+    ctx                  # Context
+    dmgrid               # Distrbitued Message Grid
+    vdist::Vector{Int}   # Vertex to worker Map
+    wdist::Vector{UnitRange{Int}} # Worker to vertex map
+end
+
+"""Global Variable to hold the MessageInterface. (May cause performance problems)"""
+const _mint = MessageInterface(nothing, nothing, Vector{Int}(), Vector{UnitRange{Int}}())
+
+"""Generate a matrix of MessageQueues and distribute it among ALL PROCESSES."""
+function get_dmgrid(ctx)
+    compute(ctx, distribute(generate_mgrid(length(procs()))))
+end
+
+"""Generate an array containing the parent process for each vertex."""
+function get_vdist(nv, w)
+    w > nv && (w = nv)
+    starts = round(Int, linspace(1, nv+1, w+1))
+    vdist = Vector{Int}()
+    for i in 2:length(starts)
+        vdist = vcat(vdist, fill(i, length(starts[i-1]:starts[i])-1))
     end
-    mlist
+    vdist
+end
+
+"""Generate an array containing the range of vertices for each worker. """
+function get_wdist(nv, w)
+    wdist = UnitRange{Int}[0:0 for i in 1:(w+1)]
+    w > nv && (w = nv)
+    starts = round(Int, linspace(1, nv+1, w+1))
+    for i in 2:length(starts)
+        wdist[i] = starts[i-1]:(starts[i]-1)
+    end
+    wdist
 end
 
 """
-Generates a vector of MessageQueues
+Initialize the message passing interface. Should be called only from the main
+process. Calling this will reset the messaging interface as well.(Very messy).
 """
-function generate_mgrid(n::Int)
-    mgrid = Array{MessageQueue, 2}(n,n)
-    for iter in eachindex(mgrid)
-        mgrid[iter] = MessageQueue()
+function mint_init(nv::Int)
+    @assert myid() == 1
+    w = length(workers())
+    ctx = Context(procs())
+
+    dmgrid = get_dmgrid(ctx)
+    vdist = get_vdist(nv, w)
+    wdist = get_wdist(nv, w)
+
+    for p in procs()
+        @spawnat p (
+            global _mint;
+            _mint.ctx = ctx;
+            _mint.dmgrid = dmgrid;
+            _mint.vdist = vdist;
+            _mint.wdist = wdist
+            )
     end
-    mgrid
+    nothing
 end
 
+"""Get the parent process of a vertex. (Called from worker process)"""
+function getParent(v::Int)
+    _mint.vdist[v]
+end
 
-"""
-Send a message to vertex v
-"""
+"""Get a worker's local vertices"""
+function getLocal(w::Int=myid())
+    _mint.wdist[w]
+end
+
+"""Get a process's message list."""
+function getMessageQueueList(w::Int=myid())
+    take!(_mint.dmgrid.refs[w][2])
+end
+
+"""Set a process's message list"""
+function setMessageQueueList(mlist::MessageQueueGrid, w::Int = myid())
+    put!(_mint.dmgrid.refs[w][2], mlist)
+    nothing
+end
+
+""" Send a message to the target vertex """
+function sendMessage(m::Message)
+    mlist = getMessageQueueList()
+    push!(mlist[getParent(dest(m))], m)
+    setMessageQueueList(mlist)
+    nothing
+end
+
+""" Redistribute messages. (Should be called only in the main process)"""
+function transmit()
+    new_layout = _mint.dmgrid.layout == cutdim(2)? cutdim(1) : cutdim(2)
+    dmgrid = compute(_mint.ctx, redistribute(_mint.dmgrid, cutdim(1)))
+    for p in procs()
+        @spawnat p (global _mint;_mint.dmgrid = dmgrid)
+    end
+    nothing
+end
+
+"""Receive all messages sent to process."""
+function receive_messages(w::Int=myid())
+    vrange = getLocal(w)
+    vmq = generate_mlist(length(vrange))
+    mlist = getMessageQueueList(w)
+    for mq in mlist
+        for m in mq
+            push!(vmq[dest(m)], m)
+        end
+    end
+    # set a new empty mlist
+    mlist = generate_mgrid(length(procs()), 1)
+    setMessageQueueList(mlist, w)
+    vmq
+end
