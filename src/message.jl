@@ -23,7 +23,7 @@ typealias MessageQueueList Array{MessageQueue, 1}
 typealias MessageQueueGrid Array{MessageQueue, 2}
 
 """
-Generates a two dimensional matrix of MessageQueues.
+Generates a vector of MessageQueues
 """
 function generate_mlist(n::Int)
     mlist = Array{MessageQueue, 1}(n)
@@ -34,7 +34,7 @@ function generate_mlist(n::Int)
 end
 
 """
-Generates a vector of MessageQueues
+Generates a two dimensional matrix of MessageQueues.
 """
 function generate_mgrid(n::Int,m::Int=n)
     mgrid = Array{MessageQueue, 2}(n,m)

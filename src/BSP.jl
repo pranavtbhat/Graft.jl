@@ -13,5 +13,5 @@ include("message.jl")
 include("message-passing.jl")
 include("compute.jl")
 include("show.jl")
-    include("algorithms/bfs.jl")
+include("algorithms/bfs.jl")
 end # module

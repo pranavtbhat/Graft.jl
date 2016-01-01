@@ -16,7 +16,7 @@ typealias GraphStruct Union{AdjacencyList, AdjacencyMatrix}
 Core graph representation.
 """
 type DistGraph{S<:GraphStruct}
-    nv::Int
+    nv::Int                            # Number of vertices
     vertices::Vector                   # Need to change this to UnitRange eventually
     adj::S
 end
@@ -29,7 +29,7 @@ Creates a Graph representation. Requires inputs:
 distgraph{S<:GraphStruct}(nv::Int, adj::S) = DistGraph(nv, collect(1:nv), adj)
 distgraph{S<:GraphStruct}(adj::S) = DistGraph(size(adj)[1], collect(1:size(adj)[1]), adj)
 
-"""Accessos functions"""
+"""Accessor functions"""
 numvertices(x::DistGraph) = x.nv
 vertices(x::DistGraph) = x.vertices
 adj(x::DistGraph) = x.adj
