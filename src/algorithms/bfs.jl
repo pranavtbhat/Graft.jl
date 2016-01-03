@@ -1,8 +1,8 @@
 """BFS Auxiliary structure. Contains the vertex status, distance from seed and parent."""
 type BFSAux <: AuxStruct
-    active::BitArray{1}
-    dists::Vector{Int}
-    parents::Vector{Int}
+    active::BitArray
+    dists::Vector
+    parents::Vector
 end
 getlayout(::BFSAux) = typelayout(BFSAux, [Bcast(), cutdim(1), cutdim(1), cutdim(1)])
 distribute(x::BFSAux) = distribute(x, getlayout(x))
@@ -58,5 +58,5 @@ end
 """
 BFS Function. Returns (dists, parents).
 """
-function bfs(graph::DistGraph{S}, seed::Int = 1)
-    
+function bfs{S}(graph::DistGraph{S}, seed::Int = 1)
+end
