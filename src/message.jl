@@ -4,9 +4,11 @@
 ###
 
 """
-Abstract Message type. All subtypes should implement process_message.
+Abstract Message type. All subtypes should implement process_message. All implementations
+of the Message type must contain a `dest` field.
 """
 abstract Message
+get_dest(x::Message) = x.dest
 
 """
 Dummy Message type for testing
@@ -14,7 +16,6 @@ Dummy Message type for testing
 type BlankMessage <: Message
     dest::Int
 end
-dest(x::BlankMessage) = x.dest
 process_message(x::BlankMessage) = x
 
 # Some typealiases to make life easier

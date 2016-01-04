@@ -1,4 +1,3 @@
-import ComputeFramework: complement
 ###
 # This file contains a message pasing interface. It uses a global variable and is Therefore
 # likely to be messy and slow :(
@@ -101,7 +100,7 @@ end
 """ Send a message to the target vertex """
 function send_message(m::Message)
     mlist = get_message_queue_list()
-    push!(mlist[get_parent(dest(m))], m)
+    push!(mlist[get_parent(get_dest(m))], m)
     get_message_queue_list(mlist)
     nothing
 end
@@ -123,7 +122,7 @@ function receive_messages(w::Int=myid())
     mlist = get_message_queue_list(w)
     for mq in mlist
         for m in mq
-            push!(vmq[dest(m)-start(vrange)+1], m)
+            push!(vmq[get_dest(m)-start(vrange)+1], m)
         end
         empty!(mq)
     end
