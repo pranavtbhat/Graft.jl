@@ -1,6 +1,6 @@
-@test typeof(BSP.generate_mlist(1)) == BSP.MessageQueueList
-@test typeof(BSP.generate_mgrid(2)) == BSP.MessageQueueGrid
+@test typeof(ParallelGraphs.generate_mlist(1)) == ParallelGraphs.MessageQueueList
+@test typeof(ParallelGraphs.generate_mgrid(2)) == ParallelGraphs.MessageQueueGrid
 
 # Type compatibility test
-mq = BSP.MessageQueue()
-push!(mq, BSP.BlankMessage(1))
+mq = ParallelGraphs.MessageQueue()
+push!(mq, ParallelGraphs.BlankMessage(1))

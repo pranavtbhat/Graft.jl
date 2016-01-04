@@ -1,5 +1,5 @@
-# BSP
-BSP.jl is a framework for Massive Graph Analysis built on [ComputeFramework.jl](https://github.com/shashi/ComputeFramework.jl). BSP.jl implements the Bulk Synchronous Parallel Model for running graph algorithms.
+# ParallelGraphs
+ParallelGraphs.jl is a framework for Massive Graph Analysis built on [ComputeFramework.jl](https://github.com/shashi/ComputeFramework.jl). ParallelGraphs.jl implements the Bulk Synchronous Parallel Model for running graph algorithms.
 
 ## Requirements
 - ComputeFramework.jl

@@ -1,5 +1,5 @@
 addprocs(2)
-using BSP
+using ParallelGraphs
 using Base.Test
 
 # write your own tests here

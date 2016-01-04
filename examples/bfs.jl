@@ -6,9 +6,9 @@
 # Number of worker processes
 addprocs(2)
 
-using BSP
-# Unfortunately this is required to avoid using the prefix BSP.*
-@everywhere importall BSP
+using ParallelGraphs
+# Unfortunately this is required to avoid using the prefix ParallelGraphs.*
+@everywhere importall ParallelGraphs
 
 # Define visitorFunction in all worker processes. Again need to fix this.
 @everywhere function visitorFunction(i, vrange, active, graph, MQ, dists)

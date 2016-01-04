@@ -1,4 +1,4 @@
-module BSP
+module ParallelGraphs
 
 using LightGraphs
 import ComputeFramework: ComputeNode, compute, Context, distribute, gather, redistribute

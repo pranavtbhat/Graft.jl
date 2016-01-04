@@ -5,8 +5,8 @@ test_cases = Pair[
 ]
 
 for tc in test_cases
-    @test BSP.get_vdist(tc[1]...) == tc[2][1]
-    @test BSP.get_wdist(tc[1]...) == tc[2][2]
+    @test ParallelGraphs.get_vdist(tc[1]...) == tc[2][1]
+    @test ParallelGraphs.get_wdist(tc[1]...) == tc[2][2]
 end
 
 # Message passing scenario
@@ -17,23 +17,23 @@ test_vertex = 1
 test_vertex_parent = 2
 local_range = 0:0
 
-m = BSP.BlankMessage(1)
+m = ParallelGraphs.BlankMessage(1)
 target_proc = 2
 
-@test BSP.mint_init(nv) == nothing
-@test length(BSP._mint.dmgrid.refs) == num_procs
-@test BSP.get_parent(test_vertex) == test_vertex_parent
-@test BSP.get_local_vertices() == local_range
+@test ParallelGraphs.mint_init(nv) == nothing
+@test length(ParallelGraphs._mint.dmgrid.refs) == num_procs
+@test ParallelGraphs.get_parent(test_vertex) == test_vertex_parent
+@test ParallelGraphs.get_local_vertices() == local_range
 
-@test BSP.send_message(m) == nothing
-mlist = BSP.get_message_queue_list()
-@test typeof(mlist) == BSP.MessageQueueGrid
+@test ParallelGraphs.send_message(m) == nothing
+mlist = ParallelGraphs.get_message_queue_list()
+@test typeof(mlist) == ParallelGraphs.MessageQueueGrid
 @test length(mlist[target_proc]) == 1
-@test BSP.get_message_queue_list(mlist) == nothing
+@test ParallelGraphs.get_message_queue_list(mlist) == nothing
 
-@test BSP.transmit() == nothing
-@test length(BSP._mint.dmgrid.refs) == num_procs
+@test ParallelGraphs.transmit() == nothing
+@test length(ParallelGraphs._mint.dmgrid.refs) == num_procs
 
-messages = BSP.receive_messages(target_proc)
-@test length(messages) == length(BSP.get_local_vertices(target_proc))
+messages = ParallelGraphs.receive_messages(target_proc)
+@test length(messages) == length(ParallelGraphs.get_local_vertices(target_proc))
 @test length(messages[1]) == 1

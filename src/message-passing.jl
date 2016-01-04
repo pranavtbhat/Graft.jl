@@ -6,7 +6,7 @@
 """
 # Message Passing between processes.
 An interface for passing messages between ALL processes including the main process.
-Message Passing has to be separated from the BSP implementation to simplify
+Message Passing has to be separated from the ParallelGraphs implementation to simplify
 the development of algorithms. Therefore the following interface is offered.
 - `mint_init(nv)` : Initialize the message passsing interface for `nv` vertices.
 - `send_message(targetVertex, message)` : Send a message to a vertex.
