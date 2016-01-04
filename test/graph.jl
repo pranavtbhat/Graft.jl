@@ -10,22 +10,22 @@ adj_matrix = round(Int, rand(nv,nv))
 function test_graph_representation(graph)
     aux_array = TestAux[TestAux(true, i) for i in 1:nv]
     # Test core accessors
-    @test ParallelGraphs.get_vertices(list_graph) == collect(1:nv)
-    @test ParallelGraphs.get_adj(list_graph) == adj_list
+    @test ParallelGraphs.get_num_vertices(graph) == nv
+    @test ParallelGraphs.get_vertices(graph) == collect(1:nv)
 
     # Test auxiliary accessors
-    @test ParallelGraphs.has_aux(list_graph) == false
-    @test ParallelGraphs.set_aux!(list_graph, aux_array) == nothing
-    @test ParallelGraphs.has_aux(list_graph) == true
-    @test ParallelGraphs.get_aux(list_graph) == aux_array
+    @test ParallelGraphs.has_aux(graph) == false
+    @test ParallelGraphs.set_aux!(graph, aux_array) == nothing
+    @test ParallelGraphs.has_aux(graph) == true
+    @test ParallelGraphs.get_aux(graph) == aux_array
 
     # Test status accessors
-    @test ParallelGraphs.is_active(list_graph, rand(1:nv)) == true
-    @test ParallelGraphs.get_num_active(list_graph) == nv
+    @test ParallelGraphs.is_active(graph, rand(1:nv)) == true
+    @test ParallelGraphs.get_num_active(graph) == nv
 
     # Test auxiliary accessors again
-    @test ParallelGraphs.take_aux!(list_graph) == aux_array
-    @test ParallelGraphs.has_aux(list_graph) == false
+    @test ParallelGraphs.take_aux!(graph) == aux_array
+    @test ParallelGraphs.has_aux(graph) == false
 end
 
 # Test AdjacencyList graphs

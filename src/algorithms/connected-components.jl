@@ -1,3 +1,5 @@
+export connected_components
+
 """
 Define an auxiliary structure with a label field
 """
@@ -25,6 +27,7 @@ function lowest_label_visitor(u::Int, adj::Vector{Int}, aux::AuxStruct, messages
     activate(aux)
     # Get lowest neighboring label
     min_label = round(Int, reduce(min, Inf, [get_label(m) for m in messages]))
+    min_label::Int
     # If new label is smaller than the old label, call set_label. Else deactivate
     if min_label < get_label(aux)
         set_label(aux, min_label)
@@ -34,4 +37,17 @@ function lowest_label_visitor(u::Int, adj::Vector{Int}, aux::AuxStruct, messages
     else
         deactivate(aux)
     end
+end
+
+"""
+Main exported function.
+"""
+
+function connected_components(graph::DistGraph)
+    aux_array = [LowestLabelAux(true, iter) for iter in get_vertices(graph)]
+    set_aux!(graph, aux_array)
+
+    graph = bsp(Context(), lowest_label_visitor, graph)
+    aux_array = take_aux!(graph)
+    map(get_label, aux_array)
 end

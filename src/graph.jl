@@ -6,15 +6,15 @@ export distgraph, num_vertices, vertices, adj
 # CORE GRAPH STRUCTURES
 ###
 """
-Permitted graph data structures. Each data structure must implement the `get_adjacencies`
+Permitted graph data structures. Each data structure must implement the `get_adj`
 method to retreive a vertex's adjacencies.
 """
 typealias AdjacencyList Array{Array{Int, 1}, 1}
 typealias AdjacencyMatrix AbstractArray{Int, 2}
 typealias GraphStruct Union{AdjacencyList, AdjacencyMatrix}
 
-get_adjacencies(x::AdjacencyList, iter::Int) = x[iter]
-get_adjacencies(x::AdjacencyMatrix, iter::Int) = x[:,iter]
+get_adj(x::AdjacencyList, iter::Int) = x[iter]
+get_adj(x::AdjacencyMatrix, iter::Int) = x[:,iter]
 ###
 # AUXILIARY GRAPH STRUCTURES
 ###
@@ -47,8 +47,9 @@ type DistGraph{S}
 end
 
 """Core accessors """
+get_num_vertices(x::DistGraph) = length(x.vertices)
 get_vertices(x::DistGraph) = x.vertices
-get_adj(x::DistGraph) = x.adj
+get_struct(x::DistGraph) = x.adj
 
 """ Auxiliary accessors """
 has_aux(x::DistGraph) = length(x.aux) > 0  # Check if the graph has auxiliary data attached.
@@ -57,7 +58,7 @@ take_aux!(x::DistGraph) = (aux = x.aux; x.aux = Vector{AuxStruct}(); aux) # Deta
 set_aux!{A<:AuxStruct}(x::DistGraph, y::Vector{A}) = (x.aux = y; nothing)  # Replace the graph's auxiliary structure.
 
 """ Check if two graphs are equal """
-isequal(x::DistGraph, y::DistGraph) = get_vertices(x) == get_vertices(y) && get_adj(x) == get_adj(y) && get_aux(x) == get_aux(y)
+isequal(x::DistGraph, y::DistGraph) = get_vertices(x) == get_vertices(y) && get_struct(x) == get_struct(y) && get_aux(x) == get_aux(y)
 
 """ Status accessors (Unsafe) """
 is_active(x::DistGraph, iter::Int) = is_active(get_aux(x)[iter])

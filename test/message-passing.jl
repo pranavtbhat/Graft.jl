@@ -20,20 +20,22 @@ local_range = 0:0
 m = ParallelGraphs.BlankMessage(1)
 target_proc = 2
 
-@test ParallelGraphs.mint_init(nv) == nothing
-@test length(ParallelGraphs._mint.dmgrid.refs) == num_procs
-@test ParallelGraphs.get_parent(test_vertex) == test_vertex_parent
-@test ParallelGraphs.get_local_vertices() == local_range
+mint = ParallelGraphs.mint_init(nv)
+@test typeof(mint) == ParallelGraphs.MessageInterface
 
-@test ParallelGraphs.send_message(m) == nothing
-mlist = ParallelGraphs.get_message_queue_list()
+@test length(mint.dmgrid.refs) == num_procs
+@test ParallelGraphs.get_parent(mint, test_vertex) == test_vertex_parent
+@test ParallelGraphs.get_local_vertices(mint) == local_range
+
+@test ParallelGraphs.send_message(mint, m) == nothing
+mlist = ParallelGraphs.get_message_queue_list(mint)
 @test typeof(mlist) == ParallelGraphs.MessageQueueGrid
 @test length(mlist[target_proc]) == 1
-@test ParallelGraphs.get_message_queue_list(mlist) == nothing
+@test ParallelGraphs.set_message_queue_list(mint, mlist) == nothing
 
-@test ParallelGraphs.transmit() == nothing
-@test length(ParallelGraphs._mint.dmgrid.refs) == num_procs
+@test ParallelGraphs.transmit(mint) == nothing
+@test length(mint.dmgrid.refs) == num_procs
 
-messages = ParallelGraphs.receive_messages(target_proc)
-@test length(messages) == length(ParallelGraphs.get_local_vertices(target_proc))
+messages = ParallelGraphs.receive_messages(mint, target_proc)
+@test length(messages) == length(ParallelGraphs.get_local_vertices(mint, target_proc))
 @test length(messages[1]) == 1

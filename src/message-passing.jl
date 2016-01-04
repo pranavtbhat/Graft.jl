@@ -1,17 +1,12 @@
-###
-# This file contains a message pasing interface. It uses a global variable and is Therefore
-# likely to be messy and slow :(
-###
-
 """
 # Message Passing between processes.
 An interface for passing messages between ALL processes including the main process.
 Message Passing has to be separated from the ParallelGraphs implementation to simplify
 the development of algorithms. Therefore the following interface is offered.
-- `mint_init(nv)` : Initialize the message passsing interface for `nv` vertices.
-- `send_message(targetVertex, message)` : Send a message to a vertex.
-- `transmit()` : Redistribute messages.
-- `receive_messages(w)` : Recieve all messages sent to a worker. Returns a MessageQueueList
+- `mint_init(nv)` : Create a message passsing interface for `nv` vertices.
+- `send_message(_mint, targetVertex, message)` : Send a message to a vertex.
+- `transmit(_mint)` : Redistribute messages.
+- `receive_messages(_mint, w)` : Recieve all messages sent to a worker. Returns a MessageQueueList
 """
 
 type MessageInterface
@@ -20,9 +15,6 @@ type MessageInterface
     vdist::Vector{Int}   # Vertex to worker Map
     wdist::Vector{UnitRange{Int}} # Worker to vertex map
 end
-
-"""Global Variable to hold the MessageInterface. (May cause performance problems)"""
-const _mint = MessageInterface(nothing, nothing, Vector{Int}(), Vector{UnitRange{Int}}())
 
 """Generate a matrix of MessageQueues and distribute it among ALL PROCESSES."""
 function get_dmgrid(ctx)
@@ -64,62 +56,51 @@ function mint_init(nv::Int)
     vdist = get_vdist(nv, w)
     wdist = get_wdist(nv, w)
 
-    for p in procs()
-        @spawnat p (
-            global _mint;
-            _mint.ctx = ctx;
-            _mint.dmgrid = dmgrid;
-            _mint.vdist = vdist;
-            _mint.wdist = wdist
-            )
-    end
-    nothing
+    MessageInterface(ctx, dmgrid, vdist, wdist)
 end
 
 """Get the parent process of a vertex. (Called from worker process)"""
-function get_parent(v::Int)
-    _mint.vdist[v]
+function get_parent(mint::MessageInterface, v::Int)
+    mint.vdist[v]
 end
 
 """Get a worker's local vertices"""
-function get_local_vertices(w::Int=myid())
-    _mint.wdist[w]
+function get_local_vertices(mint::MessageInterface, w::Int=myid())
+    mint.wdist[w]
 end
 
 """Get a process's message list."""
-function get_message_queue_list(w::Int=myid())
-    take!(_mint.dmgrid.refs[w][2])
+function get_message_queue_list(mint::MessageInterface, w::Int=myid())
+    take!(mint.dmgrid.refs[w][2])
 end
 
 """Set a process's message list"""
-function get_message_queue_list(mlist::MessageQueueGrid, w::Int = myid())
-    put!(_mint.dmgrid.refs[w][2], mlist)
+function set_message_queue_list(mint::MessageInterface, mlist::MessageQueueGrid, w::Int = myid())
+    put!(mint.dmgrid.refs[w][2], mlist)
     nothing
 end
 
 """ Send a message to the target vertex """
-function send_message(m::Message)
-    mlist = get_message_queue_list()
-    push!(mlist[get_parent(get_dest(m))], m)
-    get_message_queue_list(mlist)
+function send_message(mint::MessageInterface, m::Message)
+    mlist = get_message_queue_list(mint)
+    target_proc = get_parent(mint, get_dest(m))
+    push!(mlist[target_proc], m)
+    set_message_queue_list(mint, mlist)
     nothing
 end
 
 """ Redistribute messages. (Should be called only in the main process)"""
-function transmit()
-    new_layout = _mint.dmgrid.layout == cutdim(2)? cutdim(1) : cutdim(2)
-    dmgrid = compute(_mint.ctx, redistribute(_mint.dmgrid, new_layout))
-    for p in procs()
-        @spawnat p (global _mint;_mint.dmgrid = dmgrid)
-    end
+function transmit(mint::MessageInterface)
+    new_layout = mint.dmgrid.layout == cutdim(2)? cutdim(1) : cutdim(2)
+    mint.dmgrid = compute(mint.ctx, redistribute(mint.dmgrid, new_layout))
     nothing
 end
 
 """Receive all messages sent to process."""
-function receive_messages(w::Int=myid())
-    vrange = get_local_vertices(w)
+function receive_messages(mint::MessageInterface, w::Int=myid())
+    vrange = get_local_vertices(mint::MessageInterface, w)
     vmq = generate_mlist(length(vrange))
-    mlist = get_message_queue_list(w)
+    mlist = get_message_queue_list(mint, w)
     for mq in mlist
         for m in mq
             push!(vmq[get_dest(m)-start(vrange)+1], m)
@@ -127,6 +108,6 @@ function receive_messages(w::Int=myid())
         empty!(mq)
     end
     # set the empty mlist
-    get_message_queue_list(mlist, w)
+    set_message_queue_list(mint, mlist, w)
     vmq
 end

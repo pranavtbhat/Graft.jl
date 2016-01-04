@@ -16,5 +16,6 @@ include("compute.jl")
 
 include("show.jl")
 
-include("algorithms/bfs.jl")
+    include("algorithms/bfs.jl")
+    include("algorithms/connected-components.jl")
 end # module
