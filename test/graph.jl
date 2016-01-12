@@ -1,11 +1,17 @@
+nv = 10
+adj_list = Vector{Int}[round(Int, rand(nv)) for i in 1:nv]
+adj_matrix = round(Int, rand(nv,nv))
+
+
+
+
+
 @everywhere type TestAux <: ParallelGraphs.AuxStruct
     active::Bool
     v::Int
 end
 
-nv = 10
-adj_list = Vector{Int}[round(Int, rand(nv)) for i in 1:nv]
-adj_matrix = round(Int, rand(nv,nv))
+
 
 function test_graph_representation(graph)
     aux_array = TestAux[TestAux(true, i) for i in 1:nv]

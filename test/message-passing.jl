@@ -20,7 +20,7 @@ local_range = 0:0
 m = ParallelGraphs.BlankMessage(1)
 target_proc = 2
 
-mint = ParallelGraphs.mint_init(nv)
+mint = ParallelGraphs.message_interface(nv)
 @test typeof(mint) == ParallelGraphs.MessageInterface
 
 @test length(mint.dmgrid.refs) == num_procs
