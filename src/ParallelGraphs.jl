@@ -14,4 +14,5 @@ include("show.jl")
     # include("algorithms/connected-components.jl")
 
     include("utilities/generators.jl")
+    include("utilities/conversions.jl")
 end # module

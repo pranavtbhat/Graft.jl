@@ -7,10 +7,11 @@ end
 """Generate a undirected random graph with a given approximate density, in sparse matrix format"""
 function rand_graph(nv::Int, d::Float64)
     m = sprandbool(nv, nv, d)
-    triu(m) + triu(m,1)'
+    triu(m,1) | triu(m,1)'
 end
 
 """Generate a directed random graph with a given approximate density, in sparse matrix format"""
 function rand_digraph(nv::Int, d::Float64)
-    sprandbool(nv, nv, d)
+    m = sprandbool(nv, nv, d)
+    triu(m,1) | tril(m,-1)
 end

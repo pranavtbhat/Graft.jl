@@ -34,7 +34,7 @@ the AdjacencyMatrix representation is:
 The AdjacencyMatrix representation has fast lookup but slower iteration. The type
 also permits Sparse Matrices.
 """
-typealias AdjacencyMatrix AbstractArray{Bool, 2}
+typealias AdjacencyMatrix Union{AbstractArray{Bool, 2}, SparseMatrixCSC{Bool,Int}}
 
 """
 Permitted graph data structures:

@@ -16,7 +16,7 @@ end
 """Generate a matrix of MessageQueues and distribute it."""
 function get_dmgrid(ctx)
     lp = length(procs())
-    compute(ctx, distribute(generate_mgrid(lp))
+    compute(ctx, distribute(generate_mgrid(lp)))
 end
 
 """
@@ -27,6 +27,8 @@ function message_interface(metadata)
     @assert myid() == 1
     ctx = Context(procs())
     dmgrid = get_dmgrid(ctx)
+    metadata = reduce(vcat, UnitRange{Int}[], metadata)       # remove outer arrays
+    unshift!(metadata, 0:0)                                   # main proc is assigned no vertices.
     MessageInterface(ctx, dmgrid, metadata)
 end
 
@@ -62,9 +64,8 @@ end
 
 """ Redistribute messages. (Should be called only in the main process)"""
 function transmit(mint::MessageInterface)
-    new_layout = mint.layout == cutdim(2)? cutdim(1) : cutdim(2)
+    new_layout = mint.dmgrid.layout == cutdim(2)? cutdim(1) : cutdim(2)
     mint.dmgrid = compute(mint.ctx, redistribute(mint.dmgrid, new_layout))
-    mint.layout = new_layout
     nothing
 end
 
