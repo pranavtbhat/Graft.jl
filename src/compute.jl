@@ -6,17 +6,21 @@ input function. This function requires the following arguments:
 - gstruct: A graph structure of type GraphStruct.
 - data: Auxiliary data required for some algorithms. Can be left empty.
 """
-function bsp(ctx, visitor::Function, vlist::Vector{Vertex}, gstruct::GraphStruct, data...)
-    visitors = distribute(visitor, Bcast())
-    dvlist = distribute(vlist)
-    dgstruct = distribute(gstruct)
-    dmint = distribute(message_interface(metadata(dvlist)), Bcast())
-    ddata = map(distribute, data)
-    while true
-        dvlist = mappart(bsp_iterate, visitors, dvlist, dgstruct, dmint, ddata...)
-        transmit!(mint)
+function distribute_data(data)
+    compute(Context(), distribute(data))
+end
+
+function bsp(visitor::Function, vlist::Vector, gstruct::GraphStruct, data...)
+    visitors = compute(Context(), distribute(visitor, Bcast()))
+    dvlist = compute(Context(), distribute(vlist))
+    dgstruct = compute(Context(), distribute(gstruct))
+    dmint = compute(Context(), distribute(message_interface(metadata(dvlist)), Bcast()))
+    ddata = map(distribute_data, data)
+    for i in 1:1
+        dvlist = compute(Context(), mappart(bsp_iterate, visitors, dvlist, dgstruct, dmint, ddata...))
+        # transmit!(mint)
     end
-    gather(ctx, dvlist)
+    gather(Context(), dvlist)
 end
 
 """
@@ -27,9 +31,9 @@ the visitor function on each active vertex. This function requires the following
 - vlist: List of local vertices
 - data: Auxiliary data required for some algorithms. Can be empty.
 """
-function bsp_iterate(visitor::Function, mint::MessageInterface, vlist::Vector{Vertex}, gstruct, data...)
+function bsp_iterate(visitor::Function, vlist::Vector, gstruct,  mint::MessageInterface, data...)
     messages = receive_messages(mint)
-    for iter in eachindex(vlist, gstruct, messages)
+    for iter in eachindex(vlist)
         v = vlist[iter]
         adj = get_adj(gstruct, iter)
         mq = messages[iter]
