@@ -39,7 +39,7 @@ function bsp(visitor::Function, vlist::Vector, gstruct::GraphStruct, data...)
 
         # Throw any errors
         errors = filter(x->isa(x, ErrorMessage), messages)
-        if(!isempty(errors))
+        if !isempty(errors)
             error("Errors on worker processes:\n $(join(map(x->join([get_vertex(x),get_error(x)]," "), errors), "\n"))")
         end
 

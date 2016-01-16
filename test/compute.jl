@@ -9,7 +9,7 @@
     rand_num = rand()
     if rand_num < 0.2
         v.label = rand_num
-        v.active = false
+        ParallelGraphs.deactivate!(v)
     end
     return v
 end

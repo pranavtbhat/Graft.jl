@@ -68,7 +68,7 @@ abstract Vertex
 get_label(x::Vertex) = x.label
 
 """Modify a vertex's label"""
-function set_label(x::Vertex, label)
+function set_label!(x::Vertex, label)
     x.label = label
 end
 
@@ -81,6 +81,6 @@ function activate!(x::Vertex)
 end
 
 """Deactivate a vertex(Internal Method)"""
-function activate!(x::Vertex)
+function deactivate!(x::Vertex)
     x.active = false
 end
