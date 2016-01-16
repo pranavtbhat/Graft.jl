@@ -36,9 +36,18 @@ function bsp(visitor::Function, vlist::Vector, gstruct::GraphStruct, data...)
 
         # Extract main process's message interface
         messages = receive_messages!(mint)[1]
-        num_active = mapreduce(get_num_active, +, 0, messages)
-        println("Num active-> ", num_active)
+
+        # Throw any errors
+        errors = filter(x->isa(x, ErrorMessage), messages)
+        if(!isempty(errors))
+            error("Errors on worker processes:\n $(join(map(x->join([get_vertex(x),get_error(x)]," "), errors), "\n"))")
+        end
+
+        # Compute the number of active vertices and stop execution if there exist none
+        active_list = filter(x->isa(x, NumActive), messages)
+        num_active = mapreduce(get_num_active, +, 0, active_list)
         num_active == 0 && break
+
     end
     gather(Context(), dvlist)
 end
@@ -60,8 +69,14 @@ function bsp_iterate(visitor::Function, vlist::Vector, gstruct,  mint::MessageIn
 
         # Skip vertex if its inactive and has no messages addressed to it.
         !is_active(v) && isempty(mq) && continue
+
         # Execute the visitor function on the vertex.
-        vlist[iter] = visitor(v, adj, mint, mq, map(x->x[iter], data)...)
+        vlist[iter] = try
+            visitor(v, adj, mint, mq, map(x->x[iter], data)...)
+        catch e
+            send_message!(mint, ErrorMessage(e, vlist[iter]))
+            vlist[iter]
+        end
     end
     # Count the number of active vertices
     num_active = mapreduce(is_active, +, 0, vlist)
