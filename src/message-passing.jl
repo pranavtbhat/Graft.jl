@@ -16,7 +16,7 @@ end
 """Generate a matrix of MessageQueues and distribute it."""
 function get_dmgrid(ctx)
     lp = length(procs())
-    compute(ctx, distribute(generate_mgrid(lp)))
+    compute(ctx, distribute(generate_mgrid(lp), cutdim(2)))
 end
 
 """
@@ -56,6 +56,7 @@ end
 function send_message!(mint::MessageInterface, m::Message, w=myid())
     mlist = get_message_queue_list!(mint, w)
     target_proc = get_parent(mint, get_dest(m))
+    typeof(m) == NumActive && target_proc !=1 && println("Illegal message: to $(target_proc)", m)
     push!(mlist[target_proc], m)
     set_message_queue_list!(mint, mlist, w)
     nothing
@@ -74,7 +75,6 @@ vertex.
 """
 function receive_messages!(mint::MessageInterface, w::Int=myid())
     vrange = get_local_vertices(mint::MessageInterface, w)
-    println(vrange)
     vmq = generate_mlist(length(vrange))
     mlist = get_message_queue_list!(mint, w)
     for mq in mlist

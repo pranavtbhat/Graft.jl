@@ -1,28 +1,30 @@
-addprocs(2)
+@everywhere function test_visitor(v, adj, mint, mq, data...)
+    v::Vertex
+    adj::Vector
+    mint::MessageInterface
+    mq::MessageQueue
+    data::Tuple
 
-using ParallelGraphs
-using Base.Test
-import ComputeFramework.domain
-
-domain(::Function) = 1
-domain(::ParallelGraphs.MessageInterface) = 1
-
-@everywhere function print_visitor(v, adj, mint, mq, data...)
-    println("Vertices:", v)
-    println("Vertices:", adj)
-    println("Vertices:", mint)
-    println("Vertices:", mq)
-    println("Vertices:", data)
+    # Randomly deactivate
+    rand_num = rand()
+    if rand_num < 0.2
+        v.label = rand_num
+        v.active = false
+    end
     return v
 end
 
-@everywhere type BlankVertex <: ParallelGraphs.Vertex
+@everywhere type TestVertex <: ParallelGraphs.Vertex
     label
     active
 end
 
 nv = 10
-vlist = [BlankVertex(i,true) for i in 1:nv]
+vlist = [TestVertex(i,true) for i in 1:nv]
 gstruct = rand_graph(nv,0.25)
 
-ParallelGraphs.bsp(print_visitor, vlist, gstruct)
+vlist = ParallelGraphs.bsp(test_visitor, vlist, gstruct).xs
+vlist = reduce(vcat, [], vlist)
+for v in vlist
+    @test get_label(v) < 0.2 && !ParallelGraphs.is_active(v)
+end

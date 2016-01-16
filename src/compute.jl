@@ -1,3 +1,11 @@
+import ComputeFramework.domain
+
+"""Allow Bcast distribution of Functions"""
+domain(::Function) = 1
+
+"""Allow Bcast distribution of MessageInterface"""
+domain(::ParallelGraphs.MessageInterface) = 1
+
 """
 Bulk Synchronous Parallel processing. Executes synchronized iterations of the
 input function. This function requires the following arguments:
@@ -6,19 +14,31 @@ input function. This function requires the following arguments:
 - gstruct: A graph structure of type GraphStruct.
 - data: Auxiliary data required for some algorithms. Can be left empty.
 """
-function distribute_data(data)
-    compute(Context(), distribute(data))
-end
-
 function bsp(visitor::Function, vlist::Vector, gstruct::GraphStruct, data...)
     visitors = compute(Context(), distribute(visitor, Bcast()))
     dvlist = compute(Context(), distribute(vlist))
     dgstruct = compute(Context(), distribute(gstruct))
-    dmint = compute(Context(), distribute(message_interface(metadata(dvlist)), Bcast()))
-    ddata = map(distribute_data, data)
-    for i in 1:1
+
+    meta = reduce(vcat, UnitRange{Int}[], metadata(dvlist))
+    mint = message_interface(meta)
+
+
+    ddata = map(distribute, data)
+    while true
+        dmint = compute(Context(), distribute(mint, Bcast()))
         dvlist = compute(Context(), mappart(bsp_iterate, visitors, dvlist, dgstruct, dmint, ddata...))
-        # transmit!(mint)
+
+        # Recover message interface
+        mint = gather(Context(), dmint)
+
+        # Synchronously transmit messages
+        transmit!(mint)
+
+        # Extract main process's message interface
+        messages = receive_messages!(mint)[1]
+        num_active = mapreduce(get_num_active, +, 0, messages)
+        println("Num active-> ", num_active)
+        num_active == 0 && break
     end
     gather(Context(), dvlist)
 end
@@ -32,7 +52,7 @@ the visitor function on each active vertex. This function requires the following
 - data: Auxiliary data required for some algorithms. Can be empty.
 """
 function bsp_iterate(visitor::Function, vlist::Vector, gstruct,  mint::MessageInterface, data...)
-    messages = receive_messages(mint)
+    messages = receive_messages!(mint)
     for iter in eachindex(vlist)
         v = vlist[iter]
         adj = get_adj(gstruct, iter)
@@ -43,5 +63,10 @@ function bsp_iterate(visitor::Function, vlist::Vector, gstruct,  mint::MessageIn
         # Execute the visitor function on the vertex.
         vlist[iter] = visitor(v, adj, mint, mq, map(x->x[iter], data)...)
     end
+    # Count the number of active vertices
+    num_active = mapreduce(is_active, +, 0, vlist)
+    # Send the number of active vertices to the main process
+    send_message!(mint, NumActive(num_active))
+
     vlist
 end

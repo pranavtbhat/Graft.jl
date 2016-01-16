@@ -9,3 +9,5 @@ include("message-passing.jl")
 
     include("utilities/generators.jl")
     include("utilities/conversions.jl")
+
+include("compute.jl")
