@@ -5,10 +5,9 @@ os:
   - osx
 julia:
   - release
-  - nightly
 notifications:
   email: false
-# uncomment the following lines to override the default test script
-#script:
-#  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-#  - julia -e 'Pkg.clone(pwd()); Pkg.build("ParallelGraphs"); Pkg.test("ParallelGraphs"; coverage=true)'
+script:
+ - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+ - julia -e 'Pkg.clone("https://github.com/shashi/ComputeFramework.jl.git"); Pkg.build("ComputeFramework")' # Until ComputeFramework is registered.
+ - julia -e 'Pkg.clone(pwd()); Pkg.build("ParallelGraphs"); Pkg.test("ParallelGraphs"; coverage=true)'
