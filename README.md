@@ -1,35 +1,28 @@
 # ParallelGraphs
-ParallelGraphs.jl is a framework for Massive Graph Analysis built on [ComputeFramework.jl](https://github.com/shashi/ComputeFramework.jl). ParallelGraphs.jl implements the Bulk Synchronous Parallel Model for running graph algorithms.
+ParallelGraphs.jl is a framework for Massive-Graph Analysis built on [ComputeFramework.jl](https://github.com/shashi/ComputeFramework.jl). ParallelGraphs.jl implements the Bulk Synchronous Parallel Model for running graph algorithms. The framework is under development, and there's probably a long way to go before the first release.
+
+The graph algorithms use very light data structures, motivated by [LightGraphs.jl](https://github.com/JuliaGraphs/LightGraphs.jl). Interoperability with LightGraphs.jl is a development goal. 
+
+The framework uses the Main Julia process to schedule iterations and handle control messages. Computations take place on worker processes. Therfore *atleast* one worker process is required for the framework to function correctly.
 
 ## Requirements
 - ComputeFramework.jl
-- LightGraphs.jl 
 
-## Concept
-Algorithms that adhere to the Bulk Synchronous Parallel Model have the following stages:
+## Algorithms currently supported
+- Breadth First Search (supports multiple seeds)
+- Connected Components (Undirected graphs only)
 
-### Partitioning 
-The input graph(object or file) is processed, and the vertices are partitioned into disjoint ranges. The partioning may be random or heuristic-enabled.
+## Example Usage
+```julia
+addprocs(2)
+using ParallelGraphs
 
-### Loading
-The range of vertices are communicated to the available worker processes and the data accompanying these vertices (Adjacency lists, Labels etc) are migrated to the worker processes. 
+# Breadth First Search
+g = rand_graph(100000, 0.00003)
+@time distvector, parentvector = bfs(g)
 
-### Computing
-The compute phase consists of multiple iterations of synchronized super-steps. The inter-process communication takes place through message passing. 
-
-Each vertex in the graph is assigned an active attribute. Usually a few user-specified seed vertices will start-off activated. As the algorithm proceeds, other vertices are acitvated and deactivated. When all vertices in the graph are in the deactivated state, the algorithm terminates. 
-
-The super-steps often include:
-- Message Processing: Process the messages received in the previous iteration.
-- Vertex Visits: The input vertex visitor function is applied on all local active vertices.
-- Message Passing: The messages generated during the vertex visits are dispatched to their destination worker processes.
-
-All processes must finish the current iteration before the next iteration can start. This synchronization is required to ensure the correctness of algorithms.
-
-### Consolidation
-The distributed results are then gathered back onto the main process and a result is generated.
-
-
-## Example Usage:
-`examples/bsp.jl` contains a basic breadth first search demonstration for datasets of varying sizes.
+# Connected Components
+g = rand_graph(100000, 0.00003)
+@time distvector, parentvector = connected_components(g)
+```
 
