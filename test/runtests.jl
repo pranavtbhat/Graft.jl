@@ -13,3 +13,4 @@ include("message-passing.jl")
 include("compute.jl")
 
     include("algorithms/connected-components.jl")
+    include("algorithms/bfs.jl")

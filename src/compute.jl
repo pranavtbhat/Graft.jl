@@ -46,9 +46,7 @@ function bsp(visitor::Function, vlist::Vector, gstruct::GraphStruct, data...)
         # Compute the number of active vertices and stop execution if there exist none
         active_list = filter(x->isa(x, NumActive), messages)
         num_active = mapreduce(get_num_active, +, 0, active_list)
-        println("Num_Active-> ", num_active)
         num_active == 0 && break
-
     end
     gather(Context(), dvlist)
 end

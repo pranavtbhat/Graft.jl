@@ -46,7 +46,11 @@ end
 
 """BFS visitor. The vertex is not processed if it has already been visited."""
 function bfs_visitor(v, adj, mint, mq, data...)
-    get_parent(v) >= 0 && return v
+    # If vertex has already been visited before, simply deactivate.
+    if get_parent(v) >= 0
+        deactivate!(v)
+        return v
+    end
 
     # Check if the vertex is an unexplored seed:
     if get_dist(v) == 0
@@ -71,7 +75,7 @@ function bfs_visitor(v, adj, mint, mq, data...)
             deactivate!(v)
         end
     end
-    
+
     v
 end
 
@@ -80,10 +84,11 @@ end
 BFS Function. Returns (dists, parents).
 """
 function bfs(gstruct::GraphStruct, seeds::Vector{Int} = [1])
-    vlist = [BFSVertex(i, true, -1, -1) for i in 1:size(gstruct)[1]]
+    vlist = [BFSVertex(i, false, -1, -1) for i in 1:size(gstruct)[1]]
 
     # Initialize all seed vertices
     for seed in seeds
+        activate!(vlist[seed])
         set_dist!(vlist[seed], 0)
     end
 
