@@ -1,31 +1,30 @@
 import Base.show
 
-function show(io::IO, x::MessageAggregate)
-    write(io, "[")
-    for msg in x.mset
-        show(io, msg)
-        write(io,", ")
+function show(io::IO, x::BlankMessage)
+    write(io, "B$(get_source(x))->$(get_dest(x))")
+end
+
+function show(io::IO, x::MessageQueue)
+    write(io, "MQ[")
+    for m in x
+        show(io, m)
+        write(io, ", ")
     end
     write(io, "]")
 end
 
-function show(io::IO, x::AbstractArray{MessageAggregate, 1})
-    write(io,"[")
-    for ma in x
-        show(io, ma)
-    end
-    write(io,"]")
-end
-
-function show(io::IO, x::AbstractArray{MessageAggregate, 2})
-    for i in 1:size(x)[2]
-        show(io, x[:,i])
-    end
-end
-
-function show(io::IO, x::ActivateMessage)
-    write(io, "a")
-    show(io, x.target)
-    write(io, "by")
-    show(io, x.data)
-end
+# function show(io::IO, x::MessageQueueList)
+#     write(io, "MQL[")
+#     for mq in x
+#         show(io, mq)
+#         write(", ")
+#     end
+#     write(io, "]")
+# end
+#
+# function show(io::IO, x::MessageQueueGrid)
+#     for mql in x
+#         show(io, mql)
+#         write("\n")
+#     end
+# end

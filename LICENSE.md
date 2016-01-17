@@ -1,4 +1,4 @@
-The BSP.jl package is licensed under the MIT "Expat" License:
+The ParallelGraphs.jl package is licensed under the MIT "Expat" License:
 
 > Copyright (c) 2015: Pranav.
 >

@@ -1,98 +1,97 @@
-function getRemoteRef(node, wid)
-    node.refs[wid-1][2]
-end
+import ComputeFramework.domain
 
-function compute(ctx, node::BSPNode)
-    n, = size(node.graph)
-    n_workers = length(workers())
+"""Allow Bcast distribution of Functions"""
+domain(::Function) = 1
 
-    ### Partition vertices(based on index_splits in layout.jl)
-    vrange = getRanges(n, n_workers)
-    dvrange = compute(ctx, distribute(vrange))
+"""Allow Bcast distribution of MessageInterface"""
+domain(::ParallelGraphs.MessageInterface) = 1
 
-    ### Distribute graph and auxillaries ###
-    dgraph = compute(ctx, distribute(node.graph))
+"""
+Bulk Synchronous Parallel processing. Executes synchronized iterations of the
+input function. This function requires the following arguments:
+- ctx: ComputeFramework context indicating worker processes.
+- vlist: A list of vertices.
+- gstruct: A graph structure of type GraphStruct.
+- data: Auxiliary data required for some algorithms. Can be left empty.
+"""
+function bsp(visitor::Function, vlist::Vector, gstruct::GraphStruct, data...)
+    visitors = compute(Context(), distribute(visitor, Bcast()))
+    dvlist = compute(Context(), distribute(vlist))
+    dgstruct = compute(Context(), distribute(gstruct))
 
-    active = falses(n)
-    active[node.seed] = true
-    dactive = compute(ctx, distribute(active))
+    meta = reduce(vcat, UnitRange{Int}[], metadata(dvlist))
+    mint = message_interface(meta)
 
-    ### Load dists, change to general data later
-    dists = fill!(zeros(Int,n), -1)
-    dists[node.seed] = 0
-    ddists = compute(ctx, distribute(dists))
 
-    # load and distribute message grid
-    # the i,jth element represents the aggregation of messages
-    # sent by the ith worker to the jth worker.
-    MQ = generateMQ(n_workers)
-    dMQ = compute(ctx, distribute(MQ))
-
+    ddata = map(distribute, data)
     while true
-        taskRefs = []
-        # Iterate over workers
-        for wid in workers()
-            # Fetch RemoteRefs of distributed data
-            lvrange = getRemoteRef(dvrange, wid)
-            lactive = getRemoteRef(dactive, wid)
-            lgraph = getRemoteRef(dgraph, wid)
-            lMQ = getRemoteRef(dMQ, wid)
-            ldists = getRemoteRef(ddists, wid)
+        dmint = compute(Context(), distribute(mint, Bcast()))
+        dvlist = compute(Context(), mappart(bsp_iterate, visitors, dvlist, dgstruct, dmint, ddata...))
 
-            # Run remotecall
-            push!(taskRefs, remotecall(wid, bspIteration, node.f, lvrange,
-                                    lactive, lgraph, lMQ, ldists))
+        # Recover message interface
+        mint = gather(Context(), dmint)
+
+        # Synchronously transmit messages
+        transmit!(mint)
+
+        # Extract main process's message interface
+        messages = receive_messages!(mint)[1]
+
+        # Throw any errors
+        errors = filter(x->isa(x, ErrorMessage), messages)
+        if !isempty(errors)
+            error("Errors on worker processes:\n $(join(map(x->join([get_vertex(x),get_error(x)]," "), errors), "\n"))")
         end
 
-        # Exit if 0 vertices are active
-        num_active = mapreduce(fetch, +, 0, taskRefs)
+        # Compute the number of active vertices and stop execution if there exist none
+        active_list = filter(x->isa(x, NumActive), messages)
+        num_active = mapreduce(get_num_active, +, 0, active_list)
         num_active == 0 && break
-
-        # Compute Transpose of MQ to move messages around
-        dMQ = compute(ctx, distribute(gather(ctx, transpose(dMQ))))
     end
-    gather(ctx, ddists)
+    gather(Context(), dvlist)
 end
 
-### Function to run a single iteration ###
-function bspIteration(visitorFunction, lvrange, lactive, lgraph, lMQ, ldists)
-    # Load readonly inputs
-    vrange = fetch(lvrange)[1]
-    graph = fetch(lgraph)
+"""
+A series of super-steps. Sorts out incoming messages and runs
+the visitor function on each active vertex. This function requires the following arguments:
+- visitor: The vertex visitor function.
+- mint: MessageInterface required for message passing.
+- vlist: List of local vertices
+- data: Auxiliary data required for some algorithms. Can be empty.
+"""
+function bsp_iterate(visitor::Function, vlist::Vector, gstruct,  mint::MessageInterface, data...)
+    messages = receive_messages!(mint)
 
-    # consume writeable inputs
-    active = take!(lactive)
-    MQ = take!(lMQ)
-    dists = take!(ldists)
+    # Wake up inactive vertices with incoming messages.
+    for iter in eachindex(vlist, messages)
+        v = vlist[iter]
+        mq = messages[iter]
+        !isempty(mq) && activate!(v)
+    end
 
-    n, = size(graph)
+    # Count the number of active vertices
+    num_active = mapreduce(is_active, +, 0, vlist)
+    # Send the number of active vertices to the main process
+    send_message!(mint, NumActive(num_active))
 
-    # Process incoming messages
-    for source in workers()
-        for message::Message in getMessages(MQ[source-1])
-            i = getLocalIndex(vrange, message.target)
-            if dists[i] < 0
-                active[i] = true
-                dists[i] = message.data
-            end
+    # Process active vertices
+    for iter in eachindex(vlist)
+        v = vlist[iter]
+        !is_active(v) && continue
+
+        # Prepare data
+        adj = get_adj(gstruct, iter)
+        mq = messages[iter]
+        vdata = map(x->x[iter], data)
+
+        # Execute the visitor function on the vertex. Catch all errors possible
+        vlist[iter] = try
+            visitor(v, adj, mint, mq, vdata...)
+        catch e
+            send_message!(mint, ErrorMessage(e, vlist[iter]))
+            vlist[iter]
         end
-        empty!(MQ[source-1])
     end
 
-    # Store number of active vertices at the beginning of compute phase
-    num_active = length(find(active))
-    # Compute phase
-    for i in find(active)
-        visitorFunction(i, vrange, active, graph, MQ, dists)
-        active[i] = false
-    end
-
-    # write outputs to remote references
-    put!(lactive, active)
-    put!(lMQ, MQ)
-    put!(ldists, dists)
-
-    # return the number of active vertices at the beginning of compute phase
-    num_active
-
+    vlist
 end
