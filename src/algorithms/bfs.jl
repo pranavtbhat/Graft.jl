@@ -1,62 +1,93 @@
-"""BFS Auxiliary structure. Contains the vertex status, distance from seed and parent."""
-type BFSAux <: AuxStruct
-    active::BitArray
-    dists::Vector
-    parents::Vector
-end
-getlayout(::BFSAux) = typelayout(BFSAux, [Bcast(), cutdim(1), cutdim(1), cutdim(1)])
-distribute(x::BFSAux) = distribute(x, getlayout(x))
+export bfs
 
-"""
-BFS DiscoverVertex message. Sent by an already explored vertex to all vertices adjacent
-to it.
-"""
-type DiscoverVertex <: Message
-    source::Int
-    dest::Int
+"""Vertex subtype for Breadth First Search"""
+type BFSVertex <: Vertex
+    label
+    active::Bool
     dist::Int
+    parent
 end
-source(x::DiscoverVertex) = x.source
-dest(x::DiscoverVertex) = x.dest
-data(x::DiscoverVertex) = x.dist
 
+"""Fetch a vertex's distance from seed"""
+get_dist(x::BFSVertex) = x.dist
 
-"""
-BFS visitor. If vertex is not processed if it has already been visited.
-When a vertex receives its first discover message, it marks itself visited and explores its
-neighbors.
-"""
-function bfs_visitor{S}(i::Int, graph::DistGraph{S}, aux::BFSAux, messages::MessageQueueList)
-    ## If vertex has been visited already, skip processing. (BFS specific behavior).
-    aux.dists[i] >= 0 && return
-    ## Get the vertex id
-    u = vertices(graph)
+"""Fetch a vertex's parent in the BFS tree"""
+get_parent(x::BFSVertex) = x.parent
 
-    ## Process messages
-    for m in messages
-        if isa(m, DiscoverVertex)
-            ## Update vertex information.
-            aux.dists[i] = data(m)
-            aux.parents[i] = source(m)
+"""Set a vertex's distance from the seed"""
+function set_dist!(x::BFSVertex, dist::Int)
+    x.dist = dist
+end
 
-            ## Explore neighbors
-            for v in find(adj(graph)[:,i])
-                send_message(DiscoverVertex(u, v, aux.dists[i]+1))
-            end
+"""Set a vertex's parent in the BFS tree"""
+function set_parent!(x::BFSVertex, parent)
+    x.parent = parent
+end
 
-            ## Deactivate self
-            aux.active[i] = false
+"""Message sent by an already explored vertex to all vertices adjacent to it."""
+immutable DiscoverMessage <: Message
+    source                 # Source Vertex!
+    dest::Int                   # Destination Vertex
+    dist::Int                   # Distance from seed.
+end
 
-            ## Exit. A single deactivate message is enough to stop processing.
-            return nothing
+"""Retrieve the source vertex from a DiscoverMessage"""
+get_source(x::DiscoverMessage) = x.source
+
+"""Retrieve the distance from a DiscoverMessage"""
+get_dist(x::DiscoverMessage) = x.dist
+
+"""Broadcast distance to all neighbors"""
+function bfs_broadcast(v, adj, mint, distmx=nothing)
+    for nbor in adj
+        send_message!(mint, DiscoverMessage(get_label(v), nbor, get_dist(v)+1))
+    end
+end
+
+"""BFS visitor. The vertex is not processed if it has already been visited."""
+function bfs_visitor(v, adj, mint, mq, data...)
+    get_parent(v) >= 0 && return v
+
+    # Check if the vertex is an unexplored seed:
+    if get_dist(v) == 0
+        # set parent to 0
+        set_parent!(v, 0)
+        # broadcast dist to neighbors
+        bfs_broadcast(v, adj, mint)
+        deactivate!(v)
+    else
+        # Non seed vertex. Check if there are incoming messages and deactivate.
+        if !isempty(mq)
+            # If there are messages, find the closest source.
+            min_dist, pos = findmin(map(get_dist,mq))
+            src = get_source(mq[pos])
+            set_dist!(v, min_dist)
+            set_parent!(v, src)
+
+            # Broadcast new dist
+            bfs_broadcast(v, adj, mint)
+
+            # Deactivate
+            deactivate!(v)
         end
     end
-    nothing
+    
+    v
 end
 
 
 """
 BFS Function. Returns (dists, parents).
 """
-function bfs{S}(graph::DistGraph{S}, seed::Int = 1)
+function bfs(gstruct::GraphStruct, seeds::Vector{Int} = [1])
+    vlist = [BFSVertex(i, true, -1, -1) for i in 1:size(gstruct)[1]]
+
+    # Initialize all seed vertices
+    for seed in seeds
+        set_dist!(vlist[seed], 0)
+    end
+
+    vlist = bsp(bfs_visitor, vlist, gstruct).xs
+    vlist = reduce(vcat, [], vlist)
+    (map(get_dist, vlist), map(get_parent,vlist))
 end

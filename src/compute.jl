@@ -46,6 +46,7 @@ function bsp(visitor::Function, vlist::Vector, gstruct::GraphStruct, data...)
         # Compute the number of active vertices and stop execution if there exist none
         active_list = filter(x->isa(x, NumActive), messages)
         num_active = mapreduce(get_num_active, +, 0, active_list)
+        println("Num_Active-> ", num_active)
         num_active == 0 && break
 
     end
@@ -62,26 +63,37 @@ the visitor function on each active vertex. This function requires the following
 """
 function bsp_iterate(visitor::Function, vlist::Vector, gstruct,  mint::MessageInterface, data...)
     messages = receive_messages!(mint)
+
+    # Wake up inactive vertices with incoming messages.
+    for iter in eachindex(vlist, messages)
+        v = vlist[iter]
+        mq = messages[iter]
+        !isempty(mq) && activate!(v)
+    end
+
+    # Count the number of active vertices
+    num_active = mapreduce(is_active, +, 0, vlist)
+    # Send the number of active vertices to the main process
+    send_message!(mint, NumActive(num_active))
+
+    # Process active vertices
     for iter in eachindex(vlist)
         v = vlist[iter]
+        !is_active(v) && continue
+
+        # Prepare data
         adj = get_adj(gstruct, iter)
         mq = messages[iter]
+        vdata = map(x->x[iter], data)
 
-        # Skip vertex if its inactive and has no messages addressed to it.
-        !is_active(v) && isempty(mq) && continue
-
-        # Execute the visitor function on the vertex.
+        # Execute the visitor function on the vertex. Catch all errors possible
         vlist[iter] = try
-            visitor(v, adj, mint, mq, map(x->x[iter], data)...)
+            visitor(v, adj, mint, mq, vdata...)
         catch e
             send_message!(mint, ErrorMessage(e, vlist[iter]))
             vlist[iter]
         end
     end
-    # Count the number of active vertices
-    num_active = mapreduce(is_active, +, 0, vlist)
-    # Send the number of active vertices to the main process
-    send_message!(mint, NumActive(num_active))
 
     vlist
 end
