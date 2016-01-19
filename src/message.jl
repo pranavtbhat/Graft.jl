@@ -14,8 +14,8 @@ get_source(x::Message) = x.source
 """Get the messages's destination"""
 get_dest(x::Message) = x.dest
 
-"""A queue for subtypes of Message"""
-typealias MessageQueue Array{Message, 1}
+"""A group of messages"""
+typealias MessageAggregate Array{Message, 1}
 
 ###
 # Basic Message Definitions

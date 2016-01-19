@@ -1,3 +1,3 @@
 # Type compatibility test
-mq = ParallelGraphs.MessageQueue()
+mq = ParallelGraphs.MessageAggregate()
 push!(mq, ParallelGraphs.BlankMessage(1))

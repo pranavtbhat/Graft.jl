@@ -4,7 +4,7 @@ function show(io::IO, x::BlankMessage)
     write(io, "B$(get_source(x))->$(get_dest(x))")
 end
 
-function show(io::IO, x::MessageQueue)
+function show(io::IO, x::MessageAggregate)
     write(io, "MQ[")
     for m in x
         show(io, m)
@@ -13,7 +13,7 @@ function show(io::IO, x::MessageQueue)
     write(io, "]")
 end
 
-# function show(io::IO, x::MessageQueueList)
+# function show(io::IO, x::MessageAggregateList)
 #     write(io, "MQL[")
 #     for mq in x
 #         show(io, mq)
@@ -22,7 +22,7 @@ end
 #     write(io, "]")
 # end
 #
-# function show(io::IO, x::MessageQueueGrid)
+# function show(io::IO, x::MessageAggregateGrid)
 #     for mql in x
 #         show(io, mql)
 #         write("\n")

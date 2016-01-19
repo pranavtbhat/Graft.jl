@@ -87,7 +87,7 @@ vertex.
 """
 function receive_messages!(mint::MessageInterface, w::Int=myid())
     vrange = get_local_vertices(mint::MessageInterface, w)
-    vmq = [MessageQueue() for i in vrange]
+    vmq = [MessageAggregate() for i in vrange]
     for mbox in get_in_mboxes(mint, w)
         while isready(mbox)
             m = take!(mbox)
