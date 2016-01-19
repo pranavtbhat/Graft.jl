@@ -4,7 +4,8 @@ typealias MessageBox RemoteChannel{Channel{Message}}
 """
 An interface for passing messages between ALL processes including the main process.
 """
-type MessageInterface
+immutable MessageInterface
+    count                                   # Count the number of messages sent.
     mgrid::Array{MessageBox,2}              # Distrbitued Message Grid.
     metadata::Vector{UnitRange{Int}}        # Vertex distribution metadata.
     barrier::Vector{RemoteChannel{Channel{Bool}}} # Synchronization barrier
@@ -37,7 +38,8 @@ process.
 function message_interface(metadata::Vector)
     mgrid = get_mgrid()
     unshift!(metadata, 0:0)
-    MessageInterface(mgrid, Vector{UnitRange{Int}}(metadata), get_barrier())
+    count = RemoteChannel(()->Channel{Int}(typemax(Int)), 1)
+    MessageInterface(count, mgrid, Vector{UnitRange{Int}}(metadata), get_barrier())
 end
 
 ###
@@ -73,6 +75,7 @@ end
 ###
 """ Send a message to the target vertex """
 function send_message!(mint::MessageInterface, m::Message, w=myid())
+    put!(mint.count, 1)
     target_proc = get_parent(mint, get_dest(m))
     put!(get_out_mbox(mint, w, target_proc), m)
     nothing

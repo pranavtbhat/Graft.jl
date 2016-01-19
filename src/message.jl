@@ -21,14 +21,14 @@ typealias MessageQueue Array{Message, 1}
 # Basic Message Definitions
 ###
 """Blank Message type for testing"""
-type BlankMessage <: Message
+immutable BlankMessage <: Message
     source::Int
     dest::Int
 end
 BlankMessage(dest::Int) = BlankMessage(myid(), dest)
 
 """Message informing the master about the number of active vertices"""
-type NumActive <:Message
+immutable NumActive <:Message
     source::Int
     dest::Int
     num_active::Int
@@ -39,7 +39,7 @@ NumActive(num_active::Int) = NumActive(myid(), 0, num_active)
 get_num_active(x::NumActive) = x.num_active
 
 """Error message containing an exception from a worker process"""
-type ErrorMessage <: Message
+immutable ErrorMessage <: Message
     source::Int
     dest::Int
     err::Exception
