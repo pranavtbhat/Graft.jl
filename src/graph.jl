@@ -34,7 +34,7 @@ the AdjacencyMatrix representation is:
 The AdjacencyMatrix representation has fast lookup but slower iteration. The type
 also permits Sparse Matrices.
 """
-typealias AdjacencyMatrix Union{AbstractArray{Bool, 2}, SparseMatrixCSC{Bool,Int}}
+typealias AdjacencyMatrix Union{AbstractArray{Bool, 2}}
 
 """
 Permitted graph data structures:
@@ -48,6 +48,7 @@ typealias GraphStruct Union{AdjacencyList, AdjacencyMatrix}
 ###
 
 """Fetch a vertex's neighbors"""
+get_adj(x::SparseMatrixCSC, v::Int) = x[:,v].nzind
 get_adj(x::AdjacencyList, v::Int) = x[v]
 get_adj(x::AdjacencyMatrix, v::Int) = find(x[:,v])
 

@@ -14,18 +14,17 @@ metadata = UnitRange{Int}[1:50, 50:100]
 mint = ParallelGraphs.message_interface(metadata)
 @test typeof(mint) == ParallelGraphs.MessageInterface
 
-@test length(mint.dmgrid.refs) == num_procs
 @test ParallelGraphs.get_parent(mint, test_vertex) == test_vertex_parent
 @test ParallelGraphs.get_local_vertices(mint) == local_range
 
 @test ParallelGraphs.send_message!(mint, m) == nothing
-mlist = ParallelGraphs.get_message_queue_list!(mint)
-@test typeof(mlist) == ParallelGraphs.MessageQueueGrid
-@test length(mlist[target_proc]) == 1
-@test ParallelGraphs.set_message_queue_list!(mint, mlist) == nothing
+mbox = ParallelGraphs.get_out_mbox(mint, 1, target_proc)
+@test typeof(mbox) == ParallelGraphs.MessageBox
+@test isa(fetch(mbox), ParallelGraphs.Message)
 
-@test ParallelGraphs.transmit!(mint) == nothing
-@test length(mint.dmgrid.refs) == num_procs
+inbox = ParallelGraphs.get_in_mboxes(mint, target_proc)
+@test length(inbox) == num_procs
+@test isa(fetch(inbox[1]), ParallelGraphs.Message)
 
 messages = ParallelGraphs.receive_messages!(mint, target_proc)
 @test length(messages) == length(ParallelGraphs.get_local_vertices(mint, target_proc))

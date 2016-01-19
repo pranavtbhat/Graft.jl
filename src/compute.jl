@@ -28,15 +28,14 @@ function bsp(visitor::Function, vlist::Vector, gstruct::GraphStruct, data...)
         dmint = compute(Context(), distribute(mint, Bcast()))
         dvlist = compute(Context(), mappart(bsp_iterate, visitors, dvlist, dgstruct, dmint, ddata...))
 
+        # Wait for all workers to finish
+        barrier_wait(mint)
+        
         # Recover message interface
         mint = gather(Context(), dmint)
 
-        # Synchronously transmit messages
-        transmit!(mint)
-
         # Extract main process's message interface
         messages = receive_messages!(mint)[1]
-
         # Throw any errors
         errors = filter(x->isa(x, ErrorMessage), messages)
         if !isempty(errors)
@@ -73,7 +72,6 @@ function bsp_iterate(visitor::Function, vlist::Vector, gstruct,  mint::MessageIn
     num_active = mapreduce(is_active, +, 0, vlist)
     # Send the number of active vertices to the main process
     send_message!(mint, NumActive(num_active))
-
     # Process active vertices
     for iter in eachindex(vlist)
         v = vlist[iter]
@@ -93,5 +91,7 @@ function bsp_iterate(visitor::Function, vlist::Vector, gstruct,  mint::MessageIn
         end
     end
 
+    # Signal end of worker's execution
+    barrier_signal(mint)
     vlist
 end

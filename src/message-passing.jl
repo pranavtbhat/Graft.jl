@@ -1,34 +1,51 @@
+"""A RemoteChannel that functions as a message buffer"""
+typealias MessageBox RemoteChannel{Channel{Message}}
+
 """
 An interface for passing messages between ALL processes including the main process.
-Message Passing has to be separated from the ParallelGraphs implementation to simplify
-the development of algorithms. Therefore the following interface is offered.
-- `message_interface(vertex_metadata)` : Create a message passsing interface.
-- `send_message(mint, targetVertex, message)` : Send a message to a vertex.
-- `transmit(mint)` : Redistribute messages.
-- `receive_messages(mint, w)` : Recieve all messages sent to a worker. Returns a MessageQueueList
 """
 type MessageInterface
-    ctx                  # Context.
-    dmgrid               # Distrbitued Message Grid.
-    metadata             # Vertex distribution metadata.
+    mgrid::Array{MessageBox,2}              # Distrbitued Message Grid.
+    metadata::Vector{UnitRange{Int}}        # Vertex distribution metadata.
+    barrier::Vector{RemoteChannel{Channel{Bool}}} # Synchronization barrier
 end
 
-"""Generate a matrix of MessageQueues and distribute it."""
-function get_dmgrid(ctx)
-    lp = length(procs())
-    compute(ctx, distribute(generate_mgrid(lp), cutdim(2)))
+###
+# CONSTRUCTORS
+##
+"""
+Generate a matrix of MessageBoxes.The [i,j]th MessageBox is a buffer
+for messages from process i to process j. The jth column therefore stores all messages
+directed to a process.
+"""
+function get_mgrid(;proc_list=procs(), buf_size=typemax(Int))
+    hcat(map(pid->MessageBox[RemoteChannel(()->Channel{Message}(buf_size), pid) for i in proc_list], proc_list)...)
+end
+
+"""
+Generate a vector of RemoteChannels. When the (i-1)th channel is *ready*, it indicates
+that the ith worker has finished an iteration.
+"""
+function get_barrier(proclist=workers())
+    map(pid->RemoteChannel(()->Channel{Bool}(1), pid), proclist)
 end
 
 """
 Initialize the message passing interface. Should be called only from the main
 process.
 """
-function message_interface(metadata)
-    @assert myid() == 1
-    ctx = Context(procs())
-    dmgrid = get_dmgrid(ctx)
-    unshift!(metadata, 0:0)                                   # main proc is assigned no vertices.
-    MessageInterface(ctx, dmgrid, metadata)
+function message_interface(metadata::Vector)
+    mgrid = get_mgrid()
+    unshift!(metadata, 0:0)
+    MessageInterface(mgrid, Vector{UnitRange{Int}}(metadata), get_barrier())
+end
+
+###
+# ACCESSOR METHODS
+###
+"""Get a worker's lock"""
+function get_lock(mint::MessageInterface, w::Int=myid())
+    mint.barrier[w-1]
 end
 
 """Get the process to which the vertex has been assigned"""
@@ -41,31 +58,23 @@ function get_local_vertices(mint::MessageInterface, w::Int=myid())
     mint.metadata[w]
 end
 
-"""Get a process's message list."""
-function get_message_queue_list!(mint::MessageInterface, w::Int=myid())
-    take!(mint.dmgrid.refs[w][2])
+"""Get the MessageBox for a given source and destination"""
+function get_out_mbox(mint::MessageInterface, src::Int, dest::Int)
+    mint.mgrid[src,dest]
 end
 
-"""Set a process's message list"""
-function set_message_queue_list!(mint::MessageInterface, mlist::MessageQueueGrid, w::Int = myid())
-    put!(mint.dmgrid.refs[w][2], mlist)
-    nothing
+"""Get the list of message boxes containing incoming messages for a process"""
+function get_in_mboxes(mint::MessageInterface, dest::Int)
+    mint.mgrid[:,dest]
 end
 
+###
+# MESSAGING FUNCTIONS
+###
 """ Send a message to the target vertex """
 function send_message!(mint::MessageInterface, m::Message, w=myid())
-    mlist = get_message_queue_list!(mint, w)
     target_proc = get_parent(mint, get_dest(m))
-    typeof(m) == NumActive && target_proc !=1 && println("Illegal message: to $(target_proc)", m)
-    push!(mlist[target_proc], m)
-    set_message_queue_list!(mint, mlist, w)
-    nothing
-end
-
-""" Redistribute messages. (Should be called only in the main process)"""
-function transmit!(mint::MessageInterface)
-    new_layout = mint.dmgrid.layout == cutdim(2)? cutdim(1) : cutdim(2)
-    mint.dmgrid = compute(mint.ctx, redistribute(mint.dmgrid, new_layout))
+    put!(get_out_mbox(mint, w, target_proc), m)
     nothing
 end
 
@@ -75,15 +84,27 @@ vertex.
 """
 function receive_messages!(mint::MessageInterface, w::Int=myid())
     vrange = get_local_vertices(mint::MessageInterface, w)
-    vmq = generate_mlist(length(vrange))
-    mlist = get_message_queue_list!(mint, w)
-    for mq in mlist
-        for m::Message in mq
+    vmq = [MessageQueue() for i in vrange]
+    for mbox in get_in_mboxes(mint, w)
+        while isready(mbox)
+            m = take!(mbox)
             push!(vmq[get_dest(m)-start(vrange)+1], m)
         end
-        empty!(mq)
     end
-    # set the empty mlist
-    set_message_queue_list!(mint, mlist, w)
     vmq
+end
+
+###
+# SYNCHRONIZATION
+###
+"""Signal the end of a workers execution"""
+function barrier_signal(mint::MessageInterface, w::Int=myid())
+    put!(get_lock(mint,w), true)
+end
+
+"""Wait for all workers to signal (should be called on the main proc only)"""
+function barrier_wait(mint::MessageInterface)
+    for w in workers()
+        take!(get_lock(mint, w))
+    end
 end

@@ -17,30 +17,6 @@ get_dest(x::Message) = x.dest
 """A queue for subtypes of Message"""
 typealias MessageQueue Array{Message, 1}
 
-"""A vector of Message Queues"""
-typealias MessageQueueList Array{MessageQueue, 1}
-
-"""A matrix of Message Queues"""
-typealias MessageQueueGrid Array{MessageQueue, 2}
-
-"""Generates a vector of MessageQueues"""
-function generate_mlist(n::Int)
-    mlist = Array{MessageQueue, 1}(n)
-    for iter in eachindex(mlist)
-        mlist[iter] = MessageQueue()
-    end
-    mlist
-end
-
-"""Generates a two dimensional matrix of MessageQueues."""
-function generate_mgrid(n::Int,m::Int=n)
-    mgrid = Array{MessageQueue, 2}(n,m)
-    for iter in eachindex(mgrid)
-        mgrid[iter] = MessageQueue()
-    end
-    mgrid
-end
-
 ###
 # Basic Message Definitions
 ###
