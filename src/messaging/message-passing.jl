@@ -1,5 +1,5 @@
 """A RemoteChannel that functions as a message buffer"""
-typealias MessageBox RemoteChannel{Channel{Message}}
+typealias MessageBox RemoteChannel{Channel{MessageAggregate}}
 
 """
 An interface for passing messages between ALL processes including the main process.
@@ -8,6 +8,7 @@ immutable MessageInterface
     count                                   # Count the number of messages sent.
     mgrid::Array{MessageBox,2}              # Distrbitued Message Grid.
     metadata::Vector{UnitRange{Int}}        # Vertex distribution metadata.
+    cache::Array{MessageAggregate, 2}       # Cache to accumulate messages.
     barrier::Vector{RemoteChannel{Channel{Bool}}} # Synchronization barrier
 end
 
@@ -20,7 +21,7 @@ for messages from process i to process j. The jth column therefore stores all me
 directed to a process.
 """
 function get_mgrid(;proc_list=procs(), buf_size=typemax(Int))
-    hcat(map(pid->MessageBox[RemoteChannel(()->Channel{Message}(buf_size), pid) for i in proc_list], proc_list)...)
+    hcat(map(pid->MessageBox[RemoteChannel(()->Channel{MessageAggregate}(buf_size), pid) for i in proc_list], proc_list)...)
 end
 
 """
@@ -32,6 +33,15 @@ function get_barrier(proclist=workers())
 end
 
 """
+Generate a vector of MessageAggregates. Each process recieves a cache containing
+MessageAggregates for each process. Outgoing messages are placed in the appropriate
+cache before being dispatched in bulk.
+"""
+function get_cache(proclist=procs())
+    hcat(map(x->[MessageAggregate() for p in proclist], procs())...)
+end
+
+"""
 Initialize the message passing interface. Should be called only from the main
 process.
 """
@@ -39,7 +49,7 @@ function message_interface(metadata::Vector)
     mgrid = get_mgrid()
     unshift!(metadata, 0:0)
     count = RemoteChannel(()->Channel{Int}(typemax(Int)), 1)
-    MessageInterface(count, mgrid, Vector{UnitRange{Int}}(metadata), get_barrier())
+    MessageInterface(count, mgrid, Vector{UnitRange{Int}}(metadata), get_cache(), get_barrier())
 end
 
 ###
@@ -60,26 +70,30 @@ function get_local_vertices(mint::MessageInterface, w::Int=myid())
     mint.metadata[w]
 end
 
-"""Get the MessageBox for a given source and destination"""
-function get_out_mbox(mint::MessageInterface, src::Int, dest::Int)
-    mint.mgrid[src,dest]
-end
-
-"""Get the list of message boxes containing incoming messages for a process"""
-function get_in_mboxes(mint::MessageInterface, dest::Int)
-    mint.mgrid[:,dest]
-end
-
 ###
 # MESSAGING FUNCTIONS
 ###
-""" Send a message to the target vertex """
+""" Place a message in cache. Should be called in the transmitting process."""
 function send_message!(mint::MessageInterface, m::Message, w=myid())
     put!(mint.count, 1)
     target_proc = get_parent(mint, get_dest(m))
-    put!(get_out_mbox(mint, w, target_proc), m)
+    ma::MessageAggregate = mint.cache[w,target_proc]
+    push!(ma, m)
     nothing
 end
+
+"""
+Compress contents of cache with user defined function and transfer to
+remote channels.
+"""
+function transmit!(mint, w=myid())
+    for target_proc in procs()
+        put!(mint.mgrid[w, target_proc], copy(mint.cache[w, target_proc]))
+        empty!(mint.cache[w, target_proc])
+    end
+    nothing
+end
+
 
 """
 Receive all messages sent to process. Divides the messages based on the destination
@@ -88,10 +102,13 @@ vertex.
 function receive_messages!(mint::MessageInterface, w::Int=myid())
     vrange = get_local_vertices(mint::MessageInterface, w)
     vmq = [MessageAggregate() for i in vrange]
-    for mbox in get_in_mboxes(mint, w)
+    for mbox in mint.mgrid[:,w]
         while isready(mbox)
-            m = take!(mbox)
-            push!(vmq[get_dest(m)-start(vrange)+1], m)
+            ma::MessageAggregate = take!(mbox)
+            for m::Message in ma
+                target_vertex = get_dest(m)-start(vrange)+1
+                push!(vmq[target_vertex], m)
+            end
         end
     end
     vmq

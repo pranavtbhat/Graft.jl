@@ -18,13 +18,19 @@ mint = ParallelGraphs.message_interface(metadata)
 @test ParallelGraphs.get_local_vertices(mint) == local_range
 
 @test ParallelGraphs.send_message!(mint, m) == nothing
-mbox = ParallelGraphs.get_out_mbox(mint, 1, target_proc)
-@test typeof(mbox) == ParallelGraphs.MessageBox
-@test isa(fetch(mbox), ParallelGraphs.Message)
+@test ParallelGraphs.transmit!(mint) == nothing
 
-inbox = ParallelGraphs.get_in_mboxes(mint, target_proc)
+mbox = mint.mgrid[1,target_proc]
+@test typeof(mbox) == ParallelGraphs.MessageBox
+ma = fetch(mbox)
+@test isa(ma, ParallelGraphs.MessageAggregate)
+@test length(ma) == 1
+
+inbox = mint.mgrid[:,target_proc]
 @test length(inbox) == num_procs
-@test isa(fetch(inbox[1]), ParallelGraphs.Message)
+ma = fetch(inbox[1])
+@test isa(ma, ParallelGraphs.MessageAggregate)
+@test length(ma) == 1
 
 messages = ParallelGraphs.receive_messages!(mint, target_proc)
 @test length(messages) == length(ParallelGraphs.get_local_vertices(mint, target_proc))

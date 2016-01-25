@@ -104,6 +104,9 @@ function bsp_iterate(visitor::Function, vlist::Vector, gstruct,  mint::MessageIn
         end
     end
 
+    # Transmit cached messages
+    transmit!(mint)
+    
     # Signal end of worker's execution
     barrier_signal(mint)
     vlist
