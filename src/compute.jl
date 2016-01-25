@@ -16,6 +16,7 @@ input function. This function requires the following arguments:
 """
 function bsp(visitor::Function, vlist::Vector, gstruct::GraphStruct, data...)
     # Distributions
+    println("Distributing data among workers:")
     @time begin
         visitors = compute(Context(), distribute(visitor, Bcast()))
         dvlist = compute(Context(), distribute(vlist))
@@ -28,7 +29,7 @@ function bsp(visitor::Function, vlist::Vector, gstruct::GraphStruct, data...)
         dmint = compute(Context(), distribute(mint, Bcast()))
     end
 
-    println()
+    println("Running Iterations")
     @time while true
         dvlist = compute(Context(), mappart(bsp_iterate, visitors, dvlist, dgstruct, dmint, ddata...))
 
@@ -60,7 +61,8 @@ function bsp(visitor::Function, vlist::Vector, gstruct::GraphStruct, data...)
         num_active == 0 && break
     end
 
-    gather(Context(), dvlist)
+    println("Fetching data from workers:")
+    @time gather(Context(), dvlist)
 end
 
 """
