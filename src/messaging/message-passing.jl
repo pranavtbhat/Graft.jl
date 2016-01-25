@@ -75,10 +75,9 @@ end
 ###
 """ Place a message in cache. Should be called in the transmitting process."""
 function send_message!(mint::MessageInterface, m::Message, w=myid())
-    put!(mint.count, 1)
+    # put!(mint.count, 1)
     target_proc = get_parent(mint, get_dest(m))
-    !haskey(mint.cache, target_proc) && (mint.cache[target_proc] = MessageAggregate())
-    push!(mint.cache[target_proc], m)
+    push!(get!(mint.cache, target_proc, MessageAggregate()), m)
     nothing
 end
 

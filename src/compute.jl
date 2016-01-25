@@ -46,13 +46,13 @@ function bsp(visitor::Function, vlist::Vector, gstruct::GraphStruct, data...)
             error("Errors on worker processes:\n $(join(map(x->join([get_vertex(x),get_error(x)]," "), errors), "\n"))")
         end
 
-        count = 0
-        while(isready(mint.count))
-            take!(mint.count)
-            count += 1
-        end
-        println(count)
-        println("\n")
+        # count = 0
+        # while(isready(mint.count))
+        #     take!(mint.count)
+        #     count += 1
+        # end
+        # println(count)
+        # println("\n")
 
         # Compute the number of active vertices and stop execution if there exist none
         active_list = filter(x->isa(x, NumActive), messages)
@@ -106,7 +106,7 @@ function bsp_iterate(visitor::Function, vlist::Vector, gstruct,  mint::MessageIn
 
     # Transmit cached messages
     transmit!(mint)
-    
+
     # Signal end of worker's execution
     barrier_signal(mint)
     vlist
