@@ -15,40 +15,54 @@ input function. This function requires the following arguments:
 - data: Auxiliary data required for some algorithms. Can be left empty.
 """
 function bsp(visitor::Function, vlist::Vector, gstruct::GraphStruct, data...)
-    visitors = compute(Context(), distribute(visitor, Bcast()))
-    dvlist = compute(Context(), distribute(vlist))
-    dgstruct = compute(Context(), distribute(gstruct))
+    # Distributions
+    println("Distributing data among workers:")
+    @time begin
+        visitors = compute(Context(), distribute(visitor, Bcast()))
+        dvlist = compute(Context(), distribute(vlist))
+        dgstruct = compute(Context(), distribute(gstruct))
 
-    meta = reduce(vcat, UnitRange{Int}[], metadata(dvlist))
-    mint = message_interface(meta)
+        meta = reduce(vcat, UnitRange{Int}[], metadata(dvlist))
+        mint = message_interface(meta)
 
-
-    ddata = map(distribute, data)
-    while true
+        ddata = map(distribute, data)
         dmint = compute(Context(), distribute(mint, Bcast()))
+    end
+
+    println("Running Iterations")
+    @time while true
         dvlist = compute(Context(), mappart(bsp_iterate, visitors, dvlist, dgstruct, dmint, ddata...))
 
-        # Recover message interface
-        mint = gather(Context(), dmint)
+        # Wait for all workers to finish
+        @time barrier_wait(mint)
 
-        # Synchronously transmit messages
-        transmit!(mint)
+        # Recover message interface
+        # @time mint = gather(Context(), dmint)
 
         # Extract main process's message interface
         messages = receive_messages!(mint)[1]
-
         # Throw any errors
         errors = filter(x->isa(x, ErrorMessage), messages)
         if !isempty(errors)
             error("Errors on worker processes:\n $(join(map(x->join([get_vertex(x),get_error(x)]," "), errors), "\n"))")
         end
 
+        # count = 0
+        # while(isready(mint.count))
+        #     take!(mint.count)
+        #     count += 1
+        # end
+        # println(count)
+        # println("\n")
+
         # Compute the number of active vertices and stop execution if there exist none
         active_list = filter(x->isa(x, NumActive), messages)
         num_active = mapreduce(get_num_active, +, 0, active_list)
         num_active == 0 && break
     end
-    gather(Context(), dvlist)
+
+    println("Fetching data from workers:")
+    @time gather(Context(), dvlist)
 end
 
 """
@@ -73,7 +87,6 @@ function bsp_iterate(visitor::Function, vlist::Vector, gstruct,  mint::MessageIn
     num_active = mapreduce(is_active, +, 0, vlist)
     # Send the number of active vertices to the main process
     send_message!(mint, NumActive(num_active))
-
     # Process active vertices
     for iter in eachindex(vlist)
         v = vlist[iter]
@@ -93,5 +106,10 @@ function bsp_iterate(visitor::Function, vlist::Vector, gstruct,  mint::MessageIn
         end
     end
 
+    # Transmit cached messages
+    transmit!(mint)
+
+    # Signal end of worker's execution
+    barrier_signal(mint)
     vlist
 end

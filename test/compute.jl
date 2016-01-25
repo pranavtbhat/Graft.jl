@@ -2,7 +2,7 @@
     v::Vertex
     adj::Vector
     mint::MessageInterface
-    mq::MessageQueue
+    mq::MessageAggregate
     data::Tuple
 
     # Randomly deactivate
