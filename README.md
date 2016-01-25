@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/pranavtbhat/ParallelGraphs.jl.svg?branch=master)](https://travis-ci.org/pranavtbhat/ParallelGraphs.jl)
-*NOTE: Only Julia `0.4` is supported as of now.*
+*NOTE: Only Julia `0.5` is supported as of now.*
 
 # ParallelGraphs
 ParallelGraphs.jl is a framework for Massive-Graph Analysis built on [ComputeFramework.jl](https://github.com/shashi/ComputeFramework.jl). ParallelGraphs.jl implements the Bulk Synchronous Parallel Model for running graph algorithms. The framework is under development, and there's probably a long way to go before the first release.
