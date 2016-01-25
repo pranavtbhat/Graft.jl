@@ -8,7 +8,7 @@ immutable MessageInterface
     count                                   # Count the number of messages sent.
     mgrid::Array{MessageBox,2}              # Distrbitued Message Grid.
     metadata::Vector{UnitRange{Int}}        # Vertex distribution metadata.
-    cache::Array{MessageAggregate, 2}       # Cache to accumulate messages.
+    cache::Dict{Int, MessageAggregate}      # Cache to accumulate messages.
     barrier::Vector{RemoteChannel{Channel{Bool}}} # Synchronization barrier
 end
 
@@ -38,7 +38,7 @@ MessageAggregates for each process. Outgoing messages are placed in the appropri
 cache before being dispatched in bulk.
 """
 function get_cache(proclist=procs())
-    hcat(map(x->[MessageAggregate() for p in proclist], procs())...)
+    Dict{Int, MessageAggregate}()
 end
 
 """
@@ -77,8 +77,8 @@ end
 function send_message!(mint::MessageInterface, m::Message, w=myid())
     put!(mint.count, 1)
     target_proc = get_parent(mint, get_dest(m))
-    ma::MessageAggregate = mint.cache[w,target_proc]
-    push!(ma, m)
+    !haskey(mint.cache, target_proc) && (mint.cache[target_proc] = MessageAggregate())
+    push!(mint.cache[target_proc], m)
     nothing
 end
 
@@ -87,10 +87,10 @@ Compress contents of cache with user defined function and transfer to
 remote channels.
 """
 function transmit!(mint, w=myid())
-    for target_proc in procs()
-        put!(mint.mgrid[w, target_proc], copy(mint.cache[w, target_proc]))
-        empty!(mint.cache[w, target_proc])
+    for (target_proc,ma) in mint.cache
+        put!(mint.mgrid[w, target_proc], copy(ma))
     end
+    empty!(mint.cache)
     nothing
 end
 
