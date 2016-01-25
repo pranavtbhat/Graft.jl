@@ -6,8 +6,10 @@ using ComputeFramework
 
 
 include("graph.jl")
-include("message.jl")
-include("message-passing.jl")
+
+    include("messaging/message.jl")
+    include("messaging/message-passing.jl")
+    
 include("show.jl")
 
     include("utilities/generators.jl")

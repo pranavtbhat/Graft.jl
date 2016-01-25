@@ -4,8 +4,9 @@ using Base.Test
 
 # write your own tests here
 include("graph.jl")
-include("message.jl")
-include("message-passing.jl")
+
+    include("messaging/message.jl")
+    include("messaging/message-passing.jl")
 
     include("utilities/generators.jl")
     include("utilities/conversions.jl")
