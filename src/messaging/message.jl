@@ -4,12 +4,12 @@
 ###
 
 """
-Abstract Message type. All subtypes should implement process_message. All implementations
-of the Message type must contain a `source` and a `dest` field.
+Abstract Message type. All implementations of the Message type must contain a
+`dest` field.
 """
 abstract Message
 
-"""Get a messages's source process"""
+"""Get a messages's source process. (Optional)"""
 get_source(x::Message) = x.source
 """Get the messages's destination"""
 get_dest(x::Message) = x.dest

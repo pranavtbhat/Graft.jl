@@ -12,7 +12,7 @@ and edges:
 1 - 3
 the AdjacencyList representation is: [[2,3], [1], [1]]
 
-The adjacency list has slow lookup can be iterated through quickly.
+The adjacency list has slow lookup, but can be iterated through quickly.
 """
 typealias AdjacencyList Array{Array{Int, 1}, 1}
 
@@ -48,7 +48,7 @@ typealias GraphStruct Union{AdjacencyList, AdjacencyMatrix}
 ###
 
 """Fetch a vertex's neighbors"""
-get_adj(x::SparseMatrixCSC, v::Int) = x[:,v].nzind
+get_adj(x::SparseMatrixCSC, v::Int) = x[:,v].nzind # Temporary fix.
 get_adj(x::AdjacencyList, v::Int) = x[v]
 get_adj(x::AdjacencyMatrix, v::Int) = find(x[:,v])
 

@@ -5,7 +5,6 @@ typealias MessageBox RemoteChannel{Channel{MessageAggregate}}
 An interface for passing messages between ALL processes including the main process.
 """
 immutable MessageInterface
-    count                                   # Count the number of messages sent.
     mgrid::Array{MessageBox,2}              # Distrbitued Message Grid.
     metadata::Vector{UnitRange{Int}}        # Vertex distribution metadata.
     cache::Dict{Int, MessageAggregate}      # Cache to accumulate messages.
@@ -48,8 +47,7 @@ process.
 function message_interface(metadata::Vector)
     mgrid = get_mgrid()
     unshift!(metadata, 0:0)
-    count = RemoteChannel(()->Channel{Int}(typemax(Int)), 1)
-    MessageInterface(count, mgrid, Vector{UnitRange{Int}}(metadata), get_cache(), get_barrier())
+    MessageInterface(mgrid, Vector{UnitRange{Int}}(metadata), get_cache(), get_barrier())
 end
 
 ###
