@@ -36,12 +36,16 @@ also permits Sparse Matrices.
 """
 typealias AdjacencyMatrix Union{AbstractArray{Bool, 2}}
 
+"""Null structure to indicate the absence of an adjacency list."""
+type NullStruct
+end
+
 """
 Permitted graph data structures:
 - AdjacencyList
 - AdjacencyMatrix
 """
-typealias GraphStruct Union{AdjacencyList, AdjacencyMatrix}
+typealias GraphStruct Union{AdjacencyList, AdjacencyMatrix, NullStruct}
 
 ###
 # ACCESSORS FOR GRAPH STRUCTURES
