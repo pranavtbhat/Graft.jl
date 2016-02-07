@@ -55,15 +55,29 @@ get_adj(x::SparseMatrixCSC, v::Int) = x[:,v].nzind # Temporary fix.
 get_adj(x::AdjacencyList, v::Int) = x[v]
 get_adj(x::AdjacencyMatrix, v::Int) = find(x[:,v])
 
+
+###
+# VERTEX PROPERY
+###
+"""An Algorithm-dependant extension that adds further detail to a vertex"""
+abstract VertexProperty
+
+"""Type indicating the absence of a property"""
+ immutable NullPropery <: VertexProperty
+ end
+
 ###
 # Vertex Definition
 ###
-"""
-Abstract type representing a vertex/node in a graph. Each subtype should have the following fields:
-- label  : External vertex identifier.
-- active : A Bool indicating whether the vertex is active or not.
-"""
-abstract Vertex
+"""Type representing a vertex/node in a graph."""
+type Vertex{P<:VertexProperty}
+    id::Int                                     # An internal vertex identifier.
+    label::AbstractString                       # External vertex identifier.
+    active::Bool                                # A Bool indicating whether the vertex is active or not.
+    fadjlist::Vector{VertexID}                  # A list of VertexIDs indicating forward adjacencies.
+    badjlist::Vector{VertexID}                  # A list of VertexIDs indicating back adjacencies.
+    property::P                                 # Algorithm-dependant extension.
+end
 
 ###
 # BASIC ACCESSORS FOR VERTEX SUBTYPES.

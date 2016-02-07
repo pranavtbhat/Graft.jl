@@ -2,14 +2,14 @@
 # ABSTRACT MESSAGE TYPE.
 ###
 """
-Abstract Message type. Each message must have a destination vertex and a value.
+Abstract Message type. Each message must have a destination process and a value.
 """
 abstract Message
 
 """Get the messages's destination"""
-get_dest(x::Message) = x.dest
+getdest(x::Message) = x.dest
 """Get the messages's value"""
-get_val(x::Message) = x.value
+getval(x::Message) = x.value
 
 ###
 # MESSAGE SUBTYPES
@@ -24,7 +24,7 @@ abstract ControlMessage <: Message
 # AGGREGATIONS
 ###
 """A group of data messages"""
-typealias Batch{T} Vector{T}
+typealias Batch{T<:Message} Vector{T<:Message}
 
 ###
 # CHANNEL ALIASES
@@ -32,5 +32,8 @@ typealias Batch{T} Vector{T}
 """A RemoteChannel that functions as a control message buffer"""
 typealias ControlEndpoint RemoteChannel{Channel{ControlMessage}}
 
-"""A RemoteChannel that functions as a data message buffer"""
-typealias DataEndpoint RemoteChannel{Channel{Batch{DataMessage}}}
+"""
+A RemoteChannel that functions as a data message buffer. Can recieve messages
+in piecemeal or in bulk.
+"""
+typealias DataEndpoint RemoteChannel{Channel{DataMessage}}

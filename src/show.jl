@@ -1,7 +1,7 @@
 import Base.show
 
 # function show(io::IO, x::BlankMessage)
-#     write(io, "B$(get_source(x))->$(get_dest(x))")
+#     write(io, "B$(get_source(x))->$(getdest(x))")
 # end
 #
 # function show(io::IO, x::MessageAggregate)

@@ -16,13 +16,16 @@ const dout_refs = Dict{ProcID,DataEndpoint}()
 const din_refs = Dict{ProcID,DataEndpoint}()
 
 """Mapping from process id's to caches for outgoing vertex messages"""
-const proc_out_queue = Dict{ProcID,Batch{VertexMessage}}()
+const proc_out_queue = Dict{ProcID,Batch{VertexPayload}}()
 
 """Vector of incoming message queues"""
-const vertex_in_queue = Vector{Batch{VertexMessage}}()
+const vertex_in_queue = Vector{Vector{VertexPayload}}()
+
+"""Queue for incoming data messages"""
+const data_in_queue = Batch{DataMessage}()
 
 ###
-# REGISTERATIONS
+# REGISTRATIONS
 ###
 """Run by a process remotely to fetch its remote Endpoints"""
 function fetchrefs(pid::ProcID)
@@ -34,6 +37,7 @@ end
 
 """Fetch Endpoints from other all the processes"""
 function register()
+    global cout_refs, dout_refs
     for pid in procs()
         cout_refs[pid], dout_refs[pid] = remotecall_fetch(fetchrefs, pid, myid())
     end
@@ -43,6 +47,59 @@ end
 function minitialize()
     for pid in procs()
         remotecall_fetch(register, pid)
+    end
+end
+
+###
+# SEND MESSAGES
+###
+"""Send data messages asynchronously"""
+function sendmessage(dm::DataMessage)
+    global dout_refs, proc_out_queue
+    dest_pid::ProcID = getdest(dm)
+    out_ref = try
+        dout_refs[dest_pid]
+    catch
+        error("Proc $(myid()) isn't registered with proc $dest_pid")
+    end
+    put!(out_ref, dm)
+    nothing
+end
+
+"""Synchronously send cached vertex payloads"""
+function syncmessages()
+    global dout_refs, proc_out_queue
+    for pid in keys(proc_out_queue)
+        vm = VertexMessage(pid, copy(proc_out_queue[pid]))
+        put!(dout_refs[dest_pid], vm)
+        end
+    end
+    empty!(proc_out_queue)
+    nothing
+end
+
+"""Asynchronously send all control messages"""
+function sendmessage(cm::ControlMessage)
+    global cout_refs
+    dest_pid::ProcID = getdest(cm)
+    put!(cout_refs[dest_pid], dm)
+    nothing
+end
+
+###
+# RECIEVE DATA MESSAGES
+###
+"""
+Remove all incoming data messages from the local references and place them in
+data_in_queue
+"""
+function receivemessages()
+    global din_refs
+    for lref in din_refs
+        while isready(lref)
+            m::DataMessage = take!(lref)
+            push!(data_in_queue, m)
+        end
     end
 end
 
@@ -110,7 +167,7 @@ end
 # """ Place a message in cache. Should be called in the transmitting process."""
 # function send_message!(mint::MessageInterface, m::Message, w=myid())
 #     # put!(mint.count, 1)
-#     target_proc = get_parent(mint, get_dest(m))
+#     target_proc = get_parent(mint, getdest(m))
 #     push!(get!(mint.cache, target_proc, MessageAggregate()), m)
 #     nothing
 # end
@@ -139,7 +196,7 @@ end
 #         while isready(mbox)
 #             ma::MessageAggregate = take!(mbox)
 #             for m::Message in ma
-#                 target_vertex = get_dest(m)-start(vrange)+1
+#                 target_vertex = getdest(m)-start(vrange)+1
 #                 push!(vmq[target_vertex], m)
 #             end
 #         end
