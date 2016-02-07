@@ -1,18 +1,18 @@
 import Base.show
 
-function show(io::IO, x::BlankMessage)
-    write(io, "B$(get_source(x))->$(get_dest(x))")
-end
-
-function show(io::IO, x::MessageAggregate)
-    write(io, "MQ[")
-    for m in x
-        show(io, m)
-        write(io, ", ")
-    end
-    write(io, "]")
-end
-
+# function show(io::IO, x::BlankMessage)
+#     write(io, "B$(get_source(x))->$(get_dest(x))")
+# end
+#
+# function show(io::IO, x::MessageAggregate)
+#     write(io, "MQ[")
+#     for m in x
+#         show(io, m)
+#         write(io, ", ")
+#     end
+#     write(io, "]")
+# end
+#
 # function show(io::IO, x::MessageAggregateList)
 #     write(io, "MQL[")
 #     for mq in x

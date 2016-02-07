@@ -37,8 +37,7 @@ also permits Sparse Matrices.
 typealias AdjacencyMatrix Union{AbstractArray{Bool, 2}}
 
 """Null structure to indicate the absence of an adjacency list."""
-type NullStruct
-end
+typealias NullStruct Void
 
 """
 Permitted graph data structures:

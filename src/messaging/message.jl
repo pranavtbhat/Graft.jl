@@ -11,10 +11,6 @@ get_dest(x::Message) = x.dest
 """Get the messages's value"""
 get_val(x::Message) = x.value
 
-"""A group of messages"""
-typealias Batch Vector{Message}
-
-
 ###
 # MESSAGE SUBTYPES
 ###
@@ -23,3 +19,18 @@ abstract DataMessage <: Message
 
 """Control Message, passed from master to worker or worker to master"""
 abstract ControlMessage <: Message
+
+###
+# AGGREGATIONS
+###
+"""A group of data messages"""
+typealias Batch{T} Vector{T}
+
+###
+# CHANNEL ALIASES
+###
+"""A RemoteChannel that functions as a control message buffer"""
+typealias ControlEndpoint RemoteChannel{Channel{ControlMessage}}
+
+"""A RemoteChannel that functions as a data message buffer"""
+typealias DataEndpoint RemoteChannel{Channel{Batch{DataMessage}}}
