@@ -6,7 +6,8 @@
 ###
 type WorkerHandle
     id::ProcID                                                  # Unique process id. Same as myid().
-    partitions::Dict{ProcID,UnitRange{Int}}                        # Mapping of process id's to vertex partitions.
+    num_partitions::Int                                         # Total number of partitions
+    partitions::Dict{ProcID,UnitRange{Int}}                     # Mapping of process id's to vertex partitions.
     vertices::Vector{Vertex}                                    # Actual Vertex data.
     adj::GraphStruct                                            # Adjacency information
 end
@@ -27,14 +28,15 @@ function set_partitions(partitions::Dict{ProcID,UnitRange})
 end
 
 """Return the partition to which the vertex belongs to"""
-function vertextoproc(v::VertexID)
+function vertextoproc(v::VertexID, w::Vector{ProcID} = Workers())
     global whandle
-    for (pid,vrange) in whandle.partitions
-        v in vrange && return pid
-    end
-    error("Vertex $v doesn't belong to any partition.")
+    div = whandle.num_partitions/length(w)
+    w[round(Int, ceil(v/div))]
 end
 
-function send_message(p::VertexPayload)
+"""Find the proc on which the destination vertex resides on, and cache the message"""
+function sendmessage(p::VertexPayload)
     dest_vertex = getdestvertex(vp)
-    dest_proc =
+    dest_proc = vertextoproc(dest_vertex)
+    cachemessage(p, dest_proc)
+end

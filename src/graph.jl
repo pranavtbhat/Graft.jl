@@ -63,7 +63,7 @@ get_adj(x::AdjacencyMatrix, v::Int) = find(x[:,v])
 abstract VertexProperty
 
 """Type indicating the absence of a property"""
- immutable NullPropery <: VertexProperty
+ immutable NullProperty <: VertexProperty
  end
 
 ###
@@ -80,25 +80,45 @@ type Vertex{P<:VertexProperty}
 end
 
 ###
-# BASIC ACCESSORS FOR VERTEX SUBTYPES.
+# GETTERS
 ###
-"""Retrieve a vertex's label"""
-get_label(x::Vertex) = x.label
+getid(x::Vertex) = x.id
+getlabel(x::Vertex) = x.label
+isactive(x::Vertex) = x.active
+getfadj(x::Vertex) = x.fadjlist
+getbadj(x::Vertex) = x.badjlist
+getproperty(x::Vertex) = x.property
 
-"""Modify a vertex's label"""
-function set_label!(x::Vertex, label)
+###
+# SETTERS
+###
+function setlabel!(x::Vertex, label::AbstractString)
     x.label = label
 end
 
-"""Check if the given vertex is active(Internal Method)"""
-is_active(x::Vertex) = x.active
-
-"""Activate a vertex(Internal Method)"""
 function activate!(x::Vertex)
     x.active = true
 end
 
-"""Deactivate a vertex(Internal Method)"""
 function deactivate!(x::Vertex)
     x.active = false
+end
+
+function setfadj!(x::Vertex, fadjlist::Vector{VertexID})
+    x.fadjlist = fadjlist
+end
+
+function setbadj!(x::Vertex, badjlist::Vector{VertexID})
+    x.badjlist = badjlist
+end
+
+function setproperty!(x::Vertex{NullProperty}, property::VertexProperty)
+    x.property = property
+end
+
+setproperty(x::Vertex{VertexProperty}, ::VertexProperty) =
+    error("Can't overwrite existing property on $x")
+
+function rmproperty(x::Vertex)
+    x.property = NullProperty()
 end

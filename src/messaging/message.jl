@@ -24,7 +24,7 @@ abstract ControlMessage <: Message
 # AGGREGATIONS
 ###
 """A group of data messages"""
-typealias Batch{T<:Message} Vector{T<:Message}
+typealias Batch{T} Vector{T}
 
 ###
 # CHANNEL ALIASES
