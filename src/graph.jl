@@ -1,87 +1,66 @@
-export AdjacencyList, AdjacencyMatrix, get_adj, get_label, set_label
-
 ###
-# GRAPH STRUCTURES
+# VERTEX PROPERY
 ###
-"""
-An lists of lists denoting the neighbors of each vertex.
-Eg:
-For an undirected graph with vertices: [1,2,3]
-and edges:
-1 - 2
-1 - 3
-the AdjacencyList representation is: [[2,3], [1], [1]]
+"""An Algorithm-dependant extension that adds further detail to a vertex"""
+abstract VertexProperty
 
-The adjacency list has slow lookup can be iterated through quickly.
-"""
-typealias AdjacencyList Array{Array{Int, 1}, 1}
-
-"""
-A matrix where columns indicate vertices neighbors.
-Eg:
-For an undirected graph with vertices: [1,2,3]
-and edges:
-1 - 2
-1 - 3
-2 - 3
-the AdjacencyMatrix representation is:
-[
-    [false, true, true],
-    [true, false, false],
-    [true, false, false]
-]
-
-The AdjacencyMatrix representation has fast lookup but slower iteration. The type
-also permits Sparse Matrices.
-"""
-typealias AdjacencyMatrix Union{AbstractArray{Bool, 2}}
-
-"""
-Permitted graph data structures:
-- AdjacencyList
-- AdjacencyMatrix
-"""
-typealias GraphStruct Union{AdjacencyList, AdjacencyMatrix}
-
-###
-# ACCESSORS FOR GRAPH STRUCTURES
-###
-
-"""Fetch a vertex's neighbors"""
-get_adj(x::SparseMatrixCSC, v::Int) = x[:,v].nzind
-get_adj(x::AdjacencyList, v::Int) = x[v]
-get_adj(x::AdjacencyMatrix, v::Int) = find(x[:,v])
+"""Type indicating the absence of a property"""
+ immutable NullProperty <: VertexProperty
+ end
 
 ###
 # Vertex Definition
 ###
-"""
-Abstract type representing a vertex/node in a graph. Each subtype should have the following fields:
-- label  : External vertex identifier.
-- active : A Bool indicating whether the vertex is active or not.
-"""
-abstract Vertex
+"""Type representing a vertex/node in a graph."""
+type Vertex{P<:VertexProperty}
+    id::Int                                     # An internal vertex identifier.
+    label::AbstractString                       # External vertex identifier.
+    active::Bool                                # A Bool indicating whether the vertex is active or not.
+    fadjlist::Vector{VertexID}                  # A list of VertexIDs indicating forward adjacencies.
+    badjlist::Vector{VertexID}                  # A list of VertexIDs indicating back adjacencies.
+    property::P                                 # Algorithm-dependant extension.
+end
 
 ###
-# BASIC ACCESSORS FOR VERTEX SUBTYPES.
+# GETTERS
 ###
-"""Retrieve a vertex's label"""
-get_label(x::Vertex) = x.label
+getid(x::Vertex) = x.id
+getlabel(x::Vertex) = x.label
+isactive(x::Vertex) = x.active
+getfadj(x::Vertex) = x.fadjlist
+getbadj(x::Vertex) = x.badjlist
+getproperty(x::Vertex) = x.property
 
-"""Modify a vertex's label"""
-function set_label!(x::Vertex, label)
+###
+# SETTERS
+###
+function setlabel!(x::Vertex, label::AbstractString)
     x.label = label
 end
 
-"""Check if the given vertex is active(Internal Method)"""
-is_active(x::Vertex) = x.active
-
-"""Activate a vertex(Internal Method)"""
 function activate!(x::Vertex)
     x.active = true
 end
 
-"""Deactivate a vertex(Internal Method)"""
 function deactivate!(x::Vertex)
     x.active = false
+end
+
+function setfadj!(x::Vertex, fadjlist::Vector{VertexID})
+    x.fadjlist = fadjlist
+end
+
+function setbadj!(x::Vertex, badjlist::Vector{VertexID})
+    x.badjlist = badjlist
+end
+
+function setproperty!(x::Vertex{NullProperty}, property::VertexProperty)
+    x.property = property
+end
+
+setproperty!(x::Vertex{VertexProperty}, ::VertexProperty) =
+    error("Can't overwrite existing property on $x")
+
+function rmproperty!(x::Vertex)
+    x.property = NullProperty()
 end

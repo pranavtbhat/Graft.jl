@@ -1,54 +1,39 @@
 ###
-# This file contains the basic Message descriptions and functions to create arrays
-# for messages. (Internal use only)
+# ABSTRACT MESSAGE TYPE.
 ###
-
 """
-Abstract Message type. All subtypes should implement process_message. All implementations
-of the Message type must contain a `source` and a `dest` field.
+Abstract Message type. Each message must have a destination process and a value.
 """
 abstract Message
 
-"""Get a messages's source process"""
-get_source(x::Message) = x.source
 """Get the messages's destination"""
-get_dest(x::Message) = x.dest
-
-"""A group of messages"""
-typealias MessageAggregate Array{Message, 1}
+getdest(x::Message) = x.dest
+"""Get the messages's value"""
+getval(x::Message) = x.value
 
 ###
-# Basic Message Definitions
+# MESSAGE SUBTYPES
 ###
-"""Blank Message type for testing"""
-immutable BlankMessage <: Message
-    source::Int
-    dest::Int
-end
-BlankMessage(dest::Int) = BlankMessage(myid(), dest)
+"""Data Message, passed from worker to worker or master to worker"""
+abstract DataMessage <: Message
 
-"""Message informing the master about the number of active vertices"""
-immutable NumActive <:Message
-    source::Int
-    dest::Int
-    num_active::Int
-end
-NumActive(num_active::Int) = NumActive(myid(), 0, num_active)
+"""Control Message, passed from master to worker or worker to master"""
+abstract ControlMessage <: Message
 
-"""Retrieve the number of active vertices"""
-get_num_active(x::NumActive) = x.num_active
+###
+# AGGREGATIONS
+###
+"""A group of data messages"""
+typealias Batch{T} Vector{T}
 
-"""Error message containing an exception from a worker process"""
-immutable ErrorMessage <: Message
-    source::Int
-    dest::Int
-    err::Exception
-    v::Vertex
-end
-ErrorMessage(x::Exception, v::Vertex) = ErrorMessage(myid(), 0, x, v)
+###
+# CHANNEL ALIASES
+###
+"""A RemoteChannel that functions as a control message buffer"""
+typealias ControlEndpoint RemoteChannel{Channel{ControlMessage}}
 
-"""Retrieve the error from an ErrorMessage"""
-get_error(x::ErrorMessage) = x.err
-
-"""Retrieve the problematic vertex"""
-get_vertex(x::ErrorMessage) = x.v
+"""
+A RemoteChannel that functions as a data message buffer. Can recieve messages
+in piecemeal or in bulk.
+"""
+typealias DataEndpoint RemoteChannel{Channel{DataMessage}}

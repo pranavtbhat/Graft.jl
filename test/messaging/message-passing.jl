@@ -1,37 +1,57 @@
-# Message passing scenario
-nv = 100
-num_procs = 3
+# Test fetchrefs
+for pid_1 in procs()
+    for pid_2 in procs()
+        @test isa(remotecall_fetch(fetchrefs, pid_2, pid_1), Tuple{ControlEndpoint, DataEndpoint})
+    end
+end
 
-test_vertex = 1
-test_vertex_parent = 2
-local_range = 0:0
+# Test register
+@test register() == nothing
+for pid in procs()
+    @test pid in keys(dout_refs)
+    @test pid in keys(cout_refs)
+end
 
-m = ParallelGraphs.BlankMessage(1)
-target_proc = 2
+# Test minitialize
+@test minitialize() == nothing
+for pid in procs()
+    rdout_refs = remotecall_fetch(()-> ParallelGraphs.dout_refs, pid)
+    rcout_refs = remotecall_fetch(()-> ParallelGraphs.cout_refs, pid)
+    for pid in procs()
+        @test pid in keys(rdout_refs)
+        @test pid in keys(rcout_refs)
+    end
+end
 
-metadata = UnitRange{Int}[1:50, 50:100]
+# Test cachepayload
+vp = DebugPayload(0,0)
+for pid in procs()
+    @test cachepayload(vp, pid) == nothing
+    @test isa(pop!(proc_out_queue[pid]), VertexPayload)
+end
+empty!(proc_out_queue)
 
-mint = ParallelGraphs.message_interface(metadata)
-@test typeof(mint) == ParallelGraphs.MessageInterface
+# Test sendmessage
+for pid_1 in procs()
+    for pid_2 in procs()
+        vm = VertexMessage(pid_2, Vector{VertexPayload}())
+        @test remotecall_fetch(sendmessage, pid_1, vm) == nothing
+        @test isa(remotecall_fetch(()->take!(ParallelGraphs.din_refs[pid_1]), pid_2), VertexMessage)
+    end
+end
 
-@test ParallelGraphs.get_parent(mint, test_vertex) == test_vertex_parent
-@test ParallelGraphs.get_local_vertices(mint) == local_range
+# Test syncmessages
+map(cachepayload, map(x->DebugPayload(0,0), procs()), procs())
+@test syncmessages() == nothing
+for pid in procs()
+    @test isa(remotecall_fetch(()->take!(ParallelGraphs.din_refs[1]), pid), VertexMessage)
+end
 
-@test ParallelGraphs.send_message!(mint, m) == nothing
-@test ParallelGraphs.transmit!(mint) == nothing
-
-mbox = mint.mgrid[1,target_proc]
-@test typeof(mbox) == ParallelGraphs.MessageBox
-ma = fetch(mbox)
-@test isa(ma, ParallelGraphs.MessageAggregate)
-@test length(ma) == 1
-
-inbox = mint.mgrid[:,target_proc]
-@test length(inbox) == num_procs
-ma = fetch(inbox[1])
-@test isa(ma, ParallelGraphs.MessageAggregate)
-@test length(ma) == 1
-
-messages = ParallelGraphs.receive_messages!(mint, target_proc)
-@test length(messages) == length(ParallelGraphs.get_local_vertices(mint, target_proc))
-@test length(messages[1]) == 1
+# Test receivemessages
+target_proc = 1
+vm = VertexMessage(target_proc, Vector{VertexPayload}())
+for pid in procs()
+    remotecall_fetch(sendmessage, pid, vm)
+end
+@test receivemessages() == nothing
+@test length(data_in_queue) == length(procs())
