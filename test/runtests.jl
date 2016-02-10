@@ -4,10 +4,9 @@ using Base.Test
 
 
 # Graph Structures
-import ParallelGraphs: AdjacencyList, AdjacencyMatrix, NullStruct, GraphStruct,
-    get_adj, VertexProperty, NullProperty, Vertex, getid, getlabel, isactive,
+import ParallelGraphs: VertexProperty, NullProperty, Vertex, getid, getlabel, isactive,
     getfadj, getbadj, getproperty, setlabel!, activate!, deactivate!, setfadj!,
-    setbadj!, setproperty!, rmproperty
+    setbadj!, setproperty!, rmproperty!
 include("graph.jl")
 
 # Message Passing Definitions

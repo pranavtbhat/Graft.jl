@@ -19,7 +19,7 @@ include("master.jl")
 include("worker.jl")
 
 # Repl Helpers
-# include("show.jl")
+include("show.jl")
 
 # Utilities
 # include("utilities/generators.jl")

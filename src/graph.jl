@@ -1,61 +1,3 @@
-export AdjacencyList, AdjacencyMatrix, get_adj, get_label, set_label
-
-###
-# GRAPH STRUCTURES
-###
-"""
-An lists of lists denoting the neighbors of each vertex.
-Eg:
-For an undirected graph with vertices: [1,2,3]
-and edges:
-1 - 2
-1 - 3
-the AdjacencyList representation is: [[2,3], [1], [1]]
-
-The adjacency list has slow lookup, but can be iterated through quickly.
-"""
-typealias AdjacencyList Array{Array{Int, 1}, 1}
-
-"""
-A matrix where columns indicate vertices neighbors.
-Eg:
-For an undirected graph with vertices: [1,2,3]
-and edges:
-1 - 2
-1 - 3
-2 - 3
-the AdjacencyMatrix representation is:
-[
-    [false, true, true],
-    [true, false, false],
-    [true, false, false]
-]
-
-The AdjacencyMatrix representation has fast lookup but slower iteration. The type
-also permits Sparse Matrices.
-"""
-typealias AdjacencyMatrix Union{AbstractArray{Bool, 2}}
-
-"""Null structure to indicate the absence of an adjacency list."""
-typealias NullStruct Void
-
-"""
-Permitted graph data structures:
-- AdjacencyList
-- AdjacencyMatrix
-"""
-typealias GraphStruct Union{AdjacencyList, AdjacencyMatrix, NullStruct}
-
-###
-# ACCESSORS FOR GRAPH STRUCTURES
-###
-
-"""Fetch a vertex's neighbors"""
-get_adj(x::SparseMatrixCSC, v::Int) = x[:,v].nzind # Temporary fix.
-get_adj(x::AdjacencyList, v::Int) = x[v]
-get_adj(x::AdjacencyMatrix, v::Int) = find(x[:,v])
-
-
 ###
 # VERTEX PROPERY
 ###
@@ -116,9 +58,9 @@ function setproperty!(x::Vertex{NullProperty}, property::VertexProperty)
     x.property = property
 end
 
-setproperty(x::Vertex{VertexProperty}, ::VertexProperty) =
+setproperty!(x::Vertex{VertexProperty}, ::VertexProperty) =
     error("Can't overwrite existing property on $x")
 
-function rmproperty(x::Vertex)
+function rmproperty!(x::Vertex)
     x.property = NullProperty()
 end

@@ -1,32 +1,48 @@
-##
-# This file should be included only on workers.
-##
 ###
 # WORKER HANDLE
 ###
 type WorkerHandle
     id::ProcID                                                  # Unique process id. Same as myid().
-    num_partitions::Int                                         # Total number of partitions
+    gvcount::VertexID                                           # Global vertex count.
     partitions::Dict{ProcID,UnitRange{Int}}                     # Mapping of process id's to vertex partitions.
     vertices::Vector{Vertex}                                    # Actual Vertex data.
-    adj::GraphStruct                                            # Adjacency information
 end
 
 const whandle = WorkerHandle(
     myid(),
     0,
     Dict{Int,UnitRange{Int}}(),
-    Vector{Vertex}(),
-    NullStruct()
+    Vector{Vertex}()
 )
 
+###
+# CONTROL REMOTE CALLS
+###
 """Executed remotely by master to set partitions on workers"""
-function set_partitions(partitions::Dict{ProcID,UnitRange{Int}})
+function setpartitions(gvcount::VertexID, partitions::Dict{ProcID,UnitRange{Int}})
     global whandle
+    whandle.gvcount = gvcount
     whandle.partitions = partitions
     nothing
 end
 
+"""Executed remotely by master to set fadjlists"""
+function rsetfadjlists(fadj_lists::Vector{Vector{VertexID}})
+    global whandle
+    map(setfadj, whandle.vertices, fadj_lists)
+    nothing
+end
+
+"""Executed remotely by master to set badjlists"""
+function rsetbadjlists(badj_lists::Vector{Vector{VertexID}})
+    global whandle
+    map(setbadj, whandle.vertices, badj_lists)
+    nothing
+end
+
+###
+# VERTEX MESSAGING
+###
 """Return the partition to which the vertex belongs to"""
 function vertextoproc(v::VertexID, w::Vector{ProcID} = Workers())
     global whandle
