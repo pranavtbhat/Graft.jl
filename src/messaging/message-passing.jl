@@ -1,5 +1,3 @@
-export minitialize
-
 ###
 # GLOBALS
 ###
@@ -43,13 +41,21 @@ function register()
     end
 end
 
+"""Prompt all processes to register themselves and load relevant tasks"""
+function minitialize()
+    for pid in procs()
+        remotecall_fetch(register, pid)
+    end
+end
+
 ###
 # SEND MESSAGES
 ###
 """Place the vertex payload into cache"""
 function cachepayload(vp::VertexPayload, dest_proc::ProcID)
     global proc_out_queue
-    push!(proc_out_queue[dest_proc], vp)
+    push!(get!(proc_out_queue, dest_proc, Batch{VertexPayload}()), vp)
+    nothing
 end
 
 """Send data messages asynchronously"""
@@ -70,7 +76,7 @@ function syncmessages()
     global dout_refs, proc_out_queue
     for pid in keys(proc_out_queue)
         vm = VertexMessage(pid, copy(proc_out_queue[pid]))
-        put!(dout_refs[dest_pid], vm)
+        sendmessage(vm)
     end
     empty!(proc_out_queue)
     nothing

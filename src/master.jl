@@ -1,3 +1,5 @@
+export minitialize
+
 ##
 # This file should be included only on the master process.
 ##
@@ -30,12 +32,5 @@ function partition(num_vertices::Int, w=workers())
 
     for pid in w
         remotecall_fetch(set_partitions, pid, partitions)
-    end
-end
-
-"""Prompt all processes to register themselves and load relevant tasks"""
-function minitialize()
-    for pid in procs()
-        remotecall_fetch(register, pid)
     end
 end
