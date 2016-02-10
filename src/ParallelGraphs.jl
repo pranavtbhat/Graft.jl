@@ -14,6 +14,10 @@ include("messaging/control-messages.jl")
 include("messaging/data-messages.jl")
 include("messaging/message-passing.jl")
 
+# Core functioning
+include("master.jl")
+include("worker.jl")
+
 # Repl Helpers
 # include("show.jl")
 

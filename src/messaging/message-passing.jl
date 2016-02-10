@@ -43,13 +43,6 @@ function register()
     end
 end
 
-"""Prompt all processes to register themselves"""
-function minitialize()
-    for pid in procs()
-        remotecall_fetch(register, pid)
-    end
-end
-
 ###
 # SEND MESSAGES
 ###

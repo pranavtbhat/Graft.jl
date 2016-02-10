@@ -10,11 +10,32 @@ end
 const mhandle = MasterHandle(
     0,
     1,
-    Dict{ProcID,UnitRange{Int}}
+    Dict{ProcID,UnitRange{Int}}()
 )
 
-function partition(num_vertices::Int, num_procs=length(procs()))
-    num < num_procs && error("There must be atlease one vertex per process!")
-    starts = round(Int, linspace(1, num_vertices+1, num_procs+1))
-    map(UnitRange{Int}, starts[1:end-1], starts[2:end] .- 1)
+"""Partition a range of vertices to all available workers"""
+function partition(num_vertices::Int, w=workers())
+    global mhandle
+
+    num_vertices < length(w) && error("There must be atlease one vertex per process!")
+    starts = round(Int, linspace(1, num_vertices+1, length(w)+1))
+    vranges = map(UnitRange{Int}, starts[1:end-1], starts[2:end] .- 1)
+    partitions = Dict{ProcID,UnitRange{Int}}()
+
+    for i in eachindex(w)
+        partitions[w[i]] = vranges[i]
+    end
+
+    mhandle.partitions = partitions
+
+    for pid in w
+        remotecall_fetch(set_partitions, pid, partitions)
+    end
+end
+
+"""Prompt all processes to register themselves and load relevant tasks"""
+function minitialize()
+    for pid in procs()
+        remotecall_fetch(register, pid)
+    end
 end

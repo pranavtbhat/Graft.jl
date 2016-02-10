@@ -14,14 +14,14 @@ end
 
 const whandle = WorkerHandle(
     myid(),
+    0,
     Dict{Int,UnitRange{Int}}(),
     Vector{Vertex}(),
     NullStruct()
 )
 
-
 """Executed remotely by master to set partitions on workers"""
-function set_partitions(partitions::Dict{ProcID,UnitRange})
+function set_partitions(partitions::Dict{ProcID,UnitRange{Int}})
     global whandle
     whandle.partitions = partitions
     nothing
