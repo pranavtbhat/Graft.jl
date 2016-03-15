@@ -21,7 +21,7 @@ end
 # VERTEX MESSAGES
 ###
 """An aggregate of VertexPayloads"""
-immutable VertexMessage <: DataMessage
+immutable VertexMessage <: Message
     dest::ProcID
     value::Vector{VertexPayload}
 end

@@ -8,28 +8,17 @@ include("definitions.jl")
 # Graph Structures
 include("graph.jl")
 
-# Message Passing
-include("messaging/message.jl")
-include("messaging/control-messages.jl")
-include("messaging/data-messages.jl")
-include("messaging/message-passing.jl")
+# Serial Execution
 
-# Core functioning
-include("master.jl")
-include("worker.jl")
+# Parallel Execution
 
-# Repl Helpers
-include("show.jl")
+# Distributed Execution
 
-# Utilities
-# include("utilities/generators.jl")
-# include("utilities/conversions.jl")
+    # Message Passing
+    include("distributed/messaging/message.jl")
+    include("distributed/messaging/data-messages.jl")
+    include("distributed/messaging/message-passing.jl")
 
-# Core computation definitions
-# include("compute.jl")
-
-# Algorithms
-# include("algorithms/connected-components.jl")
-# include("algorithms/bfs.jl")
+    # Algorithms
 
 end # module
