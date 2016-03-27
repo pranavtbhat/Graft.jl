@@ -1,6 +1,4 @@
-addprocs(2)
 using ParallelGraphs
 
-gstruct = rand_graph(1000000, 0.000003)
-
-@time bfs(gstruct)
+g = rgraph(10^6, 3 * 10^6);
+@time pv = bfs(g, rand(1:10^6))
