@@ -5,6 +5,9 @@ using NDSparseData
 # Package Wide Utilities
 include("util.jl")
 
+# Vertex/Edge Properties
+include("properties.jl")
+
 # Basic Graph Definition
 include("graph.jl")
 
