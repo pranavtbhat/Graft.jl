@@ -1,0 +1,19 @@
+6 10
+
+1 name Alice age 34
+2 name Bob age 36
+3 name Charlie age 30
+4 name David age 29
+5 name Esther age 32
+6 name Fanny age 36
+
+1 5 relationship friend
+6 2 relationship follow
+3 5 relationship friend
+1 2 relationship friend
+2 3 relationship follow
+3 2 relationship follow
+6 3 relationship follow
+5 6 relationship follow
+5 4 relationship friend
+4 1 relationship friend
