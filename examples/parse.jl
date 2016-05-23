@@ -2,8 +2,7 @@ using ParallelGraphs
 
 filename = "examples/graph.txt"
 
-# Parse the file into an index graph (each vertex can be referred to only by its index)
-g = parsegraph(filename)
+g = parsegraph(filename, :TGF)
 
 # Fetch all the properties assigned to vertex 1
 g[1]

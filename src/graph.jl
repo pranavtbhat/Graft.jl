@@ -1,69 +1,57 @@
+################################################# FILE DESCRIPTION #########################################################
+
+# This file contains the core graph definitions. ParallelGraphs provides a Graph interface that all 
+# graph types must adhere to. 
+# Some features common to all graph types:
+# 1. Vertices and edges can be assigned properties
+# 2. All graph types are IMMUTABLE. Mutating the graph will create a new graph! Data will be reused to the extent possible.
+ 
+################################################# IMPORT/EXPORT ############################################################
 import NDSparseData: flush!
-export Graph, IndexGraph
+export 
+# Types
+Graph, SparseGraph,
+# Graph Interface methods
+nv, ne, adj,
+# SparseGraph Interface methods
+getprop
 
-### 
-# GRAPH REPRESENTATIONS
-###
+################################################# GRAPH INTERFACE ##########################################################
 
+""" Graph Interface that all subtypes are required to adhere to """
 abstract Graph
-   
-""" Graph where each vertex can be refered to only by its index """
-immutable IndexGraph <: Graph
-   nv::VertexID                                          # Number of vertexes
-   ne::EdgeID                                            # Number of edges
-   data::NDSparse                                        # Store all the data involved
-   pmap::PropertyMap                                     # Vertex/Edge property map
-   adj_buffer::Vector{EdgeID}                            # Sort of a colptr (for faster adjacency fetching)
-end
 
-###
-# FLUSH
-###
+""" Return the number of vertices in the graph """
+@interface nv(g::Graph)
 
-""" Flush the NDSparseData, and populate the adj_buffer """
-function flush!(g::Graph)
-   if !isempty(g.data.data_buffer)
-      flush!(g.data)
-      buf = g.adj_buffer
-      col = g.data.indexes.columns[1]
+""" Return the number of edges in the graph """
+@interface ne(g::Graph)
 
-      g.adj_buffer[1] = 1
-      cur_v = 1
-      i = 1
-      for i = eachindex(col)
-         if cur_v != col[i]
-            cur_v += 1
-            g.adj_buffer[cur_v] = i
-         end
-      end
-      g.adj_buffer[cur_v+1] = i + 1 
-   end
+""" Return the adjacencies of a given vertex """
+@interface adj(g::Graph, v::VertexID)
 
-   nothing
-end
+""" Return the properties of a particular vertex in the graph, as a dictionary """
+@interface getprop(g::Graph, v::VertexID)
 
-###
-# LOOKUPS
-###
+""" Return the value of a property for a particular vertex in the graph """
+@interface getprop(g::Graph, v::VertexID, propname::AbstractString)
 
-""" Retrieve vertex properties as dictionary """
-function Base.getindex(g::Graph, v::VertexID)
-   flush!(g)
-   vdata = g.data[v, v, :]
-   [itovprop(g.pmap, t[3]) => vdata[t...] for t in vdata.indexes]
-end
+""" Return the properties of a particular edge in the graph, as a dictionary """
+@interface getprop(g::Graph, u::VertexID, v::VertexID)
 
-""" Retrieve edge properties as dictionary """
-function Base.getindex(g::Graph, v1::VertexID, v2::VertexID)
-   flush!(g)
-   edata = g.data[v1, v2, :]
-   [itoeprop(g.pmap, t[3]) => edata[t...] for t in edata.indexes]
-end
+"""Return the value of a property for a particular edge in the graph """
+@interface getprop(g::Graph, u::VertexID, v::VertexID, propname::AbstractString)
 
-""" Retrieve the adjacencies of a vertex (including the vertex itself) """
-function Base.getindex(g::Graph, v::VertexID, ::Colon)
-   flush!(g)
-   col = g.data.indexes.columns[2]
-   range = g.adj_buffer[v] : g.adj_buffer[v+1] - 1
-   unique(col[range])
-end
+################################################# SPARSE GRAPH INTERFACE ###################################################
+
+""" Sparse Graph Interface that all graphs relying on NDSparse are required to adhere to """
+abstract SparseGraph <: Graph
+
+""" Prepare the graph for querying """
+@interface flush!(g::SparseGraph)
+
+
+include("sparsegraph.jl")
+
+
+

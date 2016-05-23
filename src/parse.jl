@@ -1,21 +1,36 @@
+################################################# FILE DESCRIPTION #########################################################
+
+# ParallelGraphs will eventually support several file formats for reading and writing graphs.
+# However currently, only a modified version of the Trivial Graph Format is supported. The TGF
+# is described below:
+# 
+# The input file should contain data in the following format:
+# <num_vertices> <num_edges>
+# <vertex_id> <vertex_prop_1> <val_1> <vertex_prop_2> <val_2> ...
+# .
+# .
+# .
+# <from_vertex_id> <to_vertex_id> <edge_property_1> <val_1> <edge_property_2> <val_2> ...
+# .
+# .
+# .
+# EOF
+
+################################################# IMPORT/EXPORT ############################################################
 export parsegraph
 
-""" 
-Constructor for Edge Lists
-The input file shou
-The input file should data in the following format:
-<num_vertices> <num_edges>
-<vertex_id> <vertex_prop_1> <val_1> <vertex_prop_2> <val_2> ...
-.
-.
-.
-<from_vertex_id> <to_vertex_id> <edge_property_1> <val_1> <edge_property_2> <val_2> ...
-.
-.
-.
-EOF
-"""
-function parsegraph(filename::AbstractString)
+
+################################################# PARSEGRAPH ###############################################################
+""" Parse a text file in a given format """
+function parsegraph(filename::AbstractString, format::Symbol)
+   (format == :TGF) && return parsegraph_tgf(filename)
+   error("Invalid graph format")
+end
+
+################################################# TRIVIAL GRAPH FORMAT #####################################################
+
+""" Parse a text file in the trivial graph format """
+function parsegraph_tgf(filename::AbstractString)
    file = open(filename)
    nv, ne = map(x->parse(Int, x), split(readline(file), " "))
    
@@ -49,5 +64,5 @@ function parsegraph(filename::AbstractString)
          end
       end
    end
-   IndexGraph(nv, ne, data, pmap, adj_buffer)
+   LocalSparseGraph(nv, ne, data, pmap, adj_buffer)
 end

@@ -1,18 +1,30 @@
-export vprops, eprops
+################################################# FILE DESCRIPTION #########################################################
 
-###
-# Each vertex/edge can have properties assigned to it. A property is a key-value pair. The key must be a AbstractString(?).
-# This file contains mappings between the keys and their indices in the sparse table. 
-###
+# ParallelGraphs allows the assignment of properties (key-value pairs) the the edges and vertices in a graph. The key is 
+# usually a string, and therefore keys must be mapped on to integers, before they can be used to index Sparse arrays. This 
+# file contains the Property Map type and related definitions. The forward maps are dictionaries that convert keys into 
+# indices, while the reverse maps are vectors and convert indices into keys. Both maps are kept since the number of 
+# properies is usally low, and the key/index resolution is a bottleneck for most queries.
+#
+# Vertices need not have a property attached to them. However every edge has an id property. 
+
+################################################# IMPORT/EXPORT ############################################################
+export 
+# Getters/Setters
+vprops, eprops,
+# Mappings
+vproptoi, eproptoi, itovprop, itoeprop
+
+################################################# PROPERTYMAP ##############################################################
 
 """ Translates Vertex/Edge property names to indexes in the sparse table and back """
 type PropertyMap
    nvprop::PropID                                        # Number of vertex properties
    neprop::PropID                                        # Number of edge properties
-   vprop_fmap::Dict{AbstractString, PropID}               # Vertex Property Forward Map
-   vprop_rmap::Vector{AbstractString}                       # Vertex Property Reverse Map
-   eprop_fmap::Dict{AbstractString, PropID}                 # Edge Property Forward Map
-   eprop_rmap::Vector{AbstractString}                       # Edge Property Reverse Map
+   vprop_fmap::Dict{AbstractString, PropID}              # Vertex Property Forward Map
+   vprop_rmap::Vector{AbstractString}                    # Vertex Property Reverse Map
+   eprop_fmap::Dict{AbstractString, PropID}              # Edge Property Forward Map
+   eprop_rmap::Vector{AbstractString}                    # Edge Property Reverse Map
 end
 
 function PropertyMap()
@@ -24,19 +36,16 @@ function PropertyMap()
    PropertyMap(0, 1, vprop_fmap, vprop_rmap, eprop_fmap, eprop_rmap)
 end
 
-###
-# LIST PROPERTIES
-###
+################################################# GETTERS/SETTERS ##########################################################
 
 """ List all vertex properties """
-vrops(pmap::PropertyMap) = vprop_rmap
+vprops(pmap::PropertyMap) = pmap.vprop_rmap
 
 """ List all edge properties """
-eprops(pmap::PropertyMap) = eprop_rmap
+eprops(pmap::PropertyMap) = pmap.eprop_rmap
 
-###
-# CREATE AND RETRIEVE MAPPINGS
-###
+################################################# MAPPING ###################################################################
+
 """ Fetch the sparse table index for the given vertex property name """
 function vproptoi(x::PropertyMap, prop::AbstractString)
    if !haskey(x.vprop_fmap, prop)
@@ -50,7 +59,7 @@ function vproptoi(x::PropertyMap, prop::AbstractString)
    end
 end
 
-""" Fetch the sparse table index for the give """
+""" Fetch the sparse table index for the given edge property name """
 function eproptoi(x::PropertyMap, prop::AbstractString)
    if !haskey(x.eprop_fmap, prop)
       # Create a new mapping
