@@ -51,6 +51,14 @@ function getprop(g::LocalSparseGraph, u::VertexID, v::VertexID, propname::Abstra
    g.data[u, v, eproptoi(g.pmap, propname)]
 end
 
+function setprop!(g::LocalSparseGraph, v::VertexID, propname::AbstractString, val::Any)
+   setindex!(g.data, val, v, v, vproptoi(g.pmap, propname))
+end
+
+function setprop!(g::LocalSparseGraph, u::VertexID, v::VertexID, propname::AbstractString, val::Any)
+   setindex!(g.data, val, u, v, eproptoi(g.pmap, propname))
+end
+
 """ Flush the NDSparseData, and populate the adj_buffer """
 function flush!(g::LocalSparseGraph) # SUPER MESSY
    if !isempty(g.data.data_buffer)

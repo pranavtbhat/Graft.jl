@@ -42,6 +42,12 @@ abstract Graph
 """Return the value of a property for a particular edge in the graph """
 @interface getprop(g::Graph, u::VertexID, v::VertexID, propname::AbstractString)
 
+""" Set the value for a vertex's property """
+@interface setprop!(g::Graph, v::VertexID, propname::AbstractString, val::Any)
+
+""" Set the value for an edge's property """
+@interface setprop!(g::Graph, u::VertexID, v::VertexID, propname::AbstractString, val::Any)
+
 ################################################# SPARSE GRAPH INTERFACE ###################################################
 
 """ Sparse Graph Interface that all graphs relying on NDSparse are required to adhere to """
