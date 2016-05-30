@@ -1,12 +1,13 @@
 ################################################# FILE DESCRIPTION #########################################################
 
-# This file contains package wide type aliases, macros, utility methods, constants, etc.
+# This file contains package wide type aliases, constants, macros, utility methods, etc.
 
 ################################################# IMPORT/EXPORT ############################################################
 
 export 
 # Type Aliases
-VertexID, EdgeID, PropID
+VertexID, EdgeID, PropID, SparseArray
+
 
 ################################################# TYPE ALIASES #############################################################
 
@@ -18,6 +19,19 @@ typealias EdgeID Int
 
 """ Datatype used to store property indices """
 typealias PropID Int
+
+""" Datatype of keys in properties """
+typealias PropName AbstractString
+
+""" Data structure used in SparseGraphs """
+typealias SparseArray NDSparse{Void,2,Tuple{Int64,Int64,Int64},Tuple{Array{Int64,1},Array{Int64,1},Array{Int64,1}},Array{Any,1}} 
+################################################# CONSTANTS    #############################################################
+
+""" Maximum number of vertices supported """
+const MAX_VERTEX = typemax(VertexID)
+
+""" Maximum number of edges supported """
+const MAX_EDGE = typemax(EdgeID)
 
 ################################################# MACROS ###################################################################
 

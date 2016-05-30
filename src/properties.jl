@@ -21,17 +21,17 @@ vproptoi, eproptoi, itovprop, itoeprop
 type PropertyMap
    nvprop::PropID                                        # Number of vertex properties
    neprop::PropID                                        # Number of edge properties
-   vprop_fmap::Dict{AbstractString, PropID}              # Vertex Property Forward Map
-   vprop_rmap::Vector{AbstractString}                    # Vertex Property Reverse Map
-   eprop_fmap::Dict{AbstractString, PropID}              # Edge Property Forward Map
-   eprop_rmap::Vector{AbstractString}                    # Edge Property Reverse Map
+   vprop_fmap::Dict{PropName, PropID}                    # Vertex Property Forward Map
+   vprop_rmap::Vector{PropName}                          # Vertex Property Reverse Map
+   eprop_fmap::Dict{PropName, PropID}                    # Edge Property Forward Map
+   eprop_rmap::Vector{PropName}                          # Edge Property Reverse Map
 end
 
 function PropertyMap()
-   vprop_fmap = Dict{AbstractString, PropID}()
-   vprop_rmap = AbstractString[]
-   eprop_fmap = Dict{AbstractString, PropID}("id" => 1)
-   eprop_rmap = AbstractString["id"]
+   vprop_fmap = Dict{PropName, PropID}()
+   vprop_rmap = PropName[]
+   eprop_fmap = Dict{PropName, PropID}("id" => 1)
+   eprop_rmap = PropName["id"]
 
    PropertyMap(0, 1, vprop_fmap, vprop_rmap, eprop_fmap, eprop_rmap)
 end
@@ -47,7 +47,7 @@ eprops(pmap::PropertyMap) = pmap.eprop_rmap
 ################################################# MAPPING ###################################################################
 
 """ Fetch the sparse table index for the given vertex property name """
-function vproptoi(x::PropertyMap, prop::AbstractString)
+function vproptoi(x::PropertyMap, prop::PropName)
    if !haskey(x.vprop_fmap, prop)
       # Create a new mapping
       x.nvprop += 1
@@ -60,7 +60,7 @@ function vproptoi(x::PropertyMap, prop::AbstractString)
 end
 
 """ Fetch the sparse table index for the given edge property name """
-function eproptoi(x::PropertyMap, prop::AbstractString)
+function eproptoi(x::PropertyMap, prop::PropName)
    if !haskey(x.eprop_fmap, prop)
       # Create a new mapping
       x.neprop += 1

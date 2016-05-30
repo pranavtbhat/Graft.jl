@@ -34,10 +34,9 @@ function parsegraph_tgf(filename::AbstractString)
    file = open(filename)
    nv, ne = map(x->parse(Int, x), split(readline(file), " "))
    
-   data = NDSparse(VertexID[], VertexID[], PropID[], WithDefault(Any[], nothing))
+   data = NDSparse((VertexID[], VertexID[], PropID[], WithDefault(Any[], nothing))
    pmap = PropertyMap()
    ne_i = 1
-   adj_buffer = Array{EdgeID}(nv+1)
 
    while !eof(file)
       line = strip(readline(file), '\n')
@@ -64,5 +63,5 @@ function parsegraph_tgf(filename::AbstractString)
          end
       end
    end
-   LocalSparseGraph(nv, ne, data, pmap, adj_buffer)
+   LocalSparseGraph(nv, ne, data, pmap)
 end
