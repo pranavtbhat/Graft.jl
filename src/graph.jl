@@ -23,7 +23,7 @@ abstract Graph
 # CONSTRUCTOR INTERFACE
 ###
 """ Return an empty graph of a given type """
-@interface emptygraph(::Type{Graph})
+@interface emptygraph(::Type{Graph}, num_verices::Int = 0)
 
 
 
@@ -42,11 +42,13 @@ abstract Graph
 """ Return the adjacencies of a given vertex """
 @interface adj(g::Graph, v::VertexID)
 
-""" Add a new vertex to the graph. Returns a new graph """
-@interface addvertex(g::Graph, props::Pair...)
+""" Add a new vertex to the graph """
+@interface addvertex!(g::Graph)
+@interface addvertex!(g::Graph, props::Dict{PropName,Any})
 
-""" Add a new edge to the graph. Returns a new graph """
-@interface addedge(g::Graph, u::VertexID, v::VertexID, props::Pair...)
+""" Add a new edge to the graph """
+@interface addedge!(g::Graph, u::VertexID ,v::VertexID)
+@interface addedge!(g::Graph, u::VertexID, v::VertexID, props::Dict{PropName,Any})
 
 
 
@@ -60,23 +62,24 @@ abstract Graph
 """ List the edge properties contained in the graph """
 @interface listeprops(g::Graph)
 
-""" Return the properties of a particular vertex in the graph, as a dictionary """
-@interface getprop(g::Graph, v::VertexID)
+""" Return the properties of a particular vertex in the graph """
+@interface getvprop(g::Graph, v::VertexID)
+@interface getvprop(g::Graph, v::VertexID, propid::PropID)
+@interface getvprop(g::Graph, v::VertexID, propname::PropName)
 
-""" Return the value of a property for a particular vertex in the graph """
-@interface getprop(g::Graph, v::VertexID, propname::PropName)
+""" Return the properties of a particular edge in the graph """
+@interface geteprop(g::Graph, u::VertexID, v::VertexID)
+@interface geteprop(g::Graph, u::VertexID, v::VertexID, propid::PropID)
+@interface geteprop(g::Graph, u::VertexID, v::VertexID, propname::PropName)
 
-""" Return the properties of a particular edge in the graph, as a dictionary """
-@interface getprop(g::Graph, u::VertexID, v::VertexID)
+""" Set the value for a vertex/edge property """
+@interface setvprop!(g::Graph, v::VertexID, props::Dict{PropName, Any})
+@interface setvprop!(g::Graph, v::VertexID, propid::PropID, val::Any)
+@interface setvprop!(g::Graph, v::VertexID, propname::PropName, val::Any)
 
-"""Return the value of a property for a particular edge in the graph """
-@interface getprop(g::Graph, u::VertexID, v::VertexID, propname::PropName)
-
-""" Set the value for a vertex's property """
-@interface setprop!(g::Graph, v::VertexID, propname::PropName, val::Any)
-
-""" Set the value for an edge's property """
-@interface setprop!(g::Graph, u::VertexID, v::VertexID, propname::PropName, val::Any)
+@interface seteprop!(g::Graph, u::VertexID, v::VertexID, props::Dict{PropName, Any})
+@interface seteprop!(g::Graph, u::VertexID, v::VertexID, propid::PropID, val::Any)
+@interface seteprop!(g::Graph, u::VertexID, v::VertexID, propname::PropName, val::Any)
 
 
 
