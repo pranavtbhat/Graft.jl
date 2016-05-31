@@ -1,6 +1,7 @@
 module ParallelGraphs
 
 using NDSparseData
+import LightGraphs
 
 # Package Wide Utilities
 include("util.jl")

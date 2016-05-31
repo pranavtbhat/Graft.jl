@@ -11,13 +11,18 @@ export
 LocalSparseGraph
 
 """ A consolidated Sparse Graph to be used on a single compute node """
-type LocalSparseGraph <: Graph
+type LocalSparseGraph <: SparseGraph
    nv::VertexID                                          # Number of vertexes
    ne::EdgeID                                            # Number of edges
    data::SparseArray                                     # Store all the data involved
    pmap::PropertyMap                                     # Vertex/Edge property map
 end
 
+################################################# SPARSE GRAPH INTERFACE ###################################################
+
+@inline data(g::LocalSparseGraph) = g.data
+
+@inline pmap(g::LocalSparseGraph) = g.pmap
 
 ################################################# CONSTRUCTION INTERFACE ###################################################
 
@@ -34,10 +39,9 @@ ne(g::LocalSparseGraph) = g.ne
 
 size(g::LocalSparseGraph) = (nv(g), ne(g))
 
-function adj(g::LocalSparseGraph, v::VertexID)
-   # TODO Performance
-   flush!(g.data)
-   cols = g.data.indexes.columns
+function adj(g::LocalSparseGraph, v::VertexID) # Messy + Poor performance
+   flush!(data(g))
+   cols = data(g.data).indexes.columns
    unique(cols[2][searchsorted(cols[1], v)])
 end
 
@@ -64,67 +68,3 @@ function addedge!(g::LocalSparseGraph, u::VertexID, v::VertexID, props::Dict{Pro
    seteprop!(g, u, v, props)
    nothing
 end
-
-################################################ PROPERTIES INTERFACE #####################################################
-
-listvprops(g::LocalSparseGraph) = vprops(g.pmap)
-
-listeprops(g::LocalSparseGraph) = eprops(g.pmap)
-
-function getvprop(g::LocalSparseGraph, v::VertexID)
-   vdata = g.data[v, v, :]
-   [itovprop(g.pmap, t[3]) => vdata[t...] for t in vdata.indexes]
-end
-
-function getvprop(g::LocalSparseGraph, v::VertexID, propid::PropID)
-   g.data[v, v, propid]
-end
-
-function getvprop(g::LocalSparseGraph, v::VertexID, propname::PropName)
-   g.data[v, v, vproptoi(g.pmap, propname)]
-end
-
-function geteprop(g::LocalSparseGraph, u::VertexID, v::VertexID)
-   edata = g.data[u, v, :]
-   [itoeprop(g.pmap, t[3]) => edata[t...] for t in edata.indexes]
-end
-
-function geteprop(g::LocalSparseGraph, u::VertexID, v::VertexID, propid::PropID)
-   g.data[u,v,propid]
-end
-
-function geteprop(g::LocalSparseGraph, u::VertexID, v::VertexID, propname::PropName)
-   g.data[u, v, eproptoi(g.pmap, propname)]
-end
-
-
-function setvprop!(g::LocalSparseGraph, v::VertexID, props::Dict{PropName, Any})
-   for (key,val) in props
-      setvprop!(g, v, key, val)
-   end
-end
-
-function setvprop!(g::LocalSparseGraph, v::VertexID, propid::PropID, val::Any)
-   setindex!(g.data, val, v, v, propid)
-end
-
-function setvprop!(g::LocalSparseGraph, v::VertexID, propname::PropName, val::Any)
-   setindex!(g.data, val, v, v, vproptoi(g.pmap, propname))
-end
-
-function seteprop!(g::LocalSparseGraph, u::VertexID, v::VertexID, props::Dict{PropName, Any})
-   for (key,val) in props
-      seteprop!(g, u, v, key, val)
-   end
-end
-
-function seteprop!(g::LocalSparseGraph, u::VertexID, v::VertexID, propid::PropID, val::Any)
-   setindex!(g.data, val, u, v, propid)
-end
-
-function seteprop!(g::LocalSparseGraph, u::VertexID, v::VertexID, propname::PropName, val::Any)
-   g.data[u, v, 1] == nothing && error("This graph does not contain edge $u -> $v")
-   setindex!(g.data, val, u, v, eproptoi(g.pmap, propname))
-end
-
-

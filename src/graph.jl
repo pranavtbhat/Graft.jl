@@ -12,7 +12,7 @@ export
 # Types
 Graph, SparseGraph,
 # Graph Interface methods
-emptygraph, nv, ne, adj, getprop, setprop!, addvertex, addedge
+emptygraph, nv, ne, adj, getprop, setprop!, addvertex!, addedge!
 
 ################################################# GRAPH INTERFACE ##########################################################
 
@@ -83,12 +83,9 @@ abstract Graph
 
 
 
-################################################# SPARSE GRAPH INTERFACE ###################################################
+################################################# GRAPH SUBTYPES #############################################################
 
-""" Sparse Graph Interface that all graphs relying on NDSparse are required to adhere to """
-abstract SparseGraph <: Graph
-
-include("localsparsegraph.jl")
+include("sparsegraph.jl")
 
 
 
