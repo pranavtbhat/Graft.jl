@@ -39,10 +39,16 @@ ne(g::LocalSparseGraph) = g.ne
 
 size(g::LocalSparseGraph) = (nv(g), ne(g))
 
-function adj(g::LocalSparseGraph, v::VertexID) # Messy + Poor performance
+function fadj(g::LocalSparseGraph, v::VertexID) # Messy + Poor performance
    flush!(data(g))
-   cols = data(g.data).indexes.columns
+   cols = data(g).indexes.columns
    unique(cols[2][searchsorted(cols[1], v)])
+end
+
+function badj(g::LocalSparseGraph, v::VertexID) # Messy + Poor performance
+   flush!(data(g))
+   cols = data(g).indexes.columns
+   unique(cols[1][find(x->x==v, cols[2])])
 end
 
 function addvertex!(g::LocalSparseGraph)

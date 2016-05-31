@@ -39,8 +39,11 @@ abstract Graph
 """ Return V x E """
 @interface size(g::Graph)
 
-""" Return the adjacencies of a given vertex """
-@interface adj(g::Graph, v::VertexID)
+""" Return the forward adjacencies of a given vertex """
+@interface fadj(g::Graph, v::VertexID)
+
+""" Return the reverse adjacencies of a given vertex """
+@interface badj(g::Graph, v::VertexID)
 
 """ Add a new vertex to the graph """
 @interface addvertex!(g::Graph)

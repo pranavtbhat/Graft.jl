@@ -38,8 +38,12 @@ ne(g::LGSparseGraph) = LightGraphs.ne(g.lg)
 
 size(g::LGSparseGraph) = (nv(g), ne(g))
 
-function adj(g::LGSparseGraph, v::VertexID)
+function fadj(g::LGSparseGraph, v::VertexID)
    copy(LightGraphs.fadj(g.lg, v))
+end
+
+function badj(g::LGSparseGraph, v::VertexID)
+   copy(LightGraphs.badj(g.lg, v))
 end
 
 function addvertex!(g::LGSparseGraph)
