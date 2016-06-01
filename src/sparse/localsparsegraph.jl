@@ -37,12 +37,12 @@ nv(g::LocalSparseGraph) = g.nv
 
 ne(g::LocalSparseGraph) = g.ne
 
-size(g::LocalSparseGraph) = (nv(g), ne(g))
+Base.size(g::LocalSparseGraph) = (nv(g), ne(g))
 
 function fadj(g::LocalSparseGraph, v::VertexID) # Messy + Poor performance
    flush!(data(g))
    cols = data(g).indexes.columns
-   unique(cols[2][searchsorted(cols[1], v)])
+   deleteat!(unique(cols[2][searchsorted(cols[1], v)]), 1)
 end
 
 function badj(g::LocalSparseGraph, v::VertexID) # Messy + Poor performance
@@ -56,7 +56,7 @@ function addvertex!(g::LocalSparseGraph)
    nothing
 end
 
-function addvertex!(g::LocalSparseGraph, props::Dict{PropName,Any})
+function addvertex!{K<:PropName,V<:Any}(g::LocalSparseGraph, props::Dict{K,V})
    g.nv += 1
    setvprop!(g, nv(g), props)
    nothing
@@ -68,7 +68,7 @@ function addedge!(g::LocalSparseGraph, u::VertexID, v::VertexID)
    nothing
 end
 
-function addedge!(g::LocalSparseGraph, u::VertexID, v::VertexID, props::Dict{PropName, Any})
+function addedge!{K<:PropName,V<:Any}(g::LocalSparseGraph, u::VertexID, v::VertexID, props::Dict{K,V})
    g.ne += 1
    seteprop!(g, u, v, 1, 1)
    seteprop!(g, u, v, props)

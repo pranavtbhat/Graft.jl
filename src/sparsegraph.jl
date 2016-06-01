@@ -21,16 +21,16 @@ listvprops(g::SparseGraph) = vprops(pmap(g))
 listeprops(g::SparseGraph) = eprops(pmap(g))
 
 function getvprop(g::SparseGraph, v::VertexID) # Messy
-   vdata = data(g)[v, v, :]
+   vdata = data(g)[v, 0, :]
    [itovprop(pmap(g), t[3]) => vdata[t...] for t in vdata.indexes]
 end
 
 function getvprop(g::SparseGraph, v::VertexID, propid::PropID)
-   data(g)[v, v, propid]
+   data(g)[v, 0, propid]
 end
 
 function getvprop(g::SparseGraph, v::VertexID, propname::PropName)
-   data(g)[v, v, vproptoi(g.pmap, propname)]
+   data(g)[v, 0, vproptoi(g.pmap, propname)]
 end
 
 function geteprop(g::SparseGraph, u::VertexID, v::VertexID)
@@ -47,21 +47,23 @@ function geteprop(g::SparseGraph, u::VertexID, v::VertexID, propname::PropName)
 end
 
 
-function setvprop!(g::SparseGraph, v::VertexID, props::Dict{PropName, Any})
+function setvprop!{K<:PropName,V<:Any}(g::SparseGraph, v::VertexID, props::Dict{K,V})
    for (key,val) in props
       setvprop!(g, v, key, val)
    end
 end
 
 function setvprop!(g::SparseGraph, v::VertexID, propid::PropID, val::Any)
-   setindex!(data(g), val, v, v, propid)
+   setindex!(data(g), val, v, 0, propid)
+   nothing
 end
 
 function setvprop!(g::SparseGraph, v::VertexID, propname::PropName, val::Any)
-   setindex!(data(g), val, v, v, vproptoi(g.pmap, propname))
+   setindex!(data(g), val, v, 0, vproptoi(g.pmap, propname))
+   nothing
 end
 
-function seteprop!(g::SparseGraph, u::VertexID, v::VertexID, props::Dict{PropName, Any})
+function seteprop!{K<:PropName,V<:Any}(g::SparseGraph, u::VertexID, v::VertexID, props::Dict{K,V})
    for (key,val) in props
       seteprop!(g, u, v, key, val)
    end
@@ -69,10 +71,12 @@ end
 
 function seteprop!(g::SparseGraph, u::VertexID, v::VertexID, propid::PropID, val::Any)
    setindex!(data(g), val, u, v, propid)
+   nothing
 end
 
 function seteprop!(g::SparseGraph, u::VertexID, v::VertexID, propname::PropName, val::Any)
    setindex!(data(g), val, u, v, eproptoi(g.pmap, propname))
+   nothing
 end
 
 ################################################ SPARSEGRAPH IMPLEMENTATIONS ###############################################

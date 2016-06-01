@@ -11,8 +11,12 @@ import NDSparseData: flush!
 export 
 # Types
 Graph, SparseGraph,
-# Graph Interface methods
-emptygraph, nv, ne, adj, getprop, setprop!, addvertex!, addedge!
+# Constructor Interface
+emptygraph,
+# Basic Graph Interface
+nv, ne, fadj, badj, addvertex!, addedge!,
+# Properties Interface
+listvprops, listeprops, getvprop, geteprop, setvprop!, seteprop!
 
 ################################################# GRAPH INTERFACE ##########################################################
 
@@ -37,7 +41,7 @@ abstract Graph
 @interface ne(g::Graph)
 
 """ Return V x E """
-@interface size(g::Graph)
+@interface Base.size(g::Graph)
 
 """ Return the forward adjacencies of a given vertex """
 @interface fadj(g::Graph, v::VertexID)
@@ -47,11 +51,11 @@ abstract Graph
 
 """ Add a new vertex to the graph """
 @interface addvertex!(g::Graph)
-@interface addvertex!(g::Graph, props::Dict{PropName,Any})
+@interface addvertex!{K<:PropName,V<:Any}(g::Graph, props::Dict{K,V})
 
 """ Add a new edge to the graph """
 @interface addedge!(g::Graph, u::VertexID ,v::VertexID)
-@interface addedge!(g::Graph, u::VertexID, v::VertexID, props::Dict{PropName,Any})
+@interface addedge!{K<:PropName,V<:Any}(g::Graph, u::VertexID, v::VertexID, props::Dict{K,V})
 
 
 
@@ -76,11 +80,11 @@ abstract Graph
 @interface geteprop(g::Graph, u::VertexID, v::VertexID, propname::PropName)
 
 """ Set the value for a vertex/edge property """
-@interface setvprop!(g::Graph, v::VertexID, props::Dict{PropName, Any})
+@interface setvprop!{K<:PropName,V<:Any}(g::Graph, v::VertexID, props::Dict{K,V})
 @interface setvprop!(g::Graph, v::VertexID, propid::PropID, val::Any)
 @interface setvprop!(g::Graph, v::VertexID, propname::PropName, val::Any)
 
-@interface seteprop!(g::Graph, u::VertexID, v::VertexID, props::Dict{PropName, Any})
+@interface seteprop!{K<:PropName,V<:Any}(g::Graph, u::VertexID, v::VertexID, props::Dict{K,V})
 @interface seteprop!(g::Graph, u::VertexID, v::VertexID, propid::PropID, val::Any)
 @interface seteprop!(g::Graph, u::VertexID, v::VertexID, propname::PropName, val::Any)
 

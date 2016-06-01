@@ -36,7 +36,7 @@ nv(g::LGSparseGraph) = LightGraphs.nv(g.lg)
 
 ne(g::LGSparseGraph) = LightGraphs.ne(g.lg)
 
-size(g::LGSparseGraph) = (nv(g), ne(g))
+Base.size(g::LGSparseGraph) = (nv(g), ne(g))
 
 function fadj(g::LGSparseGraph, v::VertexID)
    copy(LightGraphs.fadj(g.lg, v))
@@ -51,7 +51,7 @@ function addvertex!(g::LGSparseGraph)
    nothing
 end
 
-function addvertex!(g::LGSparseGraph, props::Dict{PropName,Any})
+function addvertex!{K<:PropName,V<:Any}(g::LGSparseGraph, props::Dict{K,V})
    LightGraphs.add_vertex!(g.lg)
    setvprop!(g, nv(g), props)
    nothing
@@ -63,8 +63,8 @@ function addedge!(g::LGSparseGraph, u::VertexID, v::VertexID)
    nothing
 end
 
-function addedge!(g::LGSparseGraph, u::VertexID, v::VertexID, props::Dict{PropName, Any})
-   LightGraphs.add_edge!(g, u, v)
+function addedge!{K<:PropName,V<:Any}(g::LGSparseGraph, u::VertexID, v::VertexID, props::Dict{K,V})
+   LightGraphs.add_edge!(g.lg, u, v)
    seteprop!(g, u, v, props)
    nothing
 end
