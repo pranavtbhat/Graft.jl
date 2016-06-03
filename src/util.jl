@@ -6,8 +6,11 @@
 
 export 
 # Type Aliases
-VertexID, EdgeID, PropID, SparseArray
-
+VertexID, EdgeID, PropID, SparseArray,
+# Macros
+redirect,
+# Constants
+MAX_VERTEX, MAX_EDGE, MAX_GRAPH_SIZE
 
 ################################################# TYPE ALIASES #############################################################
 
@@ -20,19 +23,17 @@ typealias EdgeID Int
 """ Datatype used to store property indices """
 typealias PropID Int
 
-""" Datatype of keys in properties """
-typealias PropName AbstractString
-
 """ Data structure used in SparseGraphs """
 typealias SparseArray NDSparse{Void,2,Tuple{Int64,Int64,Int64},Tuple{Array{Int64,1},Array{Int64,1},Array{Int64,1}},Array{Any,1}} 
 ################################################# CONSTANTS    #############################################################
 
 """ Maximum number of vertices supported """
-const MAX_VERTEX = typemax(VertexID)
+const MAX_VERTEX = typemax(Int)
 
 """ Maximum number of edges supported """
-const MAX_EDGE = typemax(EdgeID)
+const MAX_EDGE = typemax(Int)
 
+const MAX_GRAPH_SIZE = (10^8,10^8)
 ################################################# MACROS ###################################################################
 
 getvarname(x::Expr) = x.args[1]
@@ -57,4 +58,33 @@ macro interface(expr)
     :(function $(esc(fname))($(args...))
         error(string("The method ", $sig, " hasn't been implemented on ", ($typs[1])))
     end)
+end
+
+"""
+Declare that a function is to be applied on one of the fields of the first argument, instead of the first argument 
+itself. Produces a kind of redirect.
+"""
+macro redirect(expr, func)
+    @assert expr.head == :call
+
+    fname = expr.args[1]
+    f = length(fieldnames(fname)) > 0 ? fname.args[1] : fname
+
+    args = expr.args[2:end]
+
+    farg = args[1].args[1]
+
+    vars = map(x->getvarname(x), args)
+    typs = Expr(:vect, map(x -> :(typeof($x)), vars)...)
+
+    :(function $(esc(fname))($(args...))
+        $f($func($farg), $(vars[2:end]...))
+    end)
+end 
+
+################################################# UTILITIES ################################################################
+
+""" Throw an error that the method isn't supported on the given type """
+@inline function unsupported(t::DataType, fn::Function)
+   error("Method $fn isn't supported on datatype $t")
 end

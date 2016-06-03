@@ -6,8 +6,11 @@ import LightGraphs
 # Package Wide Utilities
 include("util.jl")
 
-# Vertex/Edge Properties
+# Property Modules
 include("properties.jl")
+
+# Adjacency Modules
+include("adjacency.jl")
 
 # Basic Graph Definition
 include("graph.jl")

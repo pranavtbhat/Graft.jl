@@ -7,4 +7,6 @@ end
 
 using ParallelGraphs
 
-include("interface.jl")
+include("adjacency.jl")
+
+include("properties.jl")

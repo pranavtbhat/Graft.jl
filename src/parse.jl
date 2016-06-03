@@ -22,7 +22,7 @@ export parsegraph
 
 ################################################# PARSEGRAPH ###############################################################
 """ Parse a text file in a given format """
-function parsegraph(filename::AbstractString, format::Symbol, graph_type=LocalSparseGraph)
+function parsegraph(filename::AbstractString, format::Symbol, graph_type=SimpleGraph)
    (format == :TGF) && return parsegraph_tgf(filename, graph_type)
    error("Invalid graph format")
 end
@@ -33,7 +33,7 @@ end
 function parsegraph_tgf(filename::AbstractString, graph_type)
    file = open(filename)
    nv, ne = map(x->parse(Int, x), split(readline(file), " "))
-   g = emptygraph(graph_type, nv)
+   g = graph_type(nv)
 
    while !eof(file)
       line = strip(readline(file), '\n')
@@ -43,8 +43,8 @@ function parsegraph_tgf(filename::AbstractString, graph_type)
       if length(args) % 2 == 1
          v = parse(Int, args[1])
          for i in eachindex(args)[2:2:end-1]
-            propname = args[i]
-            val = args[i+1]
+            propname = join(args[i])
+            val = join(args[i+1])
             val = isnumber(val) ? parse(Int, val) : val
             setvprop!(g, v, propname, val)
          end
@@ -52,8 +52,8 @@ function parsegraph_tgf(filename::AbstractString, graph_type)
          v1, v2 = map(x->parse(Int, x), args[1:2])
          addedge!(g, v1, v2)
          for i in eachindex(args)[3:2:end-1]
-            propname = args[i]
-            val = args[i+1]
+            propname = join(args[i])
+            val = join(args[i+1])
             val = isnumber(val) ? parse(Int, val) : val
             seteprop!(g, v1, v2, propname, val) 
          end

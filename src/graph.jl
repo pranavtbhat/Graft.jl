@@ -2,97 +2,72 @@
 
 # This file contains the core graph definitions. ParallelGraphs provides a Graph interface that all 
 # graph types must adhere to. 
-# Some features common to all graph types:
-# 1. Vertices and edges can be assigned properties
-# 2. All graph types are IMMUTABLE. Mutating the graph will create a new graph! Data will be reused to the extent possible.
- 
+# Every graph MUST have:
+# 1. An adjacency module that adheres to the AdjacencyModule interface.
+# 2. A property module that adheres to the PropertyModule interface. 
+# Additionally every graph must also adhere to the graph interface detailed below.
+
 ################################################# IMPORT/EXPORT ############################################################
-import NDSparseData: flush!
 export 
 # Types
-Graph, SparseGraph,
-# Constructor Interface
-emptygraph,
-# Basic Graph Interface
-nv, ne, fadj, badj, addvertex!, addedge!,
-# Properties Interface
-listvprops, listeprops, getvprop, geteprop, setvprop!, seteprop!
+Graph, PropLessGraph,
+# Constants
+Adjacency_Interface_Methods, Property_Interface_Methods
+
+abstract Graph
 
 ################################################# GRAPH INTERFACE ##########################################################
 
-""" Graph Interface that all subtypes are required to adhere to """
-abstract Graph
+""" Retrieve a graph's adjacency module """
+@interface adjmod(g::Graph)
 
-###
-# CONSTRUCTOR INTERFACE
-###
-""" Return an empty graph of a given type """
-@interface emptygraph(::Type{Graph}, num_verices::Int = 0)
+""" Retrieve a graph's property module """
+@interface propmod(g::Graph)
 
+################################################# METHOD REDIRECTION #######################################################
 
+@redirect nv(g::Graph) adjmod
+@redirect nv(g::Graph) adjmod
+@redirect ne(g::Graph) adjmod
+@redirect size(g::Graph) adjmod
+@redirect fadj(g::Graph, v::VertexID) adjmod
+@redirect badj(g::Graph, v::VertexID) adjmod
+@redirect addvertex!(g::Graph) adjmod
+@redirect rmvertex!(g::Graph, v::VertexID) adjmod
+@redirect addedge!(g::Graph, u::VertexID ,v::VertexID) adjmod
+@redirect rmedge!(g::Graph, u::VertexID, v::VertexID) adjmod
 
-###
-# BASIC GRAPH INTERFACE
-###
-""" Return the number of vertices in the graph """
-@interface nv(g::Graph)
+@redirect listvprops(g::Graph) propmod
+@redirect listeprops(g::Graph) propmod
+@redirect getvprop(g::Graph, v::VertexID) propmod
+@redirect getvprop{K}(g::Graph, v::VertexID, propname::K) propmod
+@redirect geteprop(g::Graph, u::VertexID, v::VertexID) propmod
+@redirect geteprop{K}(g::Graph, u::VertexID, v::VertexID, propname::K) propmod
+@redirect setvprop!(g::Graph, v::VertexID, props::Dict) propmod
+@redirect setvprop!{K,V}(g::Graph, v::VertexID, propname::K, val::V) propmod
+@redirect seteprop!(g::Graph, u::VertexID, v::VertexID, props::Dict) propmod
+@redirect seteprop!{K,V}(g::Graph, u::VertexID, v::VertexID, propname::K, val::V) propmod
 
-""" Return the number of edges in the graph """
-@interface ne(g::Graph)
+################################################# GRAPH TYPES ###############################################################
 
-""" Return V x E """
-@interface Base.size(g::Graph)
+""" A graph without properties(For Testing) """
+type PropLessGraph{AM} <: Graph
+   adjmod::AM
+   propmod::NullModule
 
-""" Return the forward adjacencies of a given vertex """
-@interface fadj(g::Graph, v::VertexID)
+   function PropLessGraph(nv::Int=0)
+      self = new{AM}()
+      self.adjmod = AM(nv)
+      self.propmod = NullModule()
+      self
+   end
+end
 
-""" Return the reverse adjacencies of a given vertex """
-@interface badj(g::Graph, v::VertexID)
+Base.call{AM}(x::PropLessGraph{AM}, nv::Int64) = PropLessGraph{AM}(nv)
 
-""" Add a new vertex to the graph """
-@interface addvertex!(g::Graph)
-@interface addvertex!{K<:PropName,V<:Any}(g::Graph, props::Dict{K,V})
+@inline adjmod(x::PropLessGraph) = x.adjmod
+@inline propmod(x::PropLessGraph) = x.propmod
 
-""" Add a new edge to the graph """
-@interface addedge!(g::Graph, u::VertexID ,v::VertexID)
-@interface addedge!{K<:PropName,V<:Any}(g::Graph, u::VertexID, v::VertexID, props::Dict{K,V})
+include("graph/simplegraph.jl")
 
-
-
-
-###
-# PROPERTIES INTERFACE
-###
-""" List the vertex properties contained in a graph """
-@interface listvprops(g::Graph)
-
-""" List the edge properties contained in the graph """
-@interface listeprops(g::Graph)
-
-""" Return the properties of a particular vertex in the graph """
-@interface getvprop(g::Graph, v::VertexID)
-@interface getvprop(g::Graph, v::VertexID, propid::PropID)
-@interface getvprop(g::Graph, v::VertexID, propname::PropName)
-
-""" Return the properties of a particular edge in the graph """
-@interface geteprop(g::Graph, u::VertexID, v::VertexID)
-@interface geteprop(g::Graph, u::VertexID, v::VertexID, propid::PropID)
-@interface geteprop(g::Graph, u::VertexID, v::VertexID, propname::PropName)
-
-""" Set the value for a vertex/edge property """
-@interface setvprop!{K<:PropName,V<:Any}(g::Graph, v::VertexID, props::Dict{K,V})
-@interface setvprop!(g::Graph, v::VertexID, propid::PropID, val::Any)
-@interface setvprop!(g::Graph, v::VertexID, propname::PropName, val::Any)
-
-@interface seteprop!{K<:PropName,V<:Any}(g::Graph, u::VertexID, v::VertexID, props::Dict{K,V})
-@interface seteprop!(g::Graph, u::VertexID, v::VertexID, propid::PropID, val::Any)
-@interface seteprop!(g::Graph, u::VertexID, v::VertexID, propname::PropName, val::Any)
-
-
-
-################################################# GRAPH SUBTYPES #############################################################
-
-include("sparsegraph.jl")
-
-
-
+include("graph/customgraph.jl")
