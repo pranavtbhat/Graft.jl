@@ -1,39 +1,50 @@
 # ParallelGraphs
 ParallelGraphs hopes to be a general purpose graph processing framework. The package will be built on the following abstractions:
 - Only directed graphs are supported.
-- Vertices are referred to by an integer indices only. (Label support?)
-- Properties (key-value pairs) can be assigned to vertices and edges. (Multigraph support through edge properties?)
-- Small graphs will be operated on locally, using sequential algorithms from LightGraphs.
+- Vertices are internally referred to by integer indices. Label Support (with arbitrary julia types) will be provdided for queries only.
+- Properties (key-value pairs) can be assigned to vertices and edges. 
+- Small graphs will be operated on locally, using sequential algorithms.
 - Large graphs will be dealt with using ComputeFramework. 
 
-## Graph Interface
-Every type that implements the `Graph` interface is expected to define the following methods:
+Every Graph type is built with three separate modular components:
+- An `AdjacencyModule` that stores all structural information in the graph. All structural queries are redirected to the `AdjacencyModule` in the graph.
+- A `PropertyModule` that stores the property information in the graph. This component will serve as a Graph-DB and will handle all property related queries and operations.
+- An optional `LabelModule`. Since vertices are referred to by integer indices, this module will translate arbitrary julia objects (as requried by the user) into the integer indices required by internal implementations. Label support will be provided only for user queries (to improve performance).
+
+
+## Adjacency Module
+Every `AdjacencyModule` subtype is expected to implement the following interface:
 - `nv` : Return the number of vertices in the graph.
 - `ne` : Return the number of edges in the graph.
 - `adj` :  Return the neighbors of a vertex. (Change this to `fadj` and `rad`j?)
-- `getprop` : Fetch properties from a vertex/edge.
-- `setprop!` : Modify the properties assigned to a vertex/edge.
--  `addvertex` : Add a vertex to the graph. 
-- `addedge` : Add an edge to the graph.
+-  `addvertex!` : Add a vertex to the graph. 
+-  `rmvertex!` : Remove a vertex from the graph.
+- `addedge!` : Add an edge to the graph.
+- `rmedge!` : Remove an edge from the graph.
+
+ParallelGraphs has the following `AdjacencyModule`s implemented:
+- `LightGraphsAM` : This module contains a `DiGraph` from *[LightGraphs.jl](https://github.com/JuliaGraphs/LightGraphs.jl)* and therefore will support all graph algorithms from *LightGraphs*.
+- `SparseMatrixAM` : This module maintains a matrix in the Compressed Sparse Column format (`SparseMatrixCSC`), and is expected to be more compact than `LightGraphsAM`. However, this module will not support many algorithms.
+
+## PropertyModule
+Every `PropertyModule` subtype is expected to implement the following interface:
+- `listvprops` : List all the vertex properties in the graph.
+- `listeprops` : List all the edge properties in the graph. 
+- `getvprop` : Fetch properties from a vertex.
+- `geteprop` : Fetch properties from an edge.
+- `setvprop!` : Modify the properties assigned to a vertex.
+- `seteprop!` : Modify the properties assigned to an edge.
+
+ParallelGraphs has the following `PropertyModule`s implemented:
+- `DictPM` : Uses the standard Julia `Dictionary` type to store vertex/edge properties.
+- `NDSparsePM` : Uses N-Dimensional Sparse arrays from *[NDSparseData.jl](https://github.com/JuliaComputing/NDSparseData.jl)* to store vertex/edge properties.
+
 
 ## Graph Types
-ParallelGraphs will support a variety of graph types, and will provide conversions between these types.
+ParallelGraphs currently implements the following Graph types:
+- `SimpleGraph` : This graph type uses `LightGraphsAM` and `DictPM`, and will support only `ASCIIString` properties.
+- `CustomGraph` : A parameterized, fully customizable graph.
 
-### SparseGraph
-Graphs of this type will use N-Dimensional sparse arrays to store graph property and structural information. This type is 
-mainly aimed at achieving parallelized computation. SparseGraph will have two separate implementations:
-- `LocalSparseGraph` : In-memory type for small graphs.
-- `DistSparseGraph`  : Distributed type (using ComputeFramework) for larger graphs.
-
-The `DistSparseGraph` variant will consist of several `LocalSparseGraph` objects, placed on different processes.
-
-### LGSparseGraph
-Graphs of this type will consist of a `LightGraphs.Graph` object for structural information, and an N-Dimensional sparse
-array for property information. This type is mainly aimed at achieving fast sequential computation on small graphs.
-This type will support most of the algorithms from `LightGraphs.jl`. 
-
-### LabelGraphs(?)
-Graphs of this type will allow indexing on vertex labels. This type will use dictionaries to store structure and property information.
 
 ## Queries
 Most adjacency/property operations will be supported through indexing. For example, consider a graph where each vertex 
@@ -61,21 +72,5 @@ g[1, 2]["relationship"]
 g[1, :]
 ```
 
-I also hope to implement a descriptive query language which will help data scientists quickly mine information from the graph, through the REPL.
-Things I have in mind are:
-
-```julia
-@pg ?.age = 5           # Return all vertices with the age property set to 5
-
-@pg 1.?.relationship = follow # Return all vertices followed by vertex 1.
-
-@pg usegraph(g)         # Tell the system which graph you're using.
-
-@pg 1 -> ?              # Get vertex 1's out-neighbors
-
-@pg ? -> 1              # Get vertex 1s in-neighbors
-
-@pg 1 -(3)> ?           # Get all vertices at a distance of 3 from vertex 1.
-
-@pg 1 -(?)> 2           # Get the distance between vertex 1 and 2
-```
+## Achnowledgements
+This project is supported by `Google Summer of Code` and mentored by [Viral Shah](https://github.com/ViralBShah) and [Shashi Gowda](https://github.com/shashi).
