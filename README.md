@@ -1,7 +1,6 @@
 # ParallelGraphs
 ParallelGraphs hopes to be a general purpose graph processing framework. The package will be built on the following abstractions:
 - Only directed graphs are supported.
-- Graphs are immutable types. Modifying the structure of a graph will yield a new one, reusing as much data as possible.
 - Vertices are referred to by an integer indices only. (Label support?)
 - Properties (key-value pairs) can be assigned to vertices and edges. (Multigraph support through edge properties?)
 - Small graphs will be operated on locally, using sequential algorithms from LightGraphs.

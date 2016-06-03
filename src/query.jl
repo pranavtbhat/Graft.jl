@@ -8,11 +8,11 @@
 ################################################# SPARSE GRAPHS ############################################################
 
 # Getindex
-Base.getindex(g::Graph, v::VertexID) = getprop(g, v)
-Base.getindex(g::Graph, u::VertexID, v::VertexID) = getprop(g, u, v)
-Base.getindex(g::Graph, v::VertexID, ::Colon) = adj(g, v)
+Base.getindex(g::Graph, v::VertexID) = getvprop(g, v)
+Base.getindex(g::Graph, u::VertexID, v::VertexID) = geteprop(g, u, v)
+Base.getindex(g::Graph, v::VertexID, ::Colon) = fadj(g, v)
 
 # Setindex
 
-Base.setindex!(g::Graph, val, v, propname) = setprop!(g, v, propname, val)
-Base.setindex!(g::Graph, val, u, v, propname) = setprop!(g, u, v, propname, val)
+Base.setindex!(g::Graph, val, v, propname) = setvprop!(g, v, propname, val)
+Base.setindex!(g::Graph, val, u, v, propname) = seteprop!(g, u, v, propname, val)
