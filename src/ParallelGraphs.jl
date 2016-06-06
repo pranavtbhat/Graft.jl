@@ -3,6 +3,9 @@ module ParallelGraphs
 using NDSparseData
 import LightGraphs
 
+# Core definitions
+include("core.jl")
+
 # Package Wide Utilities
 include("util.jl")
 

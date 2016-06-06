@@ -32,37 +32,47 @@ end
 
 ################################################# IMPLEMENTATION ############################################################
 
-listvprops{K,V}(x::DictPM{K,V}) = collect(vprops(x))
+listvprops{AM,K,V}(g::Graph{AM,DictPM{K,V}}) = collect(vprops(propmod(g)))
 
-listeprops{K,V}(x::DictPM{K,V}) = collect(eprops(x))
+listeprops{AM,K,V}(g::Graph{AM,DictPM{K,V}}) = collect(eprops(propmod(g)))
 
-@inline getvprop{K,V}(x::DictPM{K,V}, v::VertexID) = [prop => data(x)[(v,prop)] for prop in vprops(x)]
+function getvprop{AM,K,V}(g::Graph{AM,DictPM{K,V}}, v::VertexID)
+   x = propmod(g)
+   D = data(x)
+   [prop => D[(v,prop)] for prop in vprops(x)]
+end
 
-@inline getvprop{K,V}(x::DictPM{K,V}, v::VertexID, prop) = data(x)[(v,prop)]
+@inline getvprop{AM,K,V}(g::Graph{AM,DictPM{K,V}}, v::VertexID, prop) = data(propmod(g))[(v,prop)]
 
-@inline geteprop{K,V}(x::DictPM{K,V}, u::VertexID, v::VertexID) = [prop => data(x)[(u=>v,prop)] for prop in eprops(x)]
+function geteprop{AM,K,V}(g::Graph{AM,DictPM{K,V}}, u::VertexID, v::VertexID)
+   x = propmod(g)
+   D = data(x)
+   [prop => D[(u=>v,prop)] for prop in eprops(x)]
+end
 
-@inline geteprop{K,V}(x::DictPM{K,V}, u::VertexID, v::VertexID, prop) = data(x)[(u=>v,prop)]
+@inline geteprop{AM,K,V}(g::Graph{AM,DictPM{K,V}}, u::VertexID, v::VertexID, prop) = data(propmod(g))[(u=>v,prop)]
 
-function setvprop!{K,V}(x::DictPM{K,V}, v::VertexID, props::Dict)
+function setvprop!{AM,K,V}(g::Graph{AM,DictPM{K,V}}, v::VertexID, props::Dict)
    for (key,val) in props
-      setvprop!(x, v, key, val)
+      setvprop!(g, v, key, val)
    end
 end
 
-function setvprop!{K,V}(x::DictPM{K,V}, v::VertexID, prop, val)
+function setvprop!{AM,K,V}(g::Graph{AM,DictPM{K,V}}, v::VertexID, prop, val)
+   x = propmod(g)
    push!(vprops(x), prop)
    setindex!(data(x), val, (v,prop))
    nothing
 end
 
-function seteprop!{K,V}(x::DictPM{K,V}, u::VertexID, v::VertexID, props::Dict)
+function seteprop!{AM,K,V}(g::Graph{AM,DictPM{K,V}}, u::VertexID, v::VertexID, props::Dict)
    for (key,val) in props
-      seteprop!(x, u, v, key, val)
+      seteprop!(g, u, v, key, val)
    end
 end
 
-function seteprop!{K,V}(x::DictPM{K,V}, u::VertexID, v::VertexID, prop, val)
+function seteprop!{AM,K,V}(g::Graph{AM,DictPM{K,V}}, u::VertexID, v::VertexID, prop, val)
+   x = propmod(g)
    push!(eprops(x), prop)
    setindex!(data(x), val, (u=>v,prop))
    nothing

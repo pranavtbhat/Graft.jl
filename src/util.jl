@@ -60,27 +60,27 @@ macro interface(expr)
     end)
 end
 
-"""
-Declare that a function is to be applied on one of the fields of the first argument, instead of the first argument 
-itself. Produces a kind of redirect.
-"""
-macro redirect(expr, func)
-    @assert expr.head == :call
+# """
+# Declare that a function is to be applied on one of the fields of the first argument, instead of the first argument 
+# itself. Produces a kind of redirect.
+# """
+# macro redirect(expr, func)
+#     @assert expr.head == :call
 
-    fname = expr.args[1]
-    f = length(fieldnames(fname)) > 0 ? fname.args[1] : fname
+#     fname = expr.args[1]
+#     f = length(fieldnames(fname)) > 0 ? fname.args[1] : fname
 
-    args = expr.args[2:end]
+#     args = expr.args[2:end]
 
-    farg = args[1].args[1]
+#     farg = args[1].args[1]
 
-    vars = map(x->getvarname(x), args)
-    typs = Expr(:vect, map(x -> :(typeof($x)), vars)...)
+#     vars = map(x->getvarname(x), args)
+#     typs = Expr(:vect, map(x -> :(typeof($x)), vars)...)
 
-    :(function $(esc(fname))($(args...))
-        $f($func($farg), $(vars[2:end]...))
-    end)
-end 
+#     :(function $(esc(fname))($(args...))
+#         $f($func($farg), $(vars[2:end]...))
+#     end)
+# end 
 
 ################################################# UTILITIES ################################################################
 

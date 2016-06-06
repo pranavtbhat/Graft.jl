@@ -26,19 +26,19 @@ end
 
 ################################################# INTERFACE IMPLEMENTATION #################################################
 
-@inline nv(x::SparseMatrixAM) = x.nv
+@inline nv(g::Graph{SparseMatrixAM}) = adjmod(g).nv
 
-@inline ne(x::SparseMatrixAM) = x.ne
+@inline ne(g::Graph{SparseMatrixAM}) = adjmod(g).ne
 
-@inline Base.size(x::SparseMatrixAM) = (nv(x), ne(x))
+@inline Base.size(g::Graph{SparseMatrixAM}) = (nv(g), ne(g))
 
-function fadj(x::SparseMatrixAM, v::VertexID) # Messy
-   M = data(x)
+function fadj(g::Graph{SparseMatrixAM}, v::VertexID) # Messy
+   M = data(adjmod(g))
    M.rowval[M.colptr[v] : (M.colptr[v+1]-1)]
 end
 
-function badj(x::SparseMatrixAM, v::VertexID) # Messy
-   M = data(x)
+function badj(g::Graph{SparseMatrixAM}, v::VertexID) # Messy
+   M = data(adjmod(g))
    result = Array(Int, 0)
    @inbounds for col in 1:size(M, 2)
       row = v
@@ -56,27 +56,27 @@ function badj(x::SparseMatrixAM, v::VertexID) # Messy
    result
 end
 
-function addvertex!(x::SparseMatrixAM)
-   x.nv += 1
+function addvertex!(g::Graph{SparseMatrixAM})
+   adjmod(g).nv += 1
    nothing
 end
 
-function rmvertex!(x::SparseMatrixAM, v::VertexID)
-   x.nv -= 1
-   setindex!(data(x), false, v, :)
-   setindex!(data(x), false, :, v)
+function rmvertex!(g::Graph{SparseMatrixAM}, v::VertexID)
+   adjmod(g).nv -= 1
+   setindex!(data(adjmod(g)), false, v, :)
+   setindex!(data(adjmod(g)), false, :, v)
    nothing
 end
 
-function addedge!(x::SparseMatrixAM, u::VertexID, v::VertexID)
-   x.ne += 1
-   setindex!(data(x), true, v, u)
+function addedge!(g::Graph{SparseMatrixAM}, u::VertexID, v::VertexID)
+   adjmod(g).ne += 1
+   setindex!(data(adjmod(g)), true, v, u)
    nothing
 end
 
-function rmedge!(x::SparseMatrixAM, u::VertexID, v::VertexID)
-   x.ne -= 1
-   setindex!(data(x), false, v, u)
+function rmedge!(g::Graph{SparseMatrixAM}, u::VertexID, v::VertexID)
+   adjmod(g).ne -= 1
+   setindex!(data(adjmod(g)), false, v, u)
    nothing
 end
 
