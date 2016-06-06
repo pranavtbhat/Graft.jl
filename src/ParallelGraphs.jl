@@ -24,4 +24,7 @@ include("query.jl")
 # Parse Graphs from files etc.
 include("parse.jl")
 
+# Graph Algortithms
+include("algorithms.jl")
+
 end # module

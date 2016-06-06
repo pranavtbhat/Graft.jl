@@ -29,9 +29,9 @@ end
 
 @inline Base.size(g::Graph{LightGraphsAM}) = (nv(g), ne(g))
 
-@inline fadj(g::Graph{LightGraphsAM}, v::VertexID) = copy(LightGraphs.fadj(data(adjmod(g)), v))
+@inline fadj(g::Graph{LightGraphsAM}, v::VertexID) = LightGraphs.fadj(data(adjmod(g)), v)
 
-@inline badj(g::Graph{LightGraphsAM}, v::VertexID) = copy(LightGraphs.badj(data(adjmod(g)), v))
+@inline badj(g::Graph{LightGraphsAM}, v::VertexID) = LightGraphs.badj(data(adjmod(g)), v)
 
 @inline addvertex!(g::Graph{LightGraphsAM}) = (LightGraphs.add_vertex!(data(adjmod(g))); nothing)
 
