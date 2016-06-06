@@ -45,12 +45,8 @@ const Property_Interface_Methods = [:listvprops, :listeprops, :getvprop, :getepr
 
 # Null Implementation
 
-""" Null property module implementation """
-immutable NullModule{K,V} <: PropertyModule{K,V}
-end
-
-function NullModule()
-   NullModule{Void,Void}()
+""" Null property module. Does not implement the PropertyInterface """
+immutable NullModule
 end
 
 listvprops(g::NullModule) = Void()

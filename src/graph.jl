@@ -10,19 +10,29 @@
 ################################################# IMPORT/EXPORT ############################################################
 export 
 # Types
-Graph, PropLessGraph,
+Graph, SimpleGraph,
 # Constants
 Adjacency_Interface_Methods, Property_Interface_Methods
 
-abstract Graph
+type Graph{AM,PM}
+   adjmod::AM
+   propmod::PM
+
+   function Graph(nv::Int=0)
+      self = new()
+      self.adjmod = AM(nv)
+      self.propmod = PM()
+      self
+   end
+end
 
 ################################################# GRAPH INTERFACE ##########################################################
 
 """ Retrieve a graph's adjacency module """
-@interface adjmod(g::Graph)
+@inline adjmod(x::Graph) = x.adjmod
 
 """ Retrieve a graph's property module """
-@interface propmod(g::Graph)
+@inline propmod(x::Graph) = x.propmod
 
 ################################################# METHOD REDIRECTION #######################################################
 
@@ -48,26 +58,6 @@ abstract Graph
 @redirect seteprop!(g::Graph, u::VertexID, v::VertexID, props::Dict) propmod
 @redirect seteprop!{K,V}(g::Graph, u::VertexID, v::VertexID, propname::K, val::V) propmod
 
-################################################# GRAPH TYPES ###############################################################
+################################################# TYPE ALIASES ###############################################################
 
-""" A graph without properties(For Testing) """
-type PropLessGraph{AM} <: Graph
-   adjmod::AM
-   propmod::NullModule
-
-   function PropLessGraph(nv::Int=0)
-      self = new{AM}()
-      self.adjmod = AM(nv)
-      self.propmod = NullModule()
-      self
-   end
-end
-
-Base.call{AM}(x::PropLessGraph{AM}, nv::Int64) = PropLessGraph{AM}(nv)
-
-@inline adjmod(x::PropLessGraph) = x.adjmod
-@inline propmod(x::PropLessGraph) = x.propmod
-
-include("graph/simplegraph.jl")
-
-include("graph/customgraph.jl")
+typealias SimpleGraph Graph{LightGraphsAM,DictPM{ASCIIString,Any}}

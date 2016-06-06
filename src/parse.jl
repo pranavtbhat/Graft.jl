@@ -33,6 +33,7 @@ end
 function parsegraph_tgf(filename::AbstractString, graph_type)
    file = open(filename)
    nv, ne = map(x->parse(Int, x), split(readline(file), " "))
+   println(graph_type)
    g = graph_type(nv)
 
    while !eof(file)

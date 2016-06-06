@@ -6,7 +6,7 @@
 
 
 for amtype in subtypes(AdjacencyModule)
-   g = parsegraph("testgraph.txt", :TGF, PropLessGraph{amtype}())
+   g = parsegraph("testgraph.txt", :TGF, Graph{amtype,NullModule})
    am = ParallelGraphs.adjmod(g)
 
    @testset "AdjacencyModule interface for $amtype" begin
