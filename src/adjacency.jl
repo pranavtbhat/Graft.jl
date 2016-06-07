@@ -42,7 +42,6 @@ abstract AdjacencyModule
 """ Remove edge u->v from the graph """
 @interface rmedge!(g::Graph, u::VertexID, v::VertexID)
 
-
 ################################################# IMPLEMENTATIONS #########################################################
 
 include("lightgraphs/adjacencymodule.jl")

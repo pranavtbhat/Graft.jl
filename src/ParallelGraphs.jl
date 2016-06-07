@@ -2,6 +2,7 @@ module ParallelGraphs
 
 using NDSparseData
 import LightGraphs
+using Faker
 
 # Core definitions
 include("core.jl")

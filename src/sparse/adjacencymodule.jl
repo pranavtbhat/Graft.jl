@@ -4,79 +4,118 @@
  
 ################################################# IMPORT/EXPORT ############################################################
 export
-SparseMatrixAM
+SparseMatrixAM, SparseMatrixIterator
 
 type SparseMatrixAM <: AdjacencyModule
    nv::Int
    ne::Int
-   data::SparseMatrixCSC{Bool, Int}
+   fdata::SparseMatrixCSC{Bool, Int}
+   rdata::SparseMatrixCSC{Bool, Int}
+end
 
-   function SparseMatrixAM(nv=0)
-      self = new()
-      self.nv = nv
-      self.ne = 0
-      self.data = sprandbool(MAX_GRAPH_SIZE..., 0.0)
-      self
+
+################################################# GENERATORS ###############################################################
+
+function SparseMatrixAM(nv=0)
+   fdata = spzeros(Bool, nv, nv)
+   rdata = spzeros(Bool, nv, nv)
+   SparseMatrixAM(nv, 0, fdata, rdata)
+end
+
+function SparseMatrixAM(nv::Int, ne::Int)
+   x = SparseMatrixAM(nv)
+   while x.ne < ne
+      u = rand(1:nv)
+      v = rand(1:nv)
+      u == v ||hasedge(x, u, v) || addedge!(x, u, v)
    end
+   x
 end
 
 ################################################# ACCESSORS ################################################################
 
-@inline data(x::SparseMatrixAM) = x.data
+@inline fdata(x::SparseMatrixAM) = x.fdata
 
-################################################# INTERFACE IMPLEMENTATION #################################################
+@inline rdata(x::SparseMatrixAM) = x.rdata
 
-@inline nv(g::Graph{SparseMatrixAM}) = adjmod(g).nv
+################################################# INTERNAL IMPLEMENTATION ##################################################
 
-@inline ne(g::Graph{SparseMatrixAM}) = adjmod(g).ne
-
-@inline Base.size(g::Graph{SparseMatrixAM}) = (nv(g), ne(g))
-
-function fadj(g::Graph{SparseMatrixAM}, v::VertexID) # Messy
-   M = data(adjmod(g))
-   M.rowval[M.colptr[v] : (M.colptr[v+1]-1)]
+# To avoid allocating memory
+type SparseMatrixIterator
+   rowval::Vector{Int}
+   range::UnitRange{Int}
 end
 
-function badj(g::Graph{SparseMatrixAM}, v::VertexID) # Messy
-   M = data(adjmod(g))
-   result = Array(Int, 0)
-   @inbounds for col in 1:size(M, 2)
-      row = v
-      ptr = M.colptr[col]
-      stop = M.colptr[col+1]-1
-      if ptr <= stop
-         if M.rowval[ptr] <= row
-            ptr = searchsortedfirst(M.rowval, row, ptr, stop, Base.Order.Forward)
-            if ptr <= stop && M.rowval[ptr] == row
-               push!(result, col)
-            end
-         end
-      end
-   end
-   result
+Base.length(x::SparseMatrixIterator) = length(x.range)
+Base.start(x::SparseMatrixIterator) = start(x.range)
+Base.done(x::SparseMatrixIterator, i) = i > last(x.range)
+Base.next(x::SparseMatrixIterator, i) = x.rowval[i], i+1
+Base.collect(x::SparseMatrixIterator) = x.rowval[x.range]
+
+# Increase size of SparseMatrixCSC
+function grow(x::SparseMatrixCSC{Bool,Int}, sz::Int)
+   colptr = x.colptr
+   SparseMatrixCSC{Bool,Int}(x.m+sz, x.n+sz, append!(colptr, fill(colptr[end], sz)), x.rowval, x.nzval)
 end
 
-function addvertex!(g::Graph{SparseMatrixAM})
-   adjmod(g).nv += 1
+################################################# IMPLEMENTATION ############################################################
+
+nv(x::SparseMatrixAM) = x.nv
+
+ne(x::SparseMatrixAM) = x.ne
+
+Base.size(x::SparseMatrixAM) = (x.nv, x.ne)
+
+function fadj(x::SparseMatrixAM, v::Int) # Messy
+   M = fdata(x)
+   SparseMatrixIterator(M.rowval, M.colptr[v] : (M.colptr[v+1]-1))
+end
+
+function badj(x::SparseMatrixAM, v::Int)
+   M = rdata(x)
+   SparseMatrixIterator(M.rowval, M.colptr[v] : (M.colptr[v+1]-1))
+end
+
+hasedge(x::SparseMatrixAM, u::VertexID, v::VertexID) = fdata(x)[u,v]
+
+function addvertex!(x::SparseMatrixAM, numv::Int = 1)
+   fdata(x) = grow(fdata(x), numv)
+   rdata(x) = grow(rdata(x), numv)
+   x.nv += numv
    nothing
 end
 
-function rmvertex!(g::Graph{SparseMatrixAM}, v::VertexID)
-   adjmod(g).nv -= 1
-   setindex!(data(adjmod(g)), false, v, :)
-   setindex!(data(adjmod(g)), false, :, v)
+function rmvertex!(x::SparseMatrixAM, v::Int)
+   g.nv -= 1
+   setindex!(fdata(x), false, v, :)
+   setindex!(fdata(x), false, :, v)
+   setindex!(rdata(x), false, :, v)
+   setindex!(rdata(x), false, v, :)
    nothing
 end
 
-function addedge!(g::Graph{SparseMatrixAM}, u::VertexID, v::VertexID)
-   adjmod(g).ne += 1
-   setindex!(data(adjmod(g)), true, v, u)
+function addedge!(x::SparseMatrixAM, u::Int, v::Int)
+   x.ne += 1
+   setindex!(fdata(x), true, v, u)
+   setindex!(rdata(x), true, u, v)
    nothing
 end
 
-function rmedge!(g::Graph{SparseMatrixAM}, u::VertexID, v::VertexID)
-   adjmod(g).ne -= 1
-   setindex!(data(adjmod(g)), false, v, u)
+function rmedge!(x::SparseMatrixAM, u::Int, v::Int)
+   x.ne -= 1
+   setindex!(fdata(x), false, v, u)
+   setindex!(rdata(x), false, u, v)
    nothing
 end
 
+################################################# INTERFACE IMPLEMENTATION #####################################################
+
+@inline nv(g::Graph{SparseMatrixAM}) = nv(adjmod(g))
+@inline ne(g::Graph{SparseMatrixAM}) = ne(adjmod(g))
+@inline Base.size(g::Graph{SparseMatrixAM}) = size(adjmod(g))
+@inline fadj(g::Graph{SparseMatrixAM}, v::VertexID) = fadj(adjmod(g), v)
+@inline badj(g::Graph{SparseMatrixAM}, v::VertexID) = radj(adjmod(g), v)
+@inline addvertex!(g::Graph{SparseMatrixAM}) = addvertex!(adjmod(g))
+@inline rmvertex!(g::Graph{SparseMatrixAM}, v::VertexID) = rmvertex!(adjmod(g), v)
+@inline addedge!(g::Graph{SparseMatrixAM}, u::VertexID, v::VertexID) = addedge!(adjmod(g), u, v)
+@inline rmedge!(g::Graph{SparseMatrixAM}, u::VertexID, v::VertexID) = rmedge!(adjmod(g), u, v)

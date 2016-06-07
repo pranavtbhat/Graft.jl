@@ -15,6 +15,18 @@ type LightGraphsAM <: AdjacencyModule
       self.data = LightGraphs.DiGraph(nv)
       self
    end
+
+   function LightGraphsAM(x::LightGraphs.DiGraph)
+      self = new()
+      self.data = x
+      self
+   end
+end
+
+################################################# GENERATORS ###############################################################
+
+function LightGraphsAM(nv::Int, ne::Int)
+   LightGraphsAM(LightGraphs.DiGraph(nv, ne))
 end
 
 ################################################# ACCESSORS ################################################################
