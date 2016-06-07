@@ -24,6 +24,13 @@ type Graph{AM,PM}
       self.propmod = PM()
       self
    end
+
+   function Graph(nv::Int, ne::Int)
+      self = new()
+      self.adjmod = AM(nv, ne)
+      self.propmod = PM()
+      self
+   end
 end
 
 ################################################# GRAPH INTERFACE ##########################################################
