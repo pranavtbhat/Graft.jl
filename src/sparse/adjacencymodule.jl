@@ -23,13 +23,10 @@ function SparseMatrixAM(nv=0)
 end
 
 function SparseMatrixAM(nv::Int, ne::Int)
-   x = SparseMatrixAM(nv)
-   while x.ne < ne
-      u = rand(1:nv)
-      v = rand(1:nv)
-      u == v ||hasedge(x, u, v) || addedge!(x, u, v)
-   end
-   x
+   m = sprandbool(nv, nv, ne/(nv*nv))
+   fdata = triu(m,1) | tril(m,-1)
+   rdata = fdata'
+   SparseMatrixAM(nv, nnz(fdata), fdata, rdata)
 end
 
 ################################################# ACCESSORS ################################################################

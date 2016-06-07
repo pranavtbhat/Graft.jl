@@ -58,7 +58,7 @@ function dfs(g::Graph, root)
       count += 1
 
       for v in fadj(g, u)
-         order[v] == -1 || continue
+         parvec[v] == -1 || continue
          parvec[v] = u
          push!(S, v)
       end
