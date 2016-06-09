@@ -31,6 +31,27 @@ end
 
 """ Parse a text file in the trivial graph format """
 function parsegraph_tgf(filename::AbstractString, graph_type)
+   @inline function parse_vertex(g, args)
+      v = parse(Int, args[1])
+      for i in eachindex(args)[2:2:end-1]
+         propname = join(args[i])
+         val = join(args[i+1])
+         val = isnumber(val) ? parse(Int, val) : val
+         setvprop!(g, v, propname, val)
+      end
+   end
+
+   @inline function parse_edge(g, args)
+      v1, v2 = map(x->parse(Int, x), args[1:2])
+      addedge!(g, v1, v2)
+      for i in eachindex(args)[3:2:end-1]
+         propname = join(args[i])
+         val = join(args[i+1])
+         val = isnumber(val) ? parse(Int, val) : val
+         seteprop!(g, v1, v2, propname, val) 
+      end
+   end
+
    file = open(filename)
    nv, ne = map(x->parse(Int, x), split(readline(file), " "))
    g = graph_type(nv)
@@ -41,23 +62,11 @@ function parsegraph_tgf(filename::AbstractString, graph_type)
       (length(args) == 0 || length(line) == 0) && continue
 
       if length(args) % 2 == 1
-         v = parse(Int, args[1])
-         for i in eachindex(args)[2:2:end-1]
-            propname = join(args[i])
-            val = join(args[i+1])
-            val = isnumber(val) ? parse(Int, val) : val
-            setvprop!(g, v, propname, val)
-         end
+         parse_vertex(g, args)
       elseif length(args) % 2 == 0
-         v1, v2 = map(x->parse(Int, x), args[1:2])
-         addedge!(g, v1, v2)
-         for i in eachindex(args)[3:2:end-1]
-            propname = join(args[i])
-            val = join(args[i+1])
-            val = isnumber(val) ? parse(Int, val) : val
-            seteprop!(g, v1, v2, propname, val) 
-         end
+         parse_edge(g, args)
       end
    end
+
    return g
 end
