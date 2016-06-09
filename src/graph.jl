@@ -7,42 +7,50 @@ export
 # Typealiases
 SimpleGraph,
 # Random Generation
-randgraph
+random_vertex_prop!, random_edge_prop!
 
 
 ################################################# TYPE ALIASES #############################################################
 
 typealias SimpleGraph Graph{LightGraphsAM,DictPM{ASCIIString,Any}}
 
-################################################# RANDOM GENERATION ########################################################
+################################################# RANDOM PROPERTIES ########################################################
 
-function randgraph{AM,PM}(
-   ::Type{Graph{AM,PM}},
-   nv::Int,
-   ne::Int,
-   vprops::Vector{Symbol} = [:date, :first_name, :last_name, :address, :email],
-   eprops::Vector{Symbol} = [:color_name]
-   )
-   
-   g = Graph{AM,PM}(nv, ne)
-
-   for u in 1 : nv
-      for vprop in vprops
-         setvprop!(g, u, string(vprop), getfield(Faker, vprop)())
-      end
-      
-
-      for v in fadj(g, u)
-         for eprop in eprops
-            seteprop!(g, u, v, string(eprop), getfield(Faker, eprop)())
-         end
-      end
-   end
-   g
+function random_vertex_prop!(x::PropertyModule, v::Int, propname, f::Function)
+   setvprop!(x, v, propname, f())
 end
 
+function random_vertex_prop!(g::Graph, propname, f::Function)
+   map(v -> random_vertex_prop!(propmod(g), v, propname, f), 1 : nv(g))
+   nothing
+end
 
+function random_vertex_prop!(g::Graph, d::Dict)
+   for (propname,f) in d
+      random_vertex_prop!(g, propname, f)
+   end
+end
 
+function random_vertex_prop!(g::Graph)
+   random_vertex_prop!(g, "label", randstring)
+end
+
+function random_edge_prop!(x::PropertyModule, u::Int, v::Int, propname, f::Function)
+   seteprop!(x, u, v, propname, f())
+end
+
+function random_edge_prop!(g::Graph, propname, f::Function)
+   pm = propmod(g)
+   for u in 1 : nv(g)
+      for v in fadj(g, u)
+         random_edge_prop!(pm, u, v, propname, f)
+      end
+   end
+end
+
+function random_edge_prop!(g::Graph)
+   random_edge_prop!(g, "weight", () -> rand(Int))
+end
 
 ################################################# DISPLAY  #################################################################
 
