@@ -34,15 +34,14 @@ end
 
 @inline eprops(x::NDSparsePM) = x.eprops
 
-################################################# INTERFACE IMPLEMENTATION #################################################
+################################################# INTERNAL IMPLEMENTATION #################################################
 
 
-listvprops{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}) = collect(vprops(propmod(g)))
+listvprops{K,V}(x::NDSparsePM{K,V}) = collect(vprops(x))
 
-listeprops{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}) = collect(eprops(propmod(g)))
+listeprops{K,V}(x::NDSparsePM{K,V}) = collect(eprops(x))
 
-function getvprop{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, v::VertexID) # Messy
-   x = propmod(g)
+function getvprop{K,V}(x::NDSparsePM{K,V}, v::VertexID) # Messy
    flush!(data(x))
    cols = data(x).indexes.columns
    D = data(x).data
@@ -51,10 +50,9 @@ function getvprop{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, v::VertexID) # Messy
    [cols[3][idx] => D[idx] for idx in idxs]
 end
 
-@inline getvprop{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, v::VertexID, prop) = data(propmod(g))[v, 0, prop]
+getvprop{K,V}(x::NDSparsePM{K,V}, v::VertexID, prop) = data(x)[v, 0, prop]
 
-function geteprop{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, u::VertexID, v::VertexID) # Messy
-   x = propmod(g)
+function geteprop{K,V}(x::NDSparsePM{K,V}, u::VertexID, v::VertexID) # Messy
    flush!(data(x))
    cols = data(x).indexes.columns
    D = data(x).data
@@ -63,30 +61,41 @@ function geteprop{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, u::VertexID, v::VertexID
    [cols[3][idx] => D[idx] for idx in idxs]
 end
 
-@inline geteprop{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, u::VertexID, v::VertexID, prop) = data(propmod(g))[u, v, prop]
+geteprop{K,V}(x::NDSparsePM{K,V}, u::VertexID, v::VertexID, prop) = data(x)[u, v, prop]
 
-function setvprop!{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, v::VertexID, props::Dict)
+function setvprop!{K,V}(x::NDSparsePM{K,V}, v::VertexID, props::Dict)
    for (key,val) in props
-      setvprop!(g, v, key, val)
+      setvprop!(x, v, key, val)
    end
 end
 
-function setvprop!{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, v::VertexID, prop, val)
-   x = propmod(g)
+function setvprop!{K,V}(x::NDSparsePM{K,V}, v::VertexID, prop, val)
    push!(vprops(x), prop)
    setindex!(data(x), val, v, 0, prop)
    nothing
 end
 
-function seteprop!{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, u::VertexID, v::VertexID, props::Dict)
+function seteprop!{K,V}(x::NDSparsePM{K,V}, u::VertexID, v::VertexID, props::Dict)
    for (key,val) in props
-      seteprop!(g, u, v, key, val)
+      seteprop!(x, u, v, key, val)
    end
 end
 
-function seteprop!{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, u::VertexID, v::VertexID, prop, val)
-   x = propmod(g)
+function seteprop!{K,V}(x::NDSparsePM{K,V}, u::VertexID, v::VertexID, prop, val)
    push!(eprops(x), prop)
    setindex!(data(x), val, u, v, prop)
    nothing
 end
+
+################################################# INTERFACE IMPLEMENTATION ###############################################
+
+@inline listvprops{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}) = listvprops(propmod(g))
+@inline listeprops{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}) = listeprops(propmod(g))
+@inline getvprop{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, v::VertexID) = getvprop(propmod(g), v)
+@inline getvprop{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, v::VertexID, propname) = getvprop(propmod(g), v, propname)
+@inline geteprop{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, u::VertexID, v::VertexID) = geteprop(propmod(g), u, v)
+@inline geteprop{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, u::VertexID, v::VertexID, propname) = geteprop(propmod(g), u, v, propname)
+@inline setvprop!{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, v::VertexID, props::Dict) = setvprop!(propmod(g), v, props)
+@inline setvprop!{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, v::VertexID, propname, val) = setvprop!(propmod(g), v, propname, val)
+@inline seteprop!{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, u::VertexID, v::VertexID, props::Dict) = seteprop!(propmod(g), u, v, props)
+@inline seteprop!{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, u::VertexID, v::VertexID, propname, val) = seteprop!(propmod(g), u, v, propname, val)
