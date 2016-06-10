@@ -116,3 +116,10 @@ end
 @inline rmvertex!(g::Graph{SparseMatrixAM}, v::VertexID) = rmvertex!(adjmod(g), v)
 @inline addedge!(g::Graph{SparseMatrixAM}, u::VertexID, v::VertexID) = addedge!(adjmod(g), u, v)
 @inline rmedge!(g::Graph{SparseMatrixAM}, u::VertexID, v::VertexID) = rmedge!(adjmod(g), u, v)
+
+################################################# SUBGRAPH #####################################################################
+
+function subgraph(x::SparseMatrixAM, vlist::AbstractVector{VertexID})
+   fd = fdata(x)[vlist,vlist]
+   SparseMatrixAM(length(vlist), nnz(fd), fd, fd')
+end

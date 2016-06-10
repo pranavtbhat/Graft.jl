@@ -41,6 +41,19 @@ const Property_Interface_Methods = [:listvprops, :listeprops, :getvprop, :getepr
 @interface seteprop!{AM,K,V}(g::Graph{AM,PropertyModule{K,V}}, u::VertexID, v::VertexID, props::Dict)
 @interface seteprop!{AM,K,V}(g::Graph{AM,PropertyModule{K,V}}, u::VertexID, v::VertexID, propname, val)
 
+################################################# RANDOM GENERATION ########################################################
+
+function random_vertex_prop!(x::PropertyModule, v::Int, propname, f::Function)
+   setvprop!(x, v, propname, f())
+end
+
+function random_edge_prop!(x::PropertyModule, u::Int, v::Int, propname, f::Function)
+   seteprop!(x, u, v, propname, f())
+end
+################################################# SUBGRAPHING ##############################################################
+
+@interface subgraph{K,V}(x::PropertyModule{K,V}, vlist::AbstractVector{VertexID})
+
 ################################################# IMPLEMENTATIONS ##########################################################
 
 # Null Implementation
@@ -65,3 +78,5 @@ include("ndsparse/propertymodule.jl")
 
 # Dict Implementation
 include("dict/propertymodule.jl")
+
+

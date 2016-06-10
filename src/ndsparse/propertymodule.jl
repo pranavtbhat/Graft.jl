@@ -41,24 +41,20 @@ listvprops{K,V}(x::NDSparsePM{K,V}) = collect(vprops(x))
 
 listeprops{K,V}(x::NDSparsePM{K,V}) = collect(eprops(x))
 
-function getvprop{K,V}(x::NDSparsePM{K,V}, v::VertexID) # Messy
-   flush!(data(x))
-   cols = data(x).indexes.columns
-   D = data(x).data
-   r = searchsorted(cols[1], v)
-   idxs = searchsorted(cols[2], 0, first(r), last(r), Base.Order.Forward)
-   [cols[3][idx] => D[idx] for idx in idxs]
+function getvprop{K,V}(x::NDSparsePM{K,V}, v::VertexID)
+   result = data(x)[v,v,:] 
+   D = result.data
+   I = result.indexes
+   [I[i][3] => D[i] for i in eachindex(I)]
 end
 
-getvprop{K,V}(x::NDSparsePM{K,V}, v::VertexID, prop) = data(x)[v, 0, prop]
+getvprop{K,V}(x::NDSparsePM{K,V}, v::VertexID, prop) = data(x)[v, v, prop]
 
-function geteprop{K,V}(x::NDSparsePM{K,V}, u::VertexID, v::VertexID) # Messy
-   flush!(data(x))
-   cols = data(x).indexes.columns
-   D = data(x).data
-   r = searchsorted(cols[1], u)
-   idxs = searchsorted(cols[2], v, first(r), last(r), Base.Order.Forward)
-   [cols[3][idx] => D[idx] for idx in idxs]
+function geteprop{K,V}(x::NDSparsePM{K,V}, u::VertexID, v::VertexID)
+   result = data(x)[u,v,:]
+   D = result.data
+   I = result.indexes
+   [I[i][3] => D[i] for i in eachindex(I)]
 end
 
 geteprop{K,V}(x::NDSparsePM{K,V}, u::VertexID, v::VertexID, prop) = data(x)[u, v, prop]
@@ -71,7 +67,7 @@ end
 
 function setvprop!{K,V}(x::NDSparsePM{K,V}, v::VertexID, prop, val)
    push!(vprops(x), prop)
-   setindex!(data(x), val, v, 0, prop)
+   setindex!(data(x), val, v, v, prop)
    nothing
 end
 
@@ -87,7 +83,7 @@ function seteprop!{K,V}(x::NDSparsePM{K,V}, u::VertexID, v::VertexID, prop, val)
    nothing
 end
 
-################################################# INTERFACE IMPLEMENTATION ###############################################
+################################################# INTERFACE IMPLEMENTATION ################################################
 
 @inline listvprops{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}) = listvprops(propmod(g))
 @inline listeprops{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}) = listeprops(propmod(g))
@@ -99,3 +95,17 @@ end
 @inline setvprop!{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, v::VertexID, propname, val) = setvprop!(propmod(g), v, propname, val)
 @inline seteprop!{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, u::VertexID, v::VertexID, props::Dict) = seteprop!(propmod(g), u, v, props)
 @inline seteprop!{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, u::VertexID, v::VertexID, propname, val) = seteprop!(propmod(g), u, v, propname, val)
+
+
+################################################# SUBGRAPH ################################################################
+
+
+function subgraph{K,V}(x::NDSparsePM{K,V}, vlist::AbstractVector{VertexID})
+   y = NDSparsePM{K,V}()
+   y.vprops = x.vprops
+   y.eprops = y.eprops
+   y.data = data(x)[vlist, vlist, :]
+   y
+end
+
+

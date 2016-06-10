@@ -52,3 +52,7 @@ end
 @inline addedge!(g::Graph{LightGraphsAM}, u::VertexID, v::VertexID) = (LightGraphs.add_edge!(data(adjmod(g)), u, v); nothing)
 
 @inline rmedge!(g::Graph{LightGraphsAM}, u::VertexID, v::VertexID) = (LightGraphs.rem_edge!(data(adjmod(g)), u, v); nothing)
+
+################################################# SUBGRAPHS #################################################################
+
+@inline subgraph(x::LightGraphsAM, vlist::AbstractVector{VertexID}) = LightGraphsAM(LightGraphs.induced_subgraph(data(x), vlist))
