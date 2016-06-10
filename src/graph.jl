@@ -1,73 +1,62 @@
 ################################################# FILE DESCRIPTION #########################################################
 
-# This file contains the core graph definitions. ParallelGraphs provides a Graph interface that all 
-# graph types must adhere to. 
-# Every graph MUST have:
-# 1. An adjacency module that adheres to the AdjacencyModule interface.
-# 2. A property module that adheres to the PropertyModule interface. 
-# Additionally every graph must also adhere to the graph interface detailed below.
+# This file contains graph typealiases and random graph generation methods.
 
 ################################################# IMPORT/EXPORT ############################################################
-export 
-# Types
-Graph, PropLessGraph,
-# Constants
-Adjacency_Interface_Methods, Property_Interface_Methods
+export
+# Typealiases
+SimpleGraph,
+# Random Generation
+random_vertex_prop!, random_edge_prop!,
+# Subgraph
+subgraph
 
-abstract Graph
+################################################# TYPE ALIASES #############################################################
 
-################################################# GRAPH INTERFACE ##########################################################
+typealias SimpleGraph Graph{LightGraphsAM,DictPM{ASCIIString,Any}}
 
-""" Retrieve a graph's adjacency module """
-@interface adjmod(g::Graph)
+################################################# RANDOM PROPERTIES ########################################################
 
-""" Retrieve a graph's property module """
-@interface propmod(g::Graph)
 
-################################################# METHOD REDIRECTION #######################################################
+function random_vertex_prop!(g::Graph, propname, f::Function)
+   map(v -> random_vertex_prop!(propmod(g), v, propname, f), 1 : nv(g))
+   nothing
+end
 
-@redirect nv(g::Graph) adjmod
-@redirect nv(g::Graph) adjmod
-@redirect ne(g::Graph) adjmod
-@redirect size(g::Graph) adjmod
-@redirect fadj(g::Graph, v::VertexID) adjmod
-@redirect badj(g::Graph, v::VertexID) adjmod
-@redirect addvertex!(g::Graph) adjmod
-@redirect rmvertex!(g::Graph, v::VertexID) adjmod
-@redirect addedge!(g::Graph, u::VertexID ,v::VertexID) adjmod
-@redirect rmedge!(g::Graph, u::VertexID, v::VertexID) adjmod
-
-@redirect listvprops(g::Graph) propmod
-@redirect listeprops(g::Graph) propmod
-@redirect getvprop(g::Graph, v::VertexID) propmod
-@redirect getvprop{K}(g::Graph, v::VertexID, propname::K) propmod
-@redirect geteprop(g::Graph, u::VertexID, v::VertexID) propmod
-@redirect geteprop{K}(g::Graph, u::VertexID, v::VertexID, propname::K) propmod
-@redirect setvprop!(g::Graph, v::VertexID, props::Dict) propmod
-@redirect setvprop!{K,V}(g::Graph, v::VertexID, propname::K, val::V) propmod
-@redirect seteprop!(g::Graph, u::VertexID, v::VertexID, props::Dict) propmod
-@redirect seteprop!{K,V}(g::Graph, u::VertexID, v::VertexID, propname::K, val::V) propmod
-
-################################################# GRAPH TYPES ###############################################################
-
-""" A graph without properties(For Testing) """
-type PropLessGraph{AM} <: Graph
-   adjmod::AM
-   propmod::NullModule
-
-   function PropLessGraph(nv::Int=0)
-      self = new{AM}()
-      self.adjmod = AM(nv)
-      self.propmod = NullModule()
-      self
+function random_vertex_prop!(g::Graph, d::Dict)
+   for (propname,f) in d
+      random_vertex_prop!(g, propname, f)
    end
 end
 
-Base.call{AM}(x::PropLessGraph{AM}, nv::Int64) = PropLessGraph{AM}(nv)
+function random_vertex_prop!(g::Graph)
+   random_vertex_prop!(g, "label", randstring)
+end
 
-@inline adjmod(x::PropLessGraph) = x.adjmod
-@inline propmod(x::PropLessGraph) = x.propmod
+function random_edge_prop!(g::Graph, propname, f::Function)
+   pm = propmod(g)
+   for u in 1 : nv(g)
+      for v in fadj(g, u)
+         random_edge_prop!(pm, u, v, propname, f)
+      end
+   end
+end
 
-include("graph/simplegraph.jl")
+function random_edge_prop!(g::Graph)
+   random_edge_prop!(g, "weight", () -> rand(Int))
+end
 
-include("graph/customgraph.jl")
+################################################# DISPLAY ##################################################################
+
+function Base.show{AM,PM}(io::IO, g::Graph{AM,PM})
+   write(io, "Graph{$AM,$PM} with $(nv(g)) vertices and $(ne(g)) edges")
+end
+
+################################################# SUBGRAPHS ################################################################
+
+function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID})
+   sg = Graph{AM,PM}()
+   sg.adjmod = subgraph(adjmod(g), vlist)
+   sg.propmod = subgraph(propmod(g), vlist)
+   sg
+end

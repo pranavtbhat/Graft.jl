@@ -8,8 +8,6 @@ import Base: size
 export 
 # Types
 AdjacencyModule,
-# Constants
-Adjacency_Interface_Methods,
 # AdjacencyModule Interface
 nv, ne, fadj, badj, addvertex!, rmvertex!, addedge!, rmedge!
 
@@ -17,32 +15,37 @@ abstract AdjacencyModule
 
 ################################################# INTERFACE ################################################################
 
-const Adjacency_Interface_Methods = [:nv, :ne, :size, :fadj, :badj, :addvertex!, :rmvertex!, :addedge!, :rmedge!]
-
 """ The number of vertices in the graph """
-@interface nv(x::AdjacencyModule)
+@interface nv(g::Graph)
 
 """ The number of edges in the graph """
-@interface ne(x::AdjacencyModule)
+@interface ne(g::Graph)
 
 """ Return V x E """
-@interface size(x::AdjacencyModule)
+@interface size(g::Graph)
 
 """ Vertex v's out-neighbors in the graph """
-@interface fadj(x::AdjacencyModule, v::VertexID)
+@interface fadj(g::Graph, v::VertexID)
 
 """ Vertex v's in-neighbors in the graph """
-@interface badj(x::AdjacencyModule, v::VertexID)
+@interface badj(g::Graph, v::VertexID)
 
 """ Add a vertex to the graph """
-@interface addvertex!(x::AdjacencyModule)
+@interface addvertex!(g::Graph)
 
 """ Remove a vertex from the graph """
-@interface rmvertex!(x::AdjacencyModule, v::VertexID)
+@interface rmvertex!(g::Graph, v::VertexID)
+
 """ Add an edge u->v to the graph """
-@interface addedge!(x::AdjacencyModule, u::VertexID ,v::VertexID)
+@interface addedge!(g::Graph, u::VertexID ,v::VertexID)
+
 """ Remove edge u->v from the graph """
-@interface rmedge!(x::AdjacencyModule, u::VertexID, v::VertexID)
+@interface rmedge!(g::Graph, u::VertexID, v::VertexID)
+
+################################################# SUBGRAPH ################################################################
+
+@interface subgraph(g::AdjacencyModule, vlist::AbstractVector{VertexID})
+
 
 
 ################################################# IMPLEMENTATIONS #########################################################
@@ -50,3 +53,4 @@ const Adjacency_Interface_Methods = [:nv, :ne, :size, :fadj, :badj, :addvertex!,
 include("lightgraphs/adjacencymodule.jl")
 
 include("sparse/adjacencymodule.jl")
+

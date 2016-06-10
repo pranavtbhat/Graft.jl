@@ -2,6 +2,10 @@ module ParallelGraphs
 
 using NDSparseData
 import LightGraphs
+using Faker
+
+# Core definitions
+include("core.jl")
 
 # Package Wide Utilities
 include("util.jl")
@@ -20,5 +24,8 @@ include("query.jl")
 
 # Parse Graphs from files etc.
 include("parse.jl")
+
+# Graph Algortithms
+include("algorithms.jl")
 
 end # module

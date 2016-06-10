@@ -60,31 +60,111 @@ macro interface(expr)
     end)
 end
 
-"""
-Declare that a function is to be applied on one of the fields of the first argument, instead of the first argument 
-itself. Produces a kind of redirect.
-"""
-macro redirect(expr, func)
-    @assert expr.head == :call
+# """
+# Declare that a function is to be applied on one of the fields of the first argument, instead of the first argument 
+# itself. Produces a kind of redirect.
+# """
+# macro redirect(expr, func)
+#     @assert expr.head == :call
 
-    fname = expr.args[1]
-    f = length(fieldnames(fname)) > 0 ? fname.args[1] : fname
+#     fname = expr.args[1]
+#     f = length(fieldnames(fname)) > 0 ? fname.args[1] : fname
 
-    args = expr.args[2:end]
+#     args = expr.args[2:end]
 
-    farg = args[1].args[1]
+#     farg = args[1].args[1]
 
-    vars = map(x->getvarname(x), args)
-    typs = Expr(:vect, map(x -> :(typeof($x)), vars)...)
+#     vars = map(x->getvarname(x), args)
+#     typs = Expr(:vect, map(x -> :(typeof($x)), vars)...)
 
-    :(function $(esc(fname))($(args...))
-        $f($func($farg), $(vars[2:end]...))
-    end)
-end 
+#     :(function $(esc(fname))($(args...))
+#         $f($func($farg), $(vars[2:end]...))
+#     end)
+# end 
 
 ################################################# UTILITIES ################################################################
 
 """ Throw an error that the method isn't supported on the given type """
 @inline function unsupported(t::DataType, fn::Function)
    error("Method $fn isn't supported on datatype $t")
+end
+
+################################################# STACK ####################################################################
+
+# Stack implementation suited to graph algorithms. Allocates memory once, and doesn't resize (to cut down on allocs).
+
+type Stack
+    n::Int
+    top::Int
+    data::Vector{Int}
+
+    function Stack(n)
+        self = new()
+        self.n = n
+        self.top = 0
+        self.data = Array(Int, n)
+        self
+    end
+end
+
+@inline Base.isempty(s::Stack) = s.top == 0
+
+@inline function Base.push!(s::Stack, item::Int)
+    s.data[s.top+1] = item
+    s.top += 1
+    nothing
+end
+
+@inline function Base.push!(s::Stack, items::Vector{Int})
+    len = length(items)
+    s.data[(s.top+len):-1:(s.top+1)] = items
+    s.top += len
+    nothing
+end
+
+@inline function Base.pop!(s::Stack)
+    val = s.data[s.top]
+    s.top -= 1
+    val
+end
+
+################################################# DEQUE  #####################################################################
+
+# Deque implementation suited to graph algorithms. Allocates memory once, and doesn't resize (to cut down on allocs).
+
+type Deque
+    n::Int
+    left::Int
+    right::Int
+    data::Vector{Int}
+
+    function Deque(n)
+        self = new()
+        self.n = n
+        self.left = 0
+        self.right = 0
+        self.data = Array(Int, n)
+        self
+    end
+end
+
+Base.isempty(d::Deque) = d.left == d.right
+
+function Base.push!(d::Deque, item::Int)
+    d.data[d.right+1] = item
+    d.right += 1
+    nothing
+end
+
+function Base.push!(d::Deque, items::Vector{Int})
+    len = length(items)
+    d.data[(d.right+1) : (d.right+len)] = items
+    d.right += len
+    nothing
+end
+
+function Base.shift!(d::Deque)
+    val = d.data[d.left+1]
+    d.left += 1
+    val
 end
