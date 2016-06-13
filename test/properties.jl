@@ -8,7 +8,7 @@
 for pmtype in subtypes(PropertyModule)
    pmtype == NullModule && continue # No tests required here.
    @testset "Properties Interface for $pmtype" begin
-      g = parsegraph("testgraph.txt", :TGF, Graph{SparseMatrixAM, pmtype{ASCIIString,Any}})
+      g = parsegraph("testgraph.txt", :TGF, Graph{SparseMatrixAM, pmtype})
       @test listvprops(g) == ["name", "age"]
       @test listeprops(g) == ["relationship"]
       @test getvprop(g, 1) == Dict("name" => "Abel", "age" => 32)

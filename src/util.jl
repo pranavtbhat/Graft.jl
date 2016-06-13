@@ -4,7 +4,9 @@
 
 ################################################# IMPORT/EXPORT ############################################################
 
-export 
+export
+# Types
+NullModule, CustomIterator,
 # Type Aliases
 VertexID, EdgeID, PropID, SparseArray,
 # Macros
@@ -23,9 +25,7 @@ typealias EdgeID Int
 """ Datatype used to store property indices """
 typealias PropID Int
 
-""" Data structure used in SparseGraphs """
-typealias SparseArray NDSparse{Void,2,Tuple{Int64,Int64,Int64},Tuple{Array{Int64,1},Array{Int64,1},Array{Int64,1}},Array{Any,1}} 
-################################################# CONSTANTS    #############################################################
+################################################# CONSTANTS ################################################################
 
 """ Maximum number of vertices supported """
 const MAX_VERTEX = typemax(Int)
@@ -34,6 +34,52 @@ const MAX_VERTEX = typemax(Int)
 const MAX_EDGE = typemax(Int)
 
 const MAX_GRAPH_SIZE = (10^8,10^8)
+
+################################################# NULL MODULE ##############################################################
+
+""" Null property module. Does not implement any interface. To be used as a dummy. """
+
+immutable NullModule
+end
+
+nv(x::NullModule) = Void()
+ne(x::NullModule) = Void()
+Base.size(x::NullModule) = Void()
+vertices(x::NullModule) = Void()
+edges(x::NullModule, u::VertexID, v::VertexID) = Void()
+hasedge(x::NullModule, u::VertexID, v::VertexID) = Void()
+fadj(x::NullModule, v::VertexID) = Void()
+badj(x::NullModule, v::VertexID) = Void()
+addvertex!(x::NullModule) = Void()
+rmvertex!(x::NullModule, v::VertexID) = Void()
+addedge!(x::NullModule, u::VertexID, v::VertexID) = Void()
+rmedge!(x::NullModule, u::VertexID, v::VertexID) = Void()
+
+listvprops(x::NullModule) = Void()
+listeprops(x::NullModule) = Void()
+getvprop(x::NullModule, v::VertexID) = Void()
+getvprop(x::NullModule, v::VertexID, propname) = Void()
+geteprop(x::NullModule, u::VertexID, v::VertexID) = Void()
+geteprop(x::NullModule, u::VertexID, v::VertexID, propname) = Void()
+setvprop!(x::NullModule, v::VertexID, props::Dict) = Void()
+setvprop!(x::NullModule, v::VertexID, propname, val) = Void()
+seteprop!(x::NullModule, u::VertexID, v::VertexID, props::Dict) = Void()
+seteprop!(x::NullModule, u::VertexID, v::VertexID, propname, val) = Void()
+
+################################################# CUSTOM ITERATOR ##########################################################
+
+# To avoid allocating memory
+type CustomIterator
+   arr::Vector{Int}
+   idxs::AbstractVector{Int}
+end
+
+Base.length(x::CustomIterator) = length(x.idxs)
+Base.start(x::CustomIterator) = start(x.idxs)
+Base.done(x::CustomIterator, i) = i > last(x.idxs)
+Base.next(x::CustomIterator, i) = x.arr[i], i+1
+Base.collect(x::CustomIterator) = x.arr[x.idxs]
+
 ################################################# MACROS ###################################################################
 
 getvarname(x::Expr) = x.args[1]
@@ -59,28 +105,6 @@ macro interface(expr)
         error(string("The method ", $sig, " hasn't been implemented on ", ($typs[1])))
     end)
 end
-
-# """
-# Declare that a function is to be applied on one of the fields of the first argument, instead of the first argument 
-# itself. Produces a kind of redirect.
-# """
-# macro redirect(expr, func)
-#     @assert expr.head == :call
-
-#     fname = expr.args[1]
-#     f = length(fieldnames(fname)) > 0 ? fname.args[1] : fname
-
-#     args = expr.args[2:end]
-
-#     farg = args[1].args[1]
-
-#     vars = map(x->getvarname(x), args)
-#     typs = Expr(:vect, map(x -> :(typeof($x)), vars)...)
-
-#     :(function $(esc(fname))($(args...))
-#         $f($func($farg), $(vars[2:end]...))
-#     end)
-# end 
 
 ################################################# UTILITIES ################################################################
 

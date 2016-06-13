@@ -4,9 +4,6 @@ using NDSparseData
 import LightGraphs
 using Faker
 
-# Core definitions
-include("core.jl")
-
 # Package Wide Utilities
 include("util.jl")
 
