@@ -49,14 +49,16 @@ end
 addvertex!{K,V}(x::NDSparsePM{K,V}) = nothing
 
 function rmvertex!{K,V}(x::NDSparsePM{K,V}, v::VertexID)
-   data(x)[v,:,:] = nothing
-   data(x)[:,v,:] = nothing
+   # Won't work until delete / colon resolution for setindex! is implemented in NDSparse 
+   # data(x)[v,:,:] = nothing
+   # data(x)[:,v,:] = nothing
 end
 
 addedge!{K,V}(x::NDSparsePM{K,V}, u::VertexID, v::VertexID) = nothing
 
 function rmedge!{K,V}(x::NDSparsePM{K,V}, u::VertexID, v::VertexID)
-   data(x)[u,v,:] = nothing
+   # Won't work until delete / colon resolution for setindex! is implemented in NDSparse 
+   # data(x)[u,v,:] = nothing
 end 
 
 listvprops{K,V}(x::NDSparsePM{K,V}) = collect(vprops(x))

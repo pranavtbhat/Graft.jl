@@ -42,6 +42,8 @@ const MAX_GRAPH_SIZE = (10^8,10^8)
 immutable NullModule
 end
 
+NullModule(args...) = NullModule()
+
 nv(x::NullModule) = Void()
 ne(x::NullModule) = Void()
 Base.size(x::NullModule) = Void()
