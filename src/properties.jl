@@ -34,6 +34,8 @@ abstract PropertyModule{K,V}
 
 @interface subgraph{K,V}(x::PropertyModule{K,V}, vlist::AbstractVector{VertexID})
 
+@interface subgraph{K,V,I<:Integer}(x::PropertyModule{K,V}, vlist::Vector{Pair{I,I}})
+
 ################################################# IMPLEMENTATIONS ##########################################################
 
 # NDSparse Implementation

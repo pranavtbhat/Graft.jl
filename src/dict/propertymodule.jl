@@ -129,3 +129,21 @@ function subgraph{K,V}(x::DictPM{K,V}, vlist::AbstractVector{VertexID})
    y
 end
 
+function subgraph{K,V,I<:Integer}(x::DictPM{K,V}, elist::Vector{Pair{I,I}})
+   D = data(x)
+   y = DictPM{K,V}(copy(vprops(x)), copy(eprops(x)), Dict{Any,Dict}())
+   D_ = data(y)
+
+   for key in keys(D)
+      if isa(key, VertexID) && haskey(D, key)
+         D_[key] = D[key]
+      end
+   end
+
+   for e in elist
+      if haskey(D, e)
+         D_[e] = D[e]
+      end
+   end
+   y
+end

@@ -33,7 +33,7 @@ abstract AdjacencyModule
 
 @interface subgraph(x::AdjacencyModule, vlist::AbstractVector{VertexID})
 
-
+@interface subgraph(x::PropertyModule, elist::Vector{Pair})
 
 ################################################# IMPLEMENTATIONS #########################################################
 

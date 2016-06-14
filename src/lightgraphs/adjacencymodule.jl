@@ -70,3 +70,11 @@ end
 ################################################# SUBGRAPHS #################################################################
 
 @inline subgraph(x::LightGraphsAM, vlist::AbstractVector{VertexID}) = LightGraphsAM(LightGraphs.induced_subgraph(data(x), vlist))
+
+function subgraph{I<:Integer}(x::LightGraphsAM, elist::Vector{Pair{I,I}})
+   y = LightGraphsAM(nv(x))
+   for e in elist
+      addedge!(y, e...)
+   end
+   y
+end

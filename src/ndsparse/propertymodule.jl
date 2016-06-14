@@ -123,4 +123,19 @@ function subgraph{K,V}(x::NDSparsePM{K,V}, vlist::AbstractVector{VertexID})
    NDSparsePM{K,V}(copy(vprops(x)), copy(eprops(x)), D)
 end
 
+function subgraph{K,V,E<:Integer}(x::NDSparsePM{K,V}, elist::Vector{Pair{E,E}}) 
+   # Need a better filter for NDSparse. Submit PR to NDSparse to resolve this mess.
+   arr = data(x)
+   I = arr.indexes
+   cols = I.columns
+   indxs = collect(1 : length(I))
 
+   filter!(indxs) do i
+      t = I[i]
+      t[1] == t[2] && return true
+      in((t[1]=>t[2]), elist) && return true
+   end
+
+   arr_ = NDSparse(size(arr), Indexes(map(x->x[indxs], cols)...), arr.data[indxs], arr.default)
+   NDSparsePM{K,V}(copy(vprops(x)), copy(eprops(x)), arr_)
+end

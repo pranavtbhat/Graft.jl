@@ -151,3 +151,8 @@ end
 function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID})
    Graph{AM,PM}(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist))
 end
+
+""" Construct a subgraph from a list of edges """
+function subgraph{AM,PM,I<:Integer}(g::Graph{AM,PM}, elist::Vector{Pair{I,I}})
+   Graph{AM,PM}(subgraph(adjmod(g), elist), subgraph(propmod(g), elist))
+end

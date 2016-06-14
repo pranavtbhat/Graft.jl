@@ -64,7 +64,7 @@ function Base.next(x::EdgeIteratorCSC, t)
    end
 end
 
-Base.collect(x::EdgeIteratorCSC) = map(v,u->Pair(u,v), zip(findn(x.am.fdata))...)
+Base.collect(x::EdgeIteratorCSC) = Pair{VertexID,VertexID}[e for e in x]
 
 # Since SparseMatrixCSC maintains a colptr field, equal to the size of the matrix, arbitrarily high sizes cannot be 
 # maintained. Therefore, the SparseMatrix must grow, for each vertex added. Maybe a more sophisticated approach (like
@@ -137,3 +137,12 @@ function subgraph(x::SparseMatrixAM, vlist::AbstractVector{VertexID})
    M = fdata(x)[vlist,vlist]
    SparseMatrixAM(length(vlist), nnz(M), M, M')
 end
+
+function subgraph{I<:Integer}(x::SparseMatrixAM, elist::Vector{Pair{I,I}})
+   M = spzeros(size(fdata(x))...)
+   for e in elist
+      M[e.second,e.first] = true
+   end
+   SparseMatrixAM(nv(x), nnz(M), M, M')
+end
+
