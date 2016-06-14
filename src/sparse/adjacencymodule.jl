@@ -135,9 +135,5 @@ end
 function subgraph(x::SparseMatrixAM, vlist::AbstractVector{VertexID})
    vlen = length(vlist)
    M = fdata(x)[vlist,vlist]
-   
-   new_vid = [v=>i for (i,v) in enumerate(vlist)]
-   M.rowval = map(i->new_vid[i], M.rowval)
-
    SparseMatrixAM(length(vlist), nnz(M), M, M')
 end

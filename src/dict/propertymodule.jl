@@ -111,11 +111,21 @@ end
 ################################################# SUBGRAPH #################################################################
 
 function subgraph{K,V}(x::DictPM{K,V}, vlist::AbstractVector{VertexID})
-   D = filter(data(x)) do t
-      isa(t, VertexID) && v in vlist && return true
-      isa(t, Pair) && t.first in vlist && t.second in vlist && return true
-      return false
+   D = data(x)
+   new_vid = Dict([v=>i for (i,v) in enumerate(vlist)])
+   y = DictPM{K,V}(copy(vprops(x)), copy(eprops(x)), Dict{Any,Dict}())
+   D_ = data(y)
+
+   for key in keys(D)
+      if isa(key, VertexID) && key in vlist
+         u = new_vid[key]
+         D_[u] = copy(D[key])
+      elseif isa(key, Pair) && key.first in vlist && key.second in vlist
+         u = new_vid[key.first]
+         v = new_vid[key.second]
+         D_[u=>v] = copy(D[key])
+      end
    end
-   DictPM{K,V}(copy(vprops(x)), copy(eprops(x)), D)
+   y
 end
 

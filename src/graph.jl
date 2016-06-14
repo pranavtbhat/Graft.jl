@@ -8,8 +8,6 @@ export
 Graph,
 # Typealiases
 SimpleGraph,
-# Random Generation
-random_vertex_prop!, random_edge_prop!,
 # Subgraph
 subgraph
 
@@ -19,8 +17,8 @@ type Graph{AM,PM}
 
    function Graph(am::AdjacencyModule, pm::PropertyModule)
       self = new()
-      self.am = am
-      self.pm = pm
+      self.adjmod = am
+      self.propmod = pm
       self
    end
 
@@ -114,39 +112,31 @@ end
 @inline setvprop!(g::Graph, v::VertexID, props::Dict) = setvprop!(propmod(g), v, props)
 @inline setvprop!(g::Graph, v::VertexID, prop, val) = setvprop!(propmod(g), v, prop, val)
 
+function setvprop!(g::Graph, propname, vals::Vector)
+   length(vals) == nv(g) || error("Length of values supplied must equal the number of vertices in the graph")
+   x = propmod(g)
+   for v in 1 : nv(g)
+      setvprop!(x, v, propname, vals[v])
+   end
+end
+
+function setvprop!(g::Graph, propname, f::Function)
+   x = propmod(g)
+   for v in 1 : nv(g)
+      setvprop!(x, v, propname, f(v))
+   end
+end
+
+
 """ Set the value for an edge property """
 @inline seteprop!(g::Graph, u::VertexID, v::VertexID, props::Dict) = seteprop!(propmod(g), u, v, props)
 @inline seteprop!(g::Graph, u::VertexID, v::VertexID, prop, val) = seteprop!(propmod(g), u, v, prop, val)
 
-""" Attach randomly generated key-value pairs to vertices """
-function random_vertex_prop!(g::Graph, propname, f::Function)
-   map(v -> random_vertex_prop!(propmod(g), v, propname, f), 1 : nv(g))
-   nothing
-end
-
-function random_vertex_prop!(g::Graph, d::Dict)
-   for (propname,f) in d
-      random_vertex_prop!(g, propname, f)
+function seteprop!(g::Graph, propname, f::Function)
+   x = propmod(g)
+   for (u,v) in edges(g)
+      seteprop!(x, u, v, propname, f(u,v))
    end
-end
-
-function random_vertex_prop!(g::Graph)
-   random_vertex_prop!(g, "label", randstring)
-end
-
-
-""" Attach randomly generated key-value pairs to edges """
-function random_edge_prop!(g::Graph, propname, f::Function)
-   pm = propmod(g)
-   for u in 1 : nv(g)
-      for v in fadj(g, u)
-         random_edge_prop!(pm, u, v, propname, f)
-      end
-   end
-end
-
-function random_edge_prop!(g::Graph)
-   random_edge_prop!(g, "weight", () -> rand(Int))
 end
 
 ################################################# DISPLAY ##################################################################
@@ -159,8 +149,5 @@ end
 
 """ Construct an induced subgraph containing the vertices provided """
 function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID})
-   sg = Graph{AM,PM}()
-   sg.adjmod = subgraph(adjmod(g), vlist)
-   sg.propmod = subgraph(propmod(g), vlist)
-   sg
+   Graph{AM,PM}(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist))
 end

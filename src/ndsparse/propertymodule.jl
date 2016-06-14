@@ -23,6 +23,7 @@ type NDSparsePM{K,V} <: PropertyModule{K,V}
       self.vprops = vprops
       self.eprops = eprops
       self.data = data
+      self
    end
 
    function NDSparsePM()
@@ -116,8 +117,8 @@ function subgraph{K,V}(x::NDSparsePM{K,V}, vlist::AbstractVector{VertexID})
 
    flush!(D)
    new_vid = Dict([v=>i for (i,v) in enumerate(vlist)])
-   cols[1] = map(v->new_vid[v], cols[1])
-   cols[2] = map(v->new_vid[v], cols[2])
+   map!(v->new_vid[v], cols[1], cols[1])
+   map!(v->new_vid[v], cols[2], cols[2])
 
    NDSparsePM{K,V}(copy(vprops(x)), copy(eprops(x)), D)
 end

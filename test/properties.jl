@@ -7,13 +7,17 @@
 
 for pmtype in subtypes(PropertyModule)
    @testset "Properties Interface for $pmtype" begin
-      g = parsegraph("testgraph.txt", :TGF, Graph{NullModule, pmtype})
+      g = parsegraph("testgraph.txt", :TGF, Graph{SparseMatrixAM, pmtype})
       @test listvprops(g) == ["name", "age"]
       @test listeprops(g) == ["relationship"]
       @test getvprop(g, 1) == Dict("name" => "Abel", "age" => 32)
       @test getvprop(g, 9, "name") == "Ignacio"
       @test geteprop(g, 1, 2) == Dict("relationship" => "father")
       @test geteprop(g, 7, 6, "relationship") == "friend"
+
+      addvertex!(g)
+      addvertex!(g)
+      addedge!(g, 11, 12)
 
       @test setvprop!(g, 11, Dict("name" => "Kamath", "age" => 32)) == nothing
       @test getvprop(g, 11) == Dict("name" => "Kamath", "age" => 32)
@@ -29,5 +33,15 @@ for pmtype in subtypes(PropertyModule)
 
       # @test rmedge!(g, 11, 12) == nothing
       # @test isempty(geteprop(g, 11, 12))
+
+
+      @test setvprop!(g, "index", collect(1 : 12)) == nothing
+      @test sum([getvprop(g, v, "index") for v in 1 : nv(g)]) == 78
+
+      @test setvprop!(g, "favdigit", v->v % 9) == nothing
+      @test isa(Int[getvprop(g, v, "favdigit") for v in 1 : nv(g)], Vector{Int})
+
+      @test seteprop!(g, "weight", (u,v)->u+v) == nothing
+      @test isa(Int[geteprop(g, u, v, "weight") for (u,v) in edges(g)], Vector{Int})
    end
 end
