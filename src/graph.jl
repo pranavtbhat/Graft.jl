@@ -187,5 +187,5 @@ end
 
 """ Construct a subgraph from a list of edges """
 function subgraph{AM,PM,I<:Integer}(g::Graph{AM,PM}, elist::Vector{Pair{I,I}})
-   Graph{AM,PM}(subgraph(adjmod(g), elist), subgraph(propmod(g), elist), subgraph(labelmod(g), vlist))
+   Graph{AM,PM}(subgraph(adjmod(g), elist), subgraph(propmod(g), elist), subgraph(labelmod(g), elist))
 end
