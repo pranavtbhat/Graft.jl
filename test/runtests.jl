@@ -12,3 +12,5 @@ include("adjacency.jl")
 include("properties.jl")
 
 include("subgraph.jl")
+
+include("query.jl")

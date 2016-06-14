@@ -1,6 +1,6 @@
 ################################################# FILE DESCRIPTION #########################################################
 
-# Parallel allows the assignment of properties (key-value pairs) the the edges and vertices in a graph. The key can 
+# ParallelGraphs allows the assignment of properties (key-value pairs) the the edges and vertices in a graph. The key can 
 # be any arbitrary julia object, and therefore keys must be mapped on to integers, before they can be used to for indexing.
 # The PropertyModule therefore stores values of type V, indexed by objects of type K.
 

@@ -7,18 +7,21 @@ export
 # Types
 Graph,
 # Typealiases
-SimpleGraph,
+SimpleGraph, SparseGraph,
 # Subgraph
 subgraph
 
 type Graph{AM,PM}
    adjmod::AM
    propmod::PM
+   labelmod::Any
 
-   function Graph(am::AdjacencyModule, pm::PropertyModule)
+
+   function Graph(am::AdjacencyModule, pm::PropertyModule=NullModule(), lm=NullModule())
       self = new()
       self.adjmod = am
       self.propmod = pm
+      self.labelmod = lm
       self
    end
 
@@ -26,6 +29,7 @@ type Graph{AM,PM}
       self = new()
       self.adjmod = AM(nv)
       self.propmod = PM()
+      self.labelmod = NullModule()
       self
    end
 
@@ -33,19 +37,21 @@ type Graph{AM,PM}
       self = new()
       self.adjmod = AM(nv, ne)
       self.propmod = PM()
+      self.labelmod = NullModule()
       self
    end
 end
 
 @inline adjmod(g::Graph) = g.adjmod
 @inline propmod(g::Graph) = g.propmod
+@inline labelmod(g::Graph) = g.labelmod
 
-
-typealias SimpleGraph Graph{LightGraphsAM,DictPM{ASCIIString,Any}}
-
+typealias SimpleGraph Graph{LightGraphsAM,DictPM}
+typealias SparseGraph Graph{SparseMatrixAM, NDSparsePM}
 
 ################################################# GRAPH API ############################################################
 
+# Adjacency
 """ The number of vertices in the graph """
 @inline nv(g::Graph) = nv(adjmod(g))
 
@@ -94,6 +100,9 @@ function rmedge!(g::Graph, u::VertexID, v::VertexID)
    rmedge!(propmod(g), u, v)
 end
 
+
+
+# Properties
 """ List the vertex properties contained in the graph """
 @inline listvprops(g::Graph) = listvprops(propmod(g))
 
@@ -139,6 +148,30 @@ function seteprop!(g::Graph, propname, f::Function)
    end
 end
 
+
+
+# Labelling
+@inline resolve(g::Graph, x) = resolve(labelmod(g), x)
+@inline encode(g::Graph, v::VertexID) = encode(labelmod(g), v)
+
+function setlabel!{T}(g::Graph, labels::Vector{T})
+   g.labelmod = LabelModule{T}(labels)
+end
+
+function setlabel!(g::Graph, f::Function)
+   labels = [f(v) for v in vertices(g)]
+   g.labelmod = LabelModule(labels)
+   nothing
+end
+
+function setlabel!(g::Graph, propname)
+   labels = [getvprop(g, v, propname) for v in vertices(g)]
+   g.labelmod = LabelModule(labels)
+   nothing
+end
+
+@inline setlabel!(g::Graph, v::VertexID, label) = setlabel!(labelmod(g), v, label)
+
 ################################################# DISPLAY ##################################################################
 
 function Base.show{AM,PM}(io::IO, g::Graph{AM,PM})
@@ -149,10 +182,10 @@ end
 
 """ Construct an induced subgraph containing the vertices provided """
 function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID})
-   Graph{AM,PM}(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist))
+   Graph{AM,PM}(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist), subgraph(labelmod(g), vlist))
 end
 
 """ Construct a subgraph from a list of edges """
 function subgraph{AM,PM,I<:Integer}(g::Graph{AM,PM}, elist::Vector{Pair{I,I}})
-   Graph{AM,PM}(subgraph(adjmod(g), elist), subgraph(propmod(g), elist))
+   Graph{AM,PM}(subgraph(adjmod(g), elist), subgraph(propmod(g), elist), subgraph(labelmod(g), vlist))
 end

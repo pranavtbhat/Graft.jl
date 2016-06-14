@@ -11,26 +11,23 @@ vertex_filter, edge_filter
 ################################################# BASICS ###################################################################
 
 # Getindex for vertex properties
-Base.getindex(g::Graph, v::VertexID) = getvprop(g, v)
-Base.getindex(g::Graph, v::VertexID, propname) = getvprop(g, v, propname)
+Base.getindex(g::Graph, label) = getvprop(g, resolve(g, label))
 
 # Getindex of edge properties
-Base.getindex(g::Graph, e::Pair{VertexID,VertexID}) = geteprop(g, e...)
-Base.getindex(g::Graph, e::Pair{VertexID,VertexID}, propname) = geteprop(g, e..., propname)
+Base.getindex(g::Graph, e::Pair) = geteprop(g, resolve(g, e)...)
 
 # Getindex for adjacencies
-Base.getindex(g::Graph, v::VertexID, ::Colon) = fadj(g, v)
-Base.getindex(g::Graph, ::Colon, v::VertexID) = badj(g, v)
+Base.getindex(g::Graph, label, ::Colon) = fadj(g, resolve(g, label))
+Base.getindex(g::Graph, ::Colon, label) = badj(g, resolve(g, label))
 
 # Getindex for subgraph
 Base.getindex(g::Graph, flist::AbstractVector) = subgraph(g, flist)
 
-
 # Setindex for vertex properties
-Base.setindex!(g::Graph, val, v::VertexID, propname) = setvprop!(g, v, propname, val)
+Base.setindex!(g::Graph, val, label, propname) = setvprop!(g, resolve(g, label), propname, val)
 
 # Setindex for edge properties
-Base.setindex!(g::Graph, val, e::Pair{VertexID,VertexID}, propname) = seteprop!(g, e..., propname, val)
+Base.setindex!(g::Graph, val, e::Pair, propname) = seteprop!(g, resolve(g, e)..., propname, val)
 
 
 

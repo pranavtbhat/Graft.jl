@@ -44,6 +44,7 @@ end
 
 NullModule(args...) = NullModule()
 
+# Adjacency
 nv(x::NullModule) = Void()
 ne(x::NullModule) = Void()
 Base.size(x::NullModule) = Void()
@@ -57,6 +58,7 @@ rmvertex!(x::NullModule, v::VertexID) = Void()
 addedge!(x::NullModule, u::VertexID, v::VertexID) = Void()
 rmedge!(x::NullModule, u::VertexID, v::VertexID) = Void()
 
+# Properties
 listvprops(x::NullModule) = Void()
 listeprops(x::NullModule) = Void()
 getvprop(x::NullModule, v::VertexID) = Void()
@@ -67,6 +69,14 @@ setvprop!(x::NullModule, v::VertexID, props::Dict) = Void()
 setvprop!(x::NullModule, v::VertexID, propname, val) = Void()
 seteprop!(x::NullModule, u::VertexID, v::VertexID, props::Dict) = Void()
 seteprop!(x::NullModule, u::VertexID, v::VertexID, propname, val) = Void()
+
+# Labelling
+setlabel!(x::NullModule, v::VertexID, obj) = Void()
+resolve(x::NullModule, obj) = obj
+encode(x::NullModule, obj) = obj
+
+# Subgraphing
+subgraph(x::NullModule, args...) = x
 
 ################################################# CUSTOM ITERATOR ##########################################################
 
