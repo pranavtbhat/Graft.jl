@@ -9,44 +9,31 @@ export
 # Types
 AdjacencyModule,
 # AdjacencyModule Interface
-nv, ne, fadj, badj, addvertex!, rmvertex!, addedge!, rmedge!
+nv, ne, vertices, edges, hasedge, fadj, badj, addvertex!, rmvertex!, addedge!, rmedge!
 
 abstract AdjacencyModule
 
 ################################################# INTERFACE ################################################################
 
-""" The number of vertices in the graph """
-@interface nv(g::Graph)
 
-""" The number of edges in the graph """
-@interface ne(g::Graph)
-
-""" Return V x E """
-@interface size(g::Graph)
-
-""" Vertex v's out-neighbors in the graph """
-@interface fadj(g::Graph, v::VertexID)
-
-""" Vertex v's in-neighbors in the graph """
-@interface badj(g::Graph, v::VertexID)
-
-""" Add a vertex to the graph """
-@interface addvertex!(g::Graph)
-
-""" Remove a vertex from the graph """
-@interface rmvertex!(g::Graph, v::VertexID)
-
-""" Add an edge u->v to the graph """
-@interface addedge!(g::Graph, u::VertexID ,v::VertexID)
-
-""" Remove edge u->v from the graph """
-@interface rmedge!(g::Graph, u::VertexID, v::VertexID)
+@interface nv(x::AdjacencyModule)
+@interface ne(x::AdjacencyModule)
+@interface size(x::AdjacencyModule)
+@interface vertices(x::AdjacencyModule)
+@interface edges(x::AdjacencyModule)
+@interface hasedge(x::AdjacencyModule, u::VertexID, v::VertexID)
+@interface fadj(x::AdjacencyModule, v::VertexID)
+@interface badj(x::AdjacencyModule, v::VertexID)
+@interface addvertex!(x::AdjacencyModule)
+@interface rmvertex!(x::AdjacencyModule, v::VertexID)
+@interface addedge!(x::AdjacencyModule, u::VertexID ,v::VertexID)
+@interface rmedge!(x::AdjacencyModule, u::VertexID, v::VertexID)
 
 ################################################# SUBGRAPH ################################################################
 
-@interface subgraph(g::AdjacencyModule, vlist::AbstractVector{VertexID})
+@interface subgraph(x::AdjacencyModule, vlist::AbstractVector{VertexID})
 
-
+@interface subgraph(x::PropertyModule, elist::Vector{Pair})
 
 ################################################# IMPLEMENTATIONS #########################################################
 

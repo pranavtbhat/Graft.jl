@@ -9,21 +9,11 @@ LightGraphsAM
 """ An adjacency module that uses LightGraphs.DiGraph """
 type LightGraphsAM <: AdjacencyModule
    data::LightGraphs.DiGraph
-
-   function LightGraphsAM(nv=0)
-      self = new()
-      self.data = LightGraphs.DiGraph(nv)
-      self
-   end
-
-   function LightGraphsAM(x::LightGraphs.DiGraph)
-      self = new()
-      self.data = x
-      self
-   end
 end
 
-################################################# GENERATORS ###############################################################
+function LightGraphsAM(nv::Int=0)
+   LightGraphsAM(LightGraphs.DiGraph(nv))
+end
 
 function LightGraphsAM(nv::Int, ne::Int)
    LightGraphsAM(LightGraphs.DiGraph(nv, ne))
@@ -35,24 +25,56 @@ end
 
 ################################################# INTERFACE IMPLEMENTATION #################################################
 
-@inline nv(g::Graph{LightGraphsAM}) = LightGraphs.nv(data(adjmod(g)))
+@inline nv(x::LightGraphsAM) = LightGraphs.nv(data(x))
 
-@inline ne(g::Graph{LightGraphsAM}) = LightGraphs.ne(data(adjmod(g)))
+@inline ne(x::LightGraphsAM) = LightGraphs.ne(data(x))
 
-@inline Base.size(g::Graph{LightGraphsAM}) = (nv(g), ne(g))
+@inline Base.size(x::LightGraphsAM) = (nv(x), ne(x))
 
-@inline fadj(g::Graph{LightGraphsAM}, v::VertexID) = LightGraphs.fadj(data(adjmod(g)), v)
+@inline vertices(x::LightGraphsAM) = LightGraphs.vertices(data(x))
 
-@inline badj(g::Graph{LightGraphsAM}, v::VertexID) = LightGraphs.badj(data(adjmod(g)), v)
+@inline edges(x::LightGraphsAM) = LightGraphs.edges(data(x))
 
-@inline addvertex!(g::Graph{LightGraphsAM}) = (LightGraphs.add_vertex!(data(adjmod(g))); nothing)
+@inline hasedge(x::LightGraphsAM, u::VertexID, v::VertexID) = LightGraphs.has_edge(data(x), u, v)
 
-@inline rmvertex!(g::Graph{LightGraphsAM}, v::VertexID) = (LightGraphs.rem_vertex!(data(adjmod(g)), v); nothing)
+@inline fadj(x::LightGraphsAM, v::VertexID) = LightGraphs.fadj(data(x), v)
 
-@inline addedge!(g::Graph{LightGraphsAM}, u::VertexID, v::VertexID) = (LightGraphs.add_edge!(data(adjmod(g)), u, v); nothing)
+@inline badj(x::LightGraphsAM, v::VertexID) = LightGraphs.badj(data(x), v)
 
-@inline rmedge!(g::Graph{LightGraphsAM}, u::VertexID, v::VertexID) = (LightGraphs.rem_edge!(data(adjmod(g)), u, v); nothing)
+@inline addvertex!(x::LightGraphsAM) = (LightGraphs.add_vertex!(data(x)); nothing)
+
+# Override to prevent index from being deleted. Too expensive to relabel every vertex otherwise.
+function rmvertex!(x::LightGraphsAM, v::VertexID)
+   flist = x.data.fadjlist
+   rlist = x.data.badjlist
+
+   flist[v] = []
+   rlist[v] = []
+
+   for vec in flist
+      filter!(x-> x!=v, vec)
+   end
+
+   for vec in rlist
+      filter!(x-> x!=v, vec)
+   end
+
+   nothing
+end
+
+
+@inline addedge!(x::LightGraphsAM, u::VertexID, v::VertexID) = (LightGraphs.add_edge!(data(x), u, v); nothing)
+
+@inline rmedge!(x::LightGraphsAM, u::VertexID, v::VertexID) = (LightGraphs.rem_edge!(data(x), u, v); nothing)
 
 ################################################# SUBGRAPHS #################################################################
 
 @inline subgraph(x::LightGraphsAM, vlist::AbstractVector{VertexID}) = LightGraphsAM(LightGraphs.induced_subgraph(data(x), vlist))
+
+function subgraph{I<:Integer}(x::LightGraphsAM, elist::Vector{Pair{I,I}})
+   y = LightGraphsAM(nv(x))
+   for e in elist
+      addedge!(y, e...)
+   end
+   y
+end

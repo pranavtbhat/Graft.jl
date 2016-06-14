@@ -16,7 +16,15 @@ Base.zero(::Type{ASCIIString}) = ""
 type NDSparsePM{K,V} <: PropertyModule{K,V}
    vprops::Set{K}
    eprops::Set{K}
-   data::Any
+   data::AbstractArray
+
+   function NDSparsePM(vprops::Set{K}, eprops::Set{K}, data::AbstractArray)
+      self = new()
+      self.vprops = vprops
+      self.eprops = eprops
+      self.data = data
+      self
+   end
 
    function NDSparsePM()
       self = new{K,V}()
@@ -27,6 +35,9 @@ type NDSparsePM{K,V} <: PropertyModule{K,V}
    end
 end
 
+function NDSparsePM()
+   NDSparsePM{ASCIIString,Any}()
+end
 
 @inline data(x::NDSparsePM) = x.data
 
@@ -36,6 +47,20 @@ end
 
 ################################################# INTERNAL IMPLEMENTATION #################################################
 
+addvertex!{K,V}(x::NDSparsePM{K,V}) = nothing
+
+function rmvertex!{K,V}(x::NDSparsePM{K,V}, v::VertexID)
+   # Won't work until delete / colon resolution for setindex! is implemented in NDSparse 
+   # data(x)[v,:,:] = nothing
+   # data(x)[:,v,:] = nothing
+end
+
+addedge!{K,V}(x::NDSparsePM{K,V}, u::VertexID, v::VertexID) = nothing
+
+function rmedge!{K,V}(x::NDSparsePM{K,V}, u::VertexID, v::VertexID)
+   # Won't work until delete / colon resolution for setindex! is implemented in NDSparse 
+   # data(x)[u,v,:] = nothing
+end 
 
 listvprops{K,V}(x::NDSparsePM{K,V}) = collect(vprops(x))
 
@@ -83,29 +108,34 @@ function seteprop!{K,V}(x::NDSparsePM{K,V}, u::VertexID, v::VertexID, prop, val)
    nothing
 end
 
-################################################# INTERFACE IMPLEMENTATION ################################################
-
-@inline listvprops{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}) = listvprops(propmod(g))
-@inline listeprops{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}) = listeprops(propmod(g))
-@inline getvprop{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, v::VertexID) = getvprop(propmod(g), v)
-@inline getvprop{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, v::VertexID, propname) = getvprop(propmod(g), v, propname)
-@inline geteprop{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, u::VertexID, v::VertexID) = geteprop(propmod(g), u, v)
-@inline geteprop{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, u::VertexID, v::VertexID, propname) = geteprop(propmod(g), u, v, propname)
-@inline setvprop!{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, v::VertexID, props::Dict) = setvprop!(propmod(g), v, props)
-@inline setvprop!{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, v::VertexID, propname, val) = setvprop!(propmod(g), v, propname, val)
-@inline seteprop!{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, u::VertexID, v::VertexID, props::Dict) = seteprop!(propmod(g), u, v, props)
-@inline seteprop!{AM,K,V}(g::Graph{AM,NDSparsePM{K,V}}, u::VertexID, v::VertexID, propname, val) = seteprop!(propmod(g), u, v, propname, val)
-
-
 ################################################# SUBGRAPH ################################################################
 
 
 function subgraph{K,V}(x::NDSparsePM{K,V}, vlist::AbstractVector{VertexID})
-   y = NDSparsePM{K,V}()
-   y.vprops = x.vprops
-   y.eprops = y.eprops
-   y.data = data(x)[vlist, vlist, :]
-   y
+   D = data(x)[vlist, vlist, :]
+   cols = D.indexes.columns
+
+   flush!(D)
+   new_vid = Dict([v=>i for (i,v) in enumerate(vlist)])
+   map!(v->new_vid[v], cols[1], cols[1])
+   map!(v->new_vid[v], cols[2], cols[2])
+
+   NDSparsePM{K,V}(copy(vprops(x)), copy(eprops(x)), D)
 end
 
+function subgraph{K,V,E<:Integer}(x::NDSparsePM{K,V}, elist::Vector{Pair{E,E}}) 
+   # Need a better filter for NDSparse. Submit PR to NDSparse to resolve this mess.
+   arr = data(x)
+   I = arr.indexes
+   cols = I.columns
+   indxs = collect(1 : length(I))
 
+   filter!(indxs) do i
+      t = I[i]
+      t[1] == t[2] && return true
+      in((t[1]=>t[2]), elist) && return true
+   end
+
+   arr_ = NDSparse(size(arr), Indexes(map(x->x[indxs], cols)...), arr.data[indxs], arr.default)
+   NDSparsePM{K,V}(copy(vprops(x)), copy(eprops(x)), arr_)
+end

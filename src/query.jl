@@ -7,43 +7,94 @@
 
 export 
 # Filtering
-parse_filter_query, vertex_filter
+vertex_filter, edge_filter
 ################################################# BASICS ###################################################################
 
-# Getindex
-Base.getindex(g::Graph, v::VertexID) = getvprop(g, v)
-Base.getindex(g::Graph, u::VertexID, v::VertexID) = geteprop(g, u, v)
-Base.getindex(g::Graph, v::VertexID, ::Colon) = fadj(g, v)
-Base.getindex(g::Graph, ::Colon, v::VertexID) = badj(g, v)
+# Getindex for vertex properties
+Base.getindex(g::Graph, label) = getvprop(g, resolve(g, label))
 
-# Setindex
+# Getindex of edge properties
+Base.getindex(g::Graph, e::Pair) = geteprop(g, resolve(g, e)...)
 
-Base.setindex!(g::Graph, val, v, propname) = setvprop!(g, v, propname, val)
-Base.setindex!(g::Graph, val, u, v, propname) = seteprop!(g, u, v, propname, val)
+# Getindex for adjacencies
+Base.getindex(g::Graph, label, ::Colon) = fadj(g, resolve(g, label))
+Base.getindex(g::Graph, ::Colon, label) = badj(g, resolve(g, label))
+
+# Getindex for subgraph
+Base.getindex(g::Graph, flist::AbstractVector) = subgraph(g, flist)
+
+# Setindex for vertex properties
+Base.setindex!(g::Graph, val, label, propname) = setvprop!(g, resolve(g, label), propname, val)
+
+# Setindex for edge properties
+Base.setindex!(g::Graph, val, e::Pair, propname) = seteprop!(g, resolve(g, e)..., propname, val)
+
+
 
 ################################################# FILTERING #################################################################
 
-function Base.filter(g::Graph, ts::ASCIIString)
-   fn = parse_filter_query(ts)
-   vlist = filter(v->fn(g, v), 1 : nv(g))
-   subgraph(g, vlist)
-end
-
-function parse_filter_query(ts::ASCIIString)
-   ts = strip(ts)
-   rvpf = r"v[.](\w+)\s*(<|>|<=|>=|!=|==)\s*(\w+)"
-   
-   if ismatch(rvpf, ts)
-      m = match(rvpf, ts)
-      prop = join(m[1])
-      op = parse(m[2])
-      val = parse(m[3])
-      return (g,v) -> begin
-         cmp = getvprop(g, v, prop)
-         return cmp == nothing ? false : eval(op)(cmp, val)
-      end
-         
-   end 
+function Base.filter(g::Graph, ts::ASCIIString) # TODO: Support for multiple conditions
+   if ismatch(r"v[.](\w+)", ts)
+      # Vertex filter query
+      return subgraph(g, vertex_filter(g, ts))
+   elseif ismatch(r"e[.](\w+)", ts)
+      # Edge filter query
+      return subgraph(g, edge_filter(g, ts))
+   end
 
    error("The input string couldn't be parsed. Please consult documentation")
+end
+
+function vertex_filter(g::Graph, ts::ASCIIString)
+   fn = parse_vertex_query(ts)
+   filter(v->fn(g, v), vertices(g))
+end
+
+function edge_filter(g::Graph, ts::ASCIIString)
+   fn = parse_edge_query(ts)
+   filter(e->fn(g, e...), collect(edges(g)))
+end
+
+# VertexFilter Query parsing
+function parse_vertex_query(ts::ASCIIString)
+   ts = strip(ts)
+
+   # Relational filtering on vertex property
+   rvpf = r"^v[.](\w+)\s*(<|>|<=|>=|!=|==)\s*(\w+)$"
+   ismatch(rvpf, ts) && return rvpf_filter(match(rvpf, ts))
+
+   error("The input string couldn't be parsed. Please consult documentation")
+end
+
+function rvpf_filter(m)
+   prop = join(m[1])
+   op = parse(m[2])
+   val = isnumber(m[3]) ? parse(m[3]) : join(m[3])
+
+   return (g,v) -> begin
+      cmp = getvprop(g, v, prop)
+      return cmp == nothing ? false : eval(op)(cmp, val)
+   end
+end
+
+
+# EdgeFilter Query parsing
+function parse_edge_query(ts::ASCIIString)
+   ts = strip(ts)
+   # Relational filtering on edge property
+   repf = r"^e[.](\w+)\s*(<|>|<=|>=|!=|==)\s*(\w+)$"
+   ismatch(repf, ts) && return repf_filter(match(repf, ts))
+
+   error("The input string couldn't be parsed. Please consult documentation")
+end
+
+function repf_filter(m)
+   prop = join(m[1])
+   op = parse(m[2])
+   val = isnumber(m[3]) ? parse(m[3]) : join(m[3])
+
+   return (g, u, v) -> begin
+      cmp = geteprop(g, u, v, prop)
+      return cmp == nothing ? false : eval(op)(cmp, val)
+   end
 end
