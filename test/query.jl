@@ -17,9 +17,9 @@ for AM in subtypes(AdjacencyModule)
 
          @test g["Abel"=>"Bharath"] == geteprop(g, 1, 2)
 
-         @test collect(g["Abel", :]) == collect(fadj(g, 1))
+         @test g["Abel", :] == ["Bharath", "Camila"]
 
-         @test collect(g[:, "Abel"]) == collect(badj(g, 1))
+         @test g[:, "Abel"] == ["Bharath", "Camila"]
 
          g["Abel", "a"] = 5
          @test getvprop(g, 1, "a") == 5
