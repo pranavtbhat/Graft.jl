@@ -78,20 +78,6 @@ encode(x::NullModule, obj) = obj
 # Subgraphing
 subgraph(x::NullModule, args...) = x
 
-################################################# CUSTOM ITERATOR ##########################################################
-
-# To avoid allocating memory
-type CustomIterator
-   arr::Vector{Int}
-   idxs::AbstractVector{Int}
-end
-
-Base.length(x::CustomIterator) = length(x.idxs)
-Base.start(x::CustomIterator) = start(x.idxs)
-Base.done(x::CustomIterator, i) = i > last(x.idxs)
-Base.next(x::CustomIterator, i) = x.arr[i], i+1
-Base.collect(x::CustomIterator) = x.arr[x.idxs]
-
 ################################################# MACROS ###################################################################
 
 getvarname(x::Expr) = x.args[1]

@@ -17,8 +17,8 @@ Base.getindex(g::Graph, label) = getvprop(g, resolve(g, label))
 Base.getindex(g::Graph, e::Pair) = geteprop(g, resolve(g, e)...)
 
 # Getindex for adjacencies
-Base.getindex(g::Graph, label, ::Colon) = fadj(g, resolve(g, label))
-Base.getindex(g::Graph, ::Colon, label) = badj(g, resolve(g, label))
+Base.getindex(g::Graph, label, ::Colon) = map(v->encode(g, v), fadj(g, resolve(g, label)))
+Base.getindex(g::Graph, ::Colon, label) = map(v->encode(g, v), badj(g, resolve(g, label)))
 
 # Getindex for subgraph
 Base.getindex(g::Graph, flist::AbstractVector) = subgraph(g, flist)

@@ -20,11 +20,11 @@ for AM in subtypes(AdjacencyModule)
       @test length(elist) == 28
       @test sum([hasedge(g, e...) for e in elist]) == 28
 
-      @test collect(fadj(g, 1)) == [2, 3]
-      @test collect(fadj(g, 4)) == [3, 5, 6, 7, 8, 9, 10]
+      @test fadj(g, 1) == [2, 3]
+      @test fadj(g, 4) == [3, 5, 6, 7, 8, 9, 10]
       
-      @test collect(badj(g, 3)) == [1, 2, 4]
-      @test collect(badj(g, 10)) == [4, 9]
+      @test badj(g, 3) == [1, 2, 4]
+      @test badj(g, 10) == [4, 9]
       
       @test addvertex!(g) == nothing
       @test nv(g) == 11

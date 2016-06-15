@@ -90,12 +90,12 @@ Base.size(x::SparseMatrixAM) = (x.nv, x.ne)
 
 function fadj(x::SparseMatrixAM, v::Int)
    M = fdata(x)
-   CustomIterator(M.rowval, nzrange(M, v))
+   M.rowval[nzrange(M, v)]
 end
 
 function badj(x::SparseMatrixAM, v::Int)
    M = rdata(x)
-   CustomIterator(M.rowval, nzrange(M,v))
+   M.rowval[nzrange(M, v)]
 end
 
 hasedge(x::SparseMatrixAM, u::VertexID, v::VertexID) = fdata(x)[u,v]
