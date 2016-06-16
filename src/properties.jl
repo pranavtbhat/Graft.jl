@@ -38,10 +38,13 @@ abstract PropertyModule{K,V}
 
 ################################################# IMPLEMENTATIONS ##########################################################
 
+# Sparse Implementation
+include("sparse/sparsematrixpm.jl")
+
 # NDSparse Implementation
 include("ndsparse/propertymodule.jl")
 
 # Dict Implementation
-include("dict/propertymodule.jl")
+include("dict/puredictpm.jl")
 
 

@@ -26,7 +26,7 @@ ParallelGraphs has the following `AdjacencyModule`s implemented:
 The `PropertyModule` will be responsible for maintaining information attached to vertices and edges. Methods implemented on the Property Module will allow the user to fetch vertex/edge data and execute SQL like queries. 
 
 ParallelGraphs has the following `PropertyModule`s implemented:
-- `DictPM` : Uses the standard Julia `Dictionary` type to store vertex/edge properties.
+- `PureDictPM` : Uses the standard Julia `Dictionary` type to store vertex/edge properties.
 - `NDSparsePM` : Uses N-Dimensional Sparse arrays from *[NDSparseData.jl](https://github.com/JuliaComputing/NDSparseData.jl)* to store vertex/edge properties.
 
 
@@ -52,7 +52,7 @@ using ParallelGraphs
 
 # Randomly generate a graph with 50 vertices and 500 edges.
 g = SimpleGraph(50, 500)
-# Graph{ParallelGraphs.LightGraphsAM,ParallelGraphs.DictPM{ASCIIString,Any}} with 50 vertices and 500 edges
+# Graph{ParallelGraphs.LightGraphsAM,ParallelGraphs.PureDictPM{ASCIIString,Any}} with 50 vertices and 500 edges
 
 # Generate properties and attach them to vertices.
 setvprop!(g, "name", v -> Faker.first_name())
@@ -92,11 +92,11 @@ g[:, "Cynthia"]'
 
 # Get a subgraph with vertices of age less than 65
 filter(g, "v.age < 65")
-# Graph{ParallelGraphs.LightGraphsAM,ParallelGraphs.DictPM{K,V}} with 45 vertices and 402 edges
+# Graph{ParallelGraphs.LightGraphsAM,ParallelGraphs.PureDictPM{K,V}} with 45 vertices and 402 edges
 
 # Get a subgraph with edges of weight less than 7
 filter(g, "e.weight < 65")
-# Graph{ParallelGraphs.LightGraphsAM,ParallelGraphs.DictPM{K,V}} with 50 vertices and 305 edges
+# Graph{ParallelGraphs.LightGraphsAM,ParallelGraphs.PureDictPM{K,V}} with 50 vertices and 305 edges
 
 ```
 

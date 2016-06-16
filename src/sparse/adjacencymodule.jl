@@ -66,16 +66,6 @@ end
 
 Base.collect(x::EdgeIteratorCSC) = Pair{VertexID,VertexID}[e for e in x]
 
-# Since SparseMatrixCSC maintains a colptr field, equal to the size of the matrix, arbitrarily high sizes cannot be 
-# maintained. Therefore, the SparseMatrix must grow, for each vertex added. Maybe a more sophisticated approach (like
-# binary probing) can reduce the amortized allocation count?
-function grow(x::SparseMatrixCSC{Bool,Int}, sz::Int)
-   colptr = x.colptr
-   SparseMatrixCSC{Bool,Int}(x.m+sz, x.n+sz, append!(colptr, fill(colptr[end], sz)), x.rowval, x.nzval)
-end
-
-# No shrink required as of now.
-
 ################################################# INTERFACE IMPLEMENTATION ##################################################
 
 nv(x::SparseMatrixAM) = x.nv

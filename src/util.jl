@@ -78,6 +78,18 @@ encode(x::NullModule, obj) = obj
 # Subgraphing
 subgraph(x::NullModule, args...) = x
 
+################################################# SPARSEMATRIXCSC ##########################################################
+
+# Since SparseMatrixCSC maintains a colptr field, equal to the size of the matrix, arbitrarily high sizes cannot be 
+# maintained. Therefore, the SparseMatrix must grow, for each vertex added. Maybe a more sophisticated approach (like
+# binary probing) can reduce the amortized allocation count?
+
+function grow{Tv,Ti}(x::SparseMatrixCSC{Tv,Ti}, sz::Int)
+   colptr = x.colptr
+   SparseMatrixCSC{Tv,Ti}(x.m+sz, x.n+sz, append!(colptr, fill(colptr[end], sz)), x.rowval, x.nzval)
+end
+
+# No shrink required as of now.
 ################################################# MACROS ###################################################################
 
 getvarname(x::Expr) = x.args[1]

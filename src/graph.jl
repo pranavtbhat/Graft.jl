@@ -28,7 +28,7 @@ type Graph{AM,PM}
    function Graph(nv::Int=0)
       self = new()
       self.adjmod = AM(nv)
-      self.propmod = PM()
+      self.propmod = PM(nv)
       self.labelmod = NullModule()
       self
    end
@@ -36,7 +36,7 @@ type Graph{AM,PM}
    function Graph(nv::Int, ne::Int)
       self = new()
       self.adjmod = AM(nv, ne)
-      self.propmod = PM()
+      self.propmod = PM(nv)
       self.labelmod = NullModule()
       self
    end
@@ -46,7 +46,7 @@ end
 @inline propmod(g::Graph) = g.propmod
 @inline labelmod(g::Graph) = g.labelmod
 
-typealias SimpleGraph Graph{LightGraphsAM,DictPM}
+typealias SimpleGraph Graph{LightGraphsAM,PureDictPM}
 typealias SparseGraph Graph{SparseMatrixAM, NDSparsePM}
 
 ################################################# GRAPH API ############################################################
