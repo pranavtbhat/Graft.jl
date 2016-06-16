@@ -46,7 +46,10 @@ end
 @inline propmod(g::Graph) = g.propmod
 @inline labelmod(g::Graph) = g.labelmod
 
-typealias SimpleGraph Graph{LightGraphsAM,PureDictPM}
+if CAN_USE_LG
+   typealias SimpleGraph Graph{LightGraphsAM,PureDictPM}
+end
+
 typealias SparseGraph Graph{SparseMatrixAM, NDSparsePM}
 
 ################################################# GRAPH API ############################################################

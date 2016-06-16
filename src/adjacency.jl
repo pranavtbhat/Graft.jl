@@ -37,7 +37,9 @@ abstract AdjacencyModule
 
 ################################################# IMPLEMENTATIONS #########################################################
 
-include("lightgraphs/adjacencymodule.jl")
+if CAN_USE_LG
+   include("lightgraphs/adjacencymodule.jl")
+end
 
 include("sparse/adjacencymodule.jl")
 

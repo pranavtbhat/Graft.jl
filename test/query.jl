@@ -7,7 +7,7 @@
 for AM in subtypes(AdjacencyModule)
    for PM in subtypes(PropertyModule)
       @testset "Query tests for Graph{$AM,$PM}" begin
-         g = parsegraph("testgraph.txt", :TGF, SimpleGraph)
+         g = parsegraph("testgraph.txt", :TGF, Graph{AM,PM})
 
          @test setlabel!(g, "name") == nothing
 

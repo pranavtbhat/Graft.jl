@@ -1,7 +1,19 @@
 module ParallelGraphs
 
 using NDSparseData
-import LightGraphs
+
+const CAN_USE_LG = begin
+   try
+      import LightGraphs
+      true
+   catch e
+      println(e)
+      println("Cannot load LightGraphs. LightGraphsAM will be disabled.")
+      false
+   end
+end
+
+
 using Faker
 
 # Package Wide Utilities

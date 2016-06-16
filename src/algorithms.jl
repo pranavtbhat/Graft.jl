@@ -88,22 +88,26 @@ end
 
 ################################################# Connectivity ########################################################
 
-is_connected(g::Graph{LightGraphsAM}) = LightGraphs.is_connected(data(adjmod(g)))
-is_strongly_connected(g::Graph{LightGraphsAM}) = LightGraphs.is_strongly_connected(data(adjmod(g)))
-is_weakly_connected(g::Graph{LightGraphsAM})= LightGraphs.is_weakly_connected(data(adjmod(g)))
-strongly_connected_components(g::Graph{LightGraphsAM})= LightGraphs.strongly_connected_components(data(adjmod(g)))
-condensation(g::Graph{LightGraphsAM})= LightGraphs.condensation(data(adjmod(g)))
+if CAN_USE_LG
+   is_connected(g::Graph{LightGraphsAM}) = LightGraphs.is_connected(data(adjmod(g)))
+   is_strongly_connected(g::Graph{LightGraphsAM}) = LightGraphs.is_strongly_connected(data(adjmod(g)))
+   is_weakly_connected(g::Graph{LightGraphsAM})= LightGraphs.is_weakly_connected(data(adjmod(g)))
+   strongly_connected_components(g::Graph{LightGraphsAM})= LightGraphs.strongly_connected_components(data(adjmod(g)))
+   condensation(g::Graph{LightGraphsAM})= LightGraphs.condensation(data(adjmod(g)))
+end
 
 ################################################# Shortest Paths ######################################################
 
-a_star(g::Graph{LightGraphsAM}, s::Int64, t::Int64) = LightGraphs.a_star(data(adjmod(g)), s, t)
-a_star(g::Graph{LightGraphsAM}, s::Int64, t::Int64, propname::Symbol) = LightGraphs.a_star(data(adjmod), s, t, EdgePropInterface(g, propname))
+if CAN_USE_LG
+   a_star(g::Graph{LightGraphsAM}, s::Int64, t::Int64) = LightGraphs.a_star(data(adjmod(g)), s, t)
+   a_star(g::Graph{LightGraphsAM}, s::Int64, t::Int64, propname::Symbol) = LightGraphs.a_star(data(adjmod), s, t, EdgePropInterface(g, propname))
 
-dijkstra_shortest_paths(g::Graph{LightGraphsAM}, s::Int) = LightGraphs.dijkstra_shortest_paths(data(adjmod(g)), s)
-dijkstra_shortest_paths(g::Graph{LightGraphsAM}, s::Int, propname) = LightGraphs.dijkstra_shortest_paths(data(adjmod(g)), s, EdgePropInterface(g, propname))
+   dijkstra_shortest_paths(g::Graph{LightGraphsAM}, s::Int) = LightGraphs.dijkstra_shortest_paths(data(adjmod(g)), s)
+   dijkstra_shortest_paths(g::Graph{LightGraphsAM}, s::Int, propname) = LightGraphs.dijkstra_shortest_paths(data(adjmod(g)), s, EdgePropInterface(g, propname))
 
-bellman_ford_shortest_paths(g::Graph{LightGraphsAM}, s::Int) = LightGraphs.bellman_ford_shortest_paths(data(adjmod(g)), s)
-bellman_ford_shortest_paths(g::Graph{LightGraphsAM}, s::Int, propname) = LightGraphs.bellman_ford_shortest_paths(data(adjmod(g)), s, EdgePropInterface(g, propname))
+   bellman_ford_shortest_paths(g::Graph{LightGraphsAM}, s::Int) = LightGraphs.bellman_ford_shortest_paths(data(adjmod(g)), s)
+   bellman_ford_shortest_paths(g::Graph{LightGraphsAM}, s::Int, propname) = LightGraphs.bellman_ford_shortest_paths(data(adjmod(g)), s, EdgePropInterface(g, propname))
 
-sssp(g::Graph{LightGraphsAM}, s::Int) = dijkstra_shortest_paths(g, s).dists
-sssp(g::Graph{LightGraphsAM}, s::Int, propname) = dijkstra_shortest_paths(g, s, propname).dists
+   sssp(g::Graph{LightGraphsAM}, s::Int) = dijkstra_shortest_paths(g, s).dists
+   sssp(g::Graph{LightGraphsAM}, s::Int, propname) = dijkstra_shortest_paths(g, s, propname).dists
+end

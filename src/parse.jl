@@ -22,7 +22,7 @@ export parsegraph
 
 ################################################# PARSEGRAPH ###############################################################
 """ Parse a text file in a given format """
-function parsegraph(filename::AbstractString, format::Symbol, graph_type=SimpleGraph)
+function parsegraph(filename::AbstractString, format::Symbol, graph_type=SparseGraph)
    (format == :TGF) && return parsegraph_tgf(filename, graph_type)
    error("Invalid graph format")
 end
