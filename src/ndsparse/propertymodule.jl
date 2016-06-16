@@ -5,12 +5,7 @@
 ################################################# IMPORT/EXPORT ############################################################
 export 
 # Types
-NDSparsePM, NDSparseArray,
-# Constants
-NDSparsePM_Max_Size
-
-Base.zero(::Type{Any}) = nothing
-Base.zero(::Type{ASCIIString}) = ""
+NDSparsePM
 
 """ A property module that uses NDSparse arrays """
 type NDSparsePM{K,V} <: PropertyModule{K,V}

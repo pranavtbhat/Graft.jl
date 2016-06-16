@@ -31,7 +31,7 @@ type PureDictPM{K,V} <: PropertyModule{K,V}
 end
 
 function PureDictPM(nv::Int=0)
-   PureDictPM{ASCIIString,Any}()
+   PureDictPM{ASCIIString,Any}(nv)
 end
 
 @inline data(x::PureDictPM) = x.data
