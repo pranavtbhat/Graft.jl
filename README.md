@@ -6,7 +6,7 @@
 ParallelGraphs hopes to be a general purpose graph processing framework. Some of the use cases addressed are:
 - Storing and querying vertex or edge properties. ParallelGraphs allows the assignment of key-value pairs to vertices and edges, which can be used in various graph algorithms.
 - Vertex Labelling. ParallelGraphs allows users to refer to vertices using arbitrary Julia types.
-- Graph DB queries(WIP). ParallelGraphs will support SQL queries for graphs, such as filtering on vertex and edge properties.
+- Graph DB queries(WIP). ParallelGraphs will support SQL-like queries for graphs, such as filtering on vertex and edge properties.
 - Massive Graph Analysis(WIP). ParallelGraphs will leverage [ComputeFramework](https://github.com/shashi/ComputeFramework.jl) to allow for the parallel processing of very large graphs.
 
 Every Graph type in ParallelGraphs is built with three separate modular components:
@@ -26,8 +26,10 @@ ParallelGraphs has the following `AdjacencyModule`s implemented:
 The `PropertyModule` will be responsible for maintaining information attached to vertices and edges. Methods implemented on the Property Module will allow the user to fetch vertex/edge data and execute SQL like queries. 
 
 ParallelGraphs has the following `PropertyModule`s implemented:
-- `PureDictPM` : Uses the standard Julia `Dictionary` type to store vertex/edge properties.
+- `PureDictPM` : Two separate Dictionary of Dictionaries are used to maintain vertex and edge properties.
 - `NDSparsePM` : Uses N-Dimensional Sparse arrays from *[NDSparseData.jl](https://github.com/JuliaComputing/NDSparseData.jl)* to store vertex/edge properties.
+- `DictArrPM`  : Maintains separate dictionaries for Vertex and Edge Properties, that map property names onto arrays of values. Can be thought of as a Dictionary of Arrays. (Similar to Structure of Arrays).
+- `SparseMatrixPM` : A SparseMatrixCSC maps vertices and edges onto property dictionaries. Can be thought of as arrays of dictionaries.
 
 
 
@@ -35,9 +37,9 @@ ParallelGraphs has the following `PropertyModule`s implemented:
 ParallelGraphs allows users to mix and match Adjacency and Property modules to create graph structures that suit their needs. A graph can be created using the parametric constructor.
 
 ```julia
-g = Graph{SparseMatrixAM,NDSparsePM}()          # Create an empty graph
-g = Graph{SparseMatrixAM,NDSparsePM}(100)       # Create a graph with 100 vertices
-g = Graph{SparseMatrixAM,NDSparsePM}(100, 500)  # Create a graph with 500 edges.
+g = Graph{SparseMatrixAM,SparseMatrixPM}()          # Create an empty graph
+g = Graph{SparseMatrixAM,SparseMatrixPM}(100)       # Create a graph with 100 vertices
+g = Graph{SparseMatrixAM,SparseMatrixPM}(100, 500)  # Create a graph with 500 edges.
 ```
 
 For less picky users, ParallelGraphs provides two typealiases:
@@ -69,7 +71,6 @@ setlabel!(g, "name")
 # Fetch all the properties assigned to vertex Cynthia
 g["Cynthia"]
 # Dict{ASCIIString,Any} with 3 entries:
-# Dict{ASCIIString,Any} with 3 entries:
 #   "name" => "Cynthia"
 #   "age"  => 70
 #   "DOB"  => "1976-8-2"
@@ -95,7 +96,7 @@ filter(g, "v.age < 65")
 # Graph{ParallelGraphs.LightGraphsAM,ParallelGraphs.PureDictPM{K,V}} with 45 vertices and 402 edges
 
 # Get a subgraph with edges of weight less than 7
-filter(g, "e.weight < 65")
+filter(g, "e.weight < 7")
 # Graph{ParallelGraphs.LightGraphsAM,ParallelGraphs.PureDictPM{K,V}} with 50 vertices and 305 edges
 
 ```
