@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/pranavtbhat/ParallelGraphs.jl.svg?branch=master)](https://travis-ci.org/pranavtbhat/ParallelGraphs.jl)
 [![codecov.io](http://codecov.io/github/pranavtbhat/ParallelGraphs.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaGraphs/LightGraphs.jl?branch=master)
+[![Project Status: WIP - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
 
 ParallelGraphs hopes to be a general purpose graph processing framework. Some of the use cases addressed are:
 - Storing and querying vertex or edge properties. ParallelGraphs allows the assignment of key-value pairs to vertices and edges, which can be used in various graph algorithms.
@@ -101,5 +102,5 @@ filter(g, "e.weight < 7")
 
 ```
 
-## Achnowledgements
+## Acknowledgements
 This project is supported by `Google Summer of Code` and mentored by [Viral Shah](https://github.com/ViralBShah) and [Shashi Gowda](https://github.com/shashi).
