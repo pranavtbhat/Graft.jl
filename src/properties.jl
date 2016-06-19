@@ -13,6 +13,11 @@ listvprops, listeprops, getvprop, geteprop, setvprop!, seteprop!
 
 abstract PropertyModule{K,V}
 
+# Zeroing to help out with data storage
+
+Base.zero(::Type{ASCIIString}) = ""
+Base.zero(::Type{Any}) = nothing
+
 ################################################# INTERFACE ################################################################
 
 @interface addvertex!{K,V}(x::PropertyModule{K,V})
@@ -38,10 +43,14 @@ abstract PropertyModule{K,V}
 
 ################################################# IMPLEMENTATIONS ##########################################################
 
+# Sparse Implementation
+include("sparse/sparsematrixpm.jl")
+
 # NDSparse Implementation
 include("ndsparse/propertymodule.jl")
 
-# Dict Implementation
-include("dict/propertymodule.jl")
+# Pure Dict Implementation
+include("dict/puredictpm.jl")
 
-
+# Dictionary-Array Implementation
+include("dict/dictarrpm.jl")

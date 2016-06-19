@@ -5,12 +5,7 @@
 ################################################# IMPORT/EXPORT ############################################################
 export 
 # Types
-NDSparsePM, NDSparseArray,
-# Constants
-NDSparsePM_Max_Size
-
-Base.zero(::Type{Any}) = nothing
-Base.zero(::Type{ASCIIString}) = ""
+NDSparsePM
 
 """ A property module that uses NDSparse arrays """
 type NDSparsePM{K,V} <: PropertyModule{K,V}
@@ -26,7 +21,7 @@ type NDSparsePM{K,V} <: PropertyModule{K,V}
       self
    end
 
-   function NDSparsePM()
+   function NDSparsePM(nv::Int=0)
       self = new{K,V}()
       self.vprops = Set{K}()
       self.eprops = Set{K}()
@@ -35,7 +30,7 @@ type NDSparsePM{K,V} <: PropertyModule{K,V}
    end
 end
 
-function NDSparsePM()
+function NDSparsePM(nv::Int=0)
    NDSparsePM{ASCIIString,Any}()
 end
 
