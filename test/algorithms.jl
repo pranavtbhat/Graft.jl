@@ -24,6 +24,9 @@ for AM in subtypes(AdjacencyModule)
 
       @test bfs(g, 1) == [0,1,1,3,4,4,4,4,4,4]
       @test dfs(g, 1) == ([0,1,1,3,4,4,4,4,4,4],[0,9,1,2,8,7,6,5,4,3])
+
+      @test ne(bfs_subgraph(g, 1)) == 9
+      @test ne(dfs_subgraph(g, 1)) == 9
    end
 end
 

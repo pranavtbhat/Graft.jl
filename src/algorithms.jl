@@ -5,7 +5,7 @@
 ################################################# IMPORT/EXPORT ############################################################
 export
 # Traversals
-bfs, dfs,
+bfs, bfs_subgraph, dfs, dfs_subgraph,
 # Connectivity
 is_connected, is_strongly_connected, is_weakly_connected, strongly_connected_components, condensation,
 # Shortest Paths
@@ -31,15 +31,14 @@ Base.size(x::EdgePropInterface) = (x.nv, x.nv)
 
 ################################################# TRAVERSALS ###############################################################
 
-function bfs(g::Graph, seed)
+function bfs(g::Graph, seed::Vector{Int})
    N = nv(g)
 
-   parvec = Array(Int, N)
-   fill!(parvec, -1)
+   parvec = fill(-1, N)
    parvec[seed] = 0
 
-   Q = Deque(N)
-   push!(Q, seed)
+   Q = copy(seed)
+   sizehint!(Q, N)
 
    u = 0
 
@@ -53,6 +52,22 @@ function bfs(g::Graph, seed)
    end
 
    parvec
+end
+
+bfs(g::Graph, seed::AbstractVector) = bfs(g, collect(seed))
+bfs(g::Graph, seed::Int) = bfs(g, Int[seed])
+
+function bfs_subgraph{AM,PM}(g::Graph{AM,PM}, seed)
+   parvec = bfs(g, seed)
+   vlist = find(x->x>0, parvec)
+
+   h = Graph{AM,PM}(nv(g))
+
+   for i in vlist
+      addedge!(h, parvec[i], i)
+   end
+
+   h
 end
 
 function dfs(g::Graph, root)
@@ -84,6 +99,19 @@ function dfs(g::Graph, root)
    end
 
    parvec, order
+end
+
+function dfs_subgraph{AM,PM}(g::Graph{AM,PM}, root)
+   parvec, = dfs(g, root)
+   vlist = find(x->x>0, parvec)
+
+   h = Graph{AM,PM}(nv(g))
+
+   for i in vlist
+      addedge!(h, parvec[i], i)
+   end
+
+   h
 end
 
 ################################################# Connectivity ########################################################

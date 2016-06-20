@@ -17,7 +17,7 @@ type Graph{AM,PM}
    labelmod::Any
 
 
-   function Graph(am::AdjacencyModule, pm::PropertyModule=NullModule(), lm=NullModule())
+   function Graph(am, pm=NullModule(), lm=NullModule())
       self = new()
       self.adjmod = am
       self.propmod = pm

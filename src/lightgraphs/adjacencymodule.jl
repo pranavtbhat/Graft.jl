@@ -23,6 +23,10 @@ end
 
 @inline data(x::LightGraphsAM) = x.data
 
+################################################# INTERNAL IMPLEMENTATION ##################################################
+
+Base.sizehint!(x::LightGraphsAM) = nothing
+
 ################################################# INTERFACE IMPLEMENTATION #################################################
 
 @inline nv(x::LightGraphsAM) = LightGraphs.nv(data(x))

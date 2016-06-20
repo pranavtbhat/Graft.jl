@@ -68,17 +68,48 @@ function bench_generation(V::Int, E::Int, tune_file = "generation_params.jld"; s
    end
 
    tune_suite(suite, tune_file)
-   
    result = median(run(suite, seconds = 10))
-
    display(result)
-
    save_suite(result, save_file)
-
    compare_suite(result, compare_file)
    nothing
 end
+println("bench_generation(V::Int, E::Int, tune_file = \"generation_params.jld\"; save_file = \"\", compare_file = \"\")")
 
 
+###
+# 
+###
 
+function bench_setprop(V::Int, E::Int, tune_file = "setprop_params.jld"; save_file = "", compare_file= "")
+   suite = BenchmarkGroup(["Setprop"])
+
+   suite["unit"] = BenchmarkGroup()
+   for PM in subtypes(PropertyModule)
+      val=randstring()
+      suite["unit"]["$PM"] = @benchmarkable setvprop!(g, v, "test1", $val) setup=(g=Graph{SparseMatrixAM,$PM}($V,$E); v=rand(1:$V))
+   end
+
+   suite["dict"] = BenchmarkGroup()
+   for PM in subtypes(PropertyModule)
+      d = Dict("test1"=>1, "test2"=>"txt", "test3"=>3.0, "test4"=>nothing)
+      suite["dict"]["$PM"] = @benchmarkable setvprop!(g, v, $d) setup=(g=Graph{SparseMatrixAM,$PM}($V,$E); v=rand(1:$V))
+   end
+
+   suite["array"] = BenchmarkGroup()
+   for PM in subtypes(PropertyModule)
+      suite["array"]["$PM"] = @benchmarkable setvprop!(g, "test1", arr) setup=(g=Graph{SparseMatrixAM,$PM}($V,$E); v=rand(1:$V); arr=Array{Int}($V))
+   end
+
+   tune_suite(suite, tune_file)
+   result = median(run(suite, seconds = 10))
+   for (key,val) in result
+      println(key)
+      display(val)
+   end
+   save_suite(result, save_file)
+   compare_suite(result, compare_file)
+   nothing
+end
+   
 

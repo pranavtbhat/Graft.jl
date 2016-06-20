@@ -66,6 +66,15 @@ end
 
 Base.collect(x::EdgeIteratorCSC) = Pair{VertexID,VertexID}[e for e in x]
 
+function Base.sizehint!(x::SparseMatrixAM, n::Int)
+   sizehint!(fdata(x).nzval, n)
+   sizehint!(fdata(x).rowval, n)
+
+   sizehint!(rdata(x).nzval, n)
+   sizehint!(rdata(x).rowval, n)
+   nothing
+end
+
 ################################################# INTERFACE IMPLEMENTATION ##################################################
 
 nv(x::SparseMatrixAM) = x.nv
