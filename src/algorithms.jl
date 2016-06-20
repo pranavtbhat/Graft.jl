@@ -25,8 +25,8 @@ end
 
 Base.getindex(x::EdgePropInterface, s::Int, d::Int) = geteprop(x.data, s, d, x.propname)
 Base.size(x::EdgePropInterface) = (x.nv, x.nv)
-Base.transpose(x::EdgePropInterface) = EdgePropInterface(x.nv, x.data', x.propname)
-Base.ctranspose(x::EdgePropInterface) = EdgePropInterface(x.nv, x.data', x.propname)
+@interface Base.transpose(x::EdgePropInterface)
+@interface Base.ctranspose(x::EdgePropInterface)
 
 
 ################################################# TRAVERSALS ###############################################################
@@ -105,7 +105,6 @@ if CAN_USE_LG
    dijkstra_shortest_paths(g::Graph{LightGraphsAM}, s::Int) = LightGraphs.dijkstra_shortest_paths(data(adjmod(g)), s)
    dijkstra_shortest_paths(g::Graph{LightGraphsAM}, s::Int, propname) = LightGraphs.dijkstra_shortest_paths(data(adjmod(g)), s, EdgePropInterface(g, propname))
 
-   bellman_ford_shortest_paths(g::Graph{LightGraphsAM}, s::Int) = LightGraphs.bellman_ford_shortest_paths(data(adjmod(g)), s)
    bellman_ford_shortest_paths(g::Graph{LightGraphsAM}, s::Int, propname) = LightGraphs.bellman_ford_shortest_paths(data(adjmod(g)), s, EdgePropInterface(g, propname))
 
    sssp(g::Graph{LightGraphsAM}, s::Int) = dijkstra_shortest_paths(g, s).dists

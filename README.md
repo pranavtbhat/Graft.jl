@@ -1,7 +1,7 @@
 # ParallelGraphs
 
 [![Build Status](https://travis-ci.org/pranavtbhat/ParallelGraphs.jl.svg?branch=master)](https://travis-ci.org/pranavtbhat/ParallelGraphs.jl)
-[![codecov.io](http://codecov.io/github/pranavtbhat/ParallelGraphs.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaGraphs/LightGraphs.jl?branch=master)
+[![codecov.io](http://codecov.io/github/pranavtbhat/ParallelGraphs.jl/coverage.svg?branch=master)](http://codecov.io/github/pranavtbhat/ParallelGraphs.jl/coverage.svg?branch=master)
 [![Project Status: WIP - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
 
 ParallelGraphs hopes to be a general purpose graph processing framework. Some of the use cases addressed are:

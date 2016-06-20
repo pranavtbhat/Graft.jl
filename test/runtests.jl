@@ -14,3 +14,5 @@ include("properties.jl")
 include("subgraph.jl")
 
 include("query.jl")
+
+include("algorithms.jl")

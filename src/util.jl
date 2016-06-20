@@ -151,7 +151,8 @@ end
 
 @inline function Base.push!(s::Stack, items::Vector{Int})
     len = length(items)
-    s.data[(s.top+len):-1:(s.top+1)] = items
+    top = s.top
+    s.data[(top+len):-1:(top+1)] = items
     s.top += len
     nothing
 end
@@ -192,7 +193,8 @@ end
 
 function Base.push!(d::Deque, items::Vector{Int})
     len = length(items)
-    d.data[(d.right+1) : (d.right+len)] = items
+    right = d.right
+    d.data[(right+1) : (right+len)] = items
     d.right += len
     nothing
 end
