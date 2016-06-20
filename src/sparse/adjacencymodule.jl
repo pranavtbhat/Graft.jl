@@ -23,7 +23,7 @@ function SparseMatrixAM(nv=0)
 end
 
 function SparseMatrixAM(nv::Int, ne::Int)
-   m = sprandbool(nv, nv, ne/(nv*nv))
+   m = sprandbool(nv, nv, ne/(nv*(nv-1)))
    fdata = triu(m,1) | tril(m,-1)
    rdata = fdata'
    SparseMatrixAM(nv, nnz(fdata), fdata, rdata)

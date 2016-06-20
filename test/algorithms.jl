@@ -42,8 +42,8 @@ if ParallelGraphs.CAN_USE_LG
       @test is_connected(g) == true
       @test is_strongly_connected(g) == true
       @test is_weakly_connected(g) == true
-      println(strongly_connected_components(g))
-      println(condensation(g))
+      @test length(strongly_connected_components(g)) == 1
+      @test nv(condensation(g)) == 1
    end
 
 

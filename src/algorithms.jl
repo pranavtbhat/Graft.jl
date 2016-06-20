@@ -93,7 +93,7 @@ if CAN_USE_LG
    is_strongly_connected(g::Graph{LightGraphsAM}) = LightGraphs.is_strongly_connected(data(adjmod(g)))
    is_weakly_connected(g::Graph{LightGraphsAM})= LightGraphs.is_weakly_connected(data(adjmod(g)))
    strongly_connected_components(g::Graph{LightGraphsAM})= LightGraphs.strongly_connected_components(data(adjmod(g)))
-   condensation(g::Graph{LightGraphsAM})= LightGraphs.condensation(data(adjmod(g)))
+   condensation(g::Graph{LightGraphsAM})= LightGraphsAM(LightGraphs.condensation(data(adjmod(g))))
 end
 
 ################################################# Shortest Paths ######################################################

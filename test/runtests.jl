@@ -15,4 +15,7 @@ include("subgraph.jl")
 
 include("query.jl")
 
+include("filter.jl")
+
 include("algorithms.jl")
+
