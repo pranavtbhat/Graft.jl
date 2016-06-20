@@ -123,34 +123,14 @@ end
 """ Set the value for a vertex property """
 @inline setvprop!(g::Graph, v::VertexID, props::Dict) = setvprop!(propmod(g), v, props)
 @inline setvprop!(g::Graph, v::VertexID, prop, val) = setvprop!(propmod(g), v, prop, val)
-
-function setvprop!(g::Graph, propname, vals::Vector)
-   length(vals) == nv(g) || error("Length of values supplied must equal the number of vertices in the graph")
-   x = propmod(g)
-   for v in 1 : nv(g)
-      setvprop!(x, v, propname, vals[v])
-   end
-end
-
-function setvprop!(g::Graph, propname, f::Function)
-   x = propmod(g)
-   for v in 1 : nv(g)
-      setvprop!(x, v, propname, f(v))
-   end
-end
+@inline setvprop!(g::Graph, propname, vals::Vector) = setvprop!(propmod(g), vertices(g), vals, propname)
+@inline setvprop!(g::Graph, propname, f::Function) = setvprop!(propmod(g), vertices(g), f, propname)
 
 
 """ Set the value for an edge property """
 @inline seteprop!(g::Graph, u::VertexID, v::VertexID, props::Dict) = seteprop!(propmod(g), u, v, props)
 @inline seteprop!(g::Graph, u::VertexID, v::VertexID, prop, val) = seteprop!(propmod(g), u, v, prop, val)
-
-function seteprop!(g::Graph, propname, f::Function)
-   x = propmod(g)
-   for (u,v) in edges(g)
-      seteprop!(x, u, v, propname, f(u,v))
-   end
-end
-
+@inline seteprop!(g::Graph, propname, f::Function) = seteprop!(propmod(g), f, propname, edges(g))
 
 
 # Labelling

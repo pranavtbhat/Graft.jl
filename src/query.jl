@@ -33,26 +33,39 @@ Base.setindex!(g::Graph, val, e::Pair, propname) = seteprop!(g, resolve(g, e)...
 
 ################################################# FILTERING #################################################################
 
-function Base.filter(g::Graph, ts::ASCIIString) # TODO: Support for multiple conditions
-   if ismatch(r"v[.](\w+)", ts)
-      # Vertex filter query
-      return subgraph(g, vertex_filter(g, ts))
-   elseif ismatch(r"e[.](\w+)", ts)
-      # Edge filter query
-      return subgraph(g, edge_filter(g, ts))
+function Base.filter(g::Graph, vts::ASCIIString...)
+   vlist = vertices(g)
+   elist = collect(edges(g))
+
+   for ts in vts
+      if ismatch(r"v[.](\w+)", ts)
+         # Vertex filter query
+         vlist = vertex_filter(g, ts, vlist)
+      elseif ismatch(r"e[.](\w+)", ts)
+         # Edge filter query
+         elist = edge_filter(g, ts, elist)
+      else
+         error("The input string couldn't be parsed. Please consult documentation")
+      end
    end
 
-   error("The input string couldn't be parsed. Please consult documentation")
+   if(length(elist) == ne(g))
+      return subgraph(g, vlist)
+   elseif(length(vlist) == nv(g))
+      return subgraph(g, elist)
+   else
+      return subgraph(subgraph(g, elist), vlist)
+   end
 end
 
-function vertex_filter(g::Graph, ts::ASCIIString)
+function vertex_filter(g::Graph, ts::ASCIIString, vlist=vertices(g))
    fn = parse_vertex_query(ts)
-   filter(v->fn(g, v), vertices(g))
+   filter(v->fn(g, v), vlist)
 end
 
-function edge_filter(g::Graph, ts::ASCIIString)
+function edge_filter(g::Graph, ts::ASCIIString, elist=collect(edges(g)))
    fn = parse_edge_query(ts)
-   filter(e->fn(g, e...), collect(edges(g)))
+   filter(e->fn(g, e...), elist)
 end
 
 # VertexFilter Query parsing
