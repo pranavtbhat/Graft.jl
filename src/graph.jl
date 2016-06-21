@@ -50,7 +50,7 @@ if CAN_USE_LG
    typealias SimpleGraph Graph{LightGraphsAM,PureDictPM}
 end
 
-typealias SparseGraph Graph{SparseMatrixAM, NDSparsePM}
+typealias SparseGraph Graph{SparseMatrixAM, DictArrPM}
 
 ################################################# GRAPH API ############################################################
 
@@ -136,9 +136,11 @@ end
 # Labelling
 @inline resolve(g::Graph, x) = resolve(labelmod(g), x)
 @inline encode(g::Graph, v::VertexID) = encode(labelmod(g), v)
+@inline encode(g::Graph, e::Pair{Int,Int}) = encode(labelmod(g), e)
 
 function setlabel!{T}(g::Graph, labels::Vector{T})
-   g.labelmod = LabelModule{T}(labels)
+   g.labelmod = LabelModule(labels)
+   nothing
 end
 
 function setlabel!(g::Graph, f::Function)

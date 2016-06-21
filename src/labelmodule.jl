@@ -36,14 +36,10 @@ function resolve{T}(x::LabelModule{T}, label::T)
    fmap(x)[label]
 end
 
-function resolve{T}(x::LabelModule{T}, e::Pair)
-   D = fmap(x)
-   (haskey(D, e.first) && haskey(D, e.second)) || error("Input Vertex identifier $label couldn't be resolved")
-   Pair{T,T}(D[e.first], D[e.second])
-end
+@inline resolve{T}(x::LabelModule{T}, e::Pair) = Pair{Int,Int}(resolve(x, e.first), resolve(x, e.second))
 
 @inline encode{T}(x::LabelModule{T}, v::VertexID) = rmap(x)[v]
-
+encode{T}(x::LabelModule{T}, e::Pair{Int,Int}) = Pair{T,T}(encode(x, e.first), encode(x, e.second))
 
 function subgraph{T}(x::LabelModule{T}, vlist::AbstractVector{VertexID})
    new_labels = rmap(x)[vlist]
