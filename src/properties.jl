@@ -52,13 +52,13 @@ Base.zero(::Type{Any}) = nothing
 ################################################# IMPLEMENTATIONS ##########################################################
 
 # Sparse Implementation
-include("sparse/sparsematrixpm.jl")
+include("propmods/sparsematrix.jl")
 
 # NDSparse Implementation
-include("ndsparse/propertymodule.jl")
+include("propmods/ndsparse.jl")
 
 # Pure Dict Implementation
-include("dict/puredictpm.jl")
+include("propmods/puredict.jl")
 
 # Dictionary-Array Implementation
-include("dict/dictarrpm.jl")
+include("propmods/dictarr.jl")

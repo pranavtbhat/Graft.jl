@@ -38,8 +38,8 @@ abstract AdjacencyModule
 ################################################# IMPLEMENTATIONS #########################################################
 
 if CAN_USE_LG
-   include("lightgraphs/adjacencymodule.jl")
+   include("adjmods/lightgraphs.jl")
 end
 
-include("sparse/adjacencymodule.jl")
+include("adjmods/sparsematrix.jl")
 
