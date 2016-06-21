@@ -44,7 +44,7 @@ function bfs(g::Graph, seed::Vector{Int})
 
    while !isempty(Q)
       u = shift!(Q)
-      @inbounds for v in fadj(g, u)
+      for v in fadj(g, u)
          parvec[v] != -1 && continue
          parvec[v] = u
          push!(Q, v)
@@ -78,8 +78,8 @@ function dfs(g::Graph, root)
 
    order = fill(-1, N)
 
-   S = Stack(N)
-   push!(S, root)
+   S = Int[root]
+   sizehint!(S, N)
 
    count = 0
    u = 0

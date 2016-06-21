@@ -10,6 +10,10 @@ export
 vertex_filter, edge_filter
 ################################################# BASICS ###################################################################
 
+# Getindex for basics
+Base.getindex(g::Graph, ::Colon) = map(v->encode(g, v), vertices(g))
+Base.getindex(g::Graph, ::Colon, ::Colon) = map(e->Pair(encode(g, e.first), encode(g, e.second)), edges(g))
+
 # Getindex for vertex properties
 Base.getindex(g::Graph, label) = getvprop(g, resolve(g, label))
 
@@ -21,14 +25,14 @@ Base.getindex(g::Graph, label, ::Colon) = map(v->encode(g, v), fadj(g, resolve(g
 Base.getindex(g::Graph, ::Colon, label) = map(v->encode(g, v), badj(g, resolve(g, label)))
 
 # Getindex for subgraph
-Base.getindex(g::Graph, flist::AbstractVector) = subgraph(g, flist)
+Base.getindex(g::Graph, vlist::Vector{VertexID}) = map(v->encode(g, v), vlist)
+Base.getindex(g::Graph, elist::Vector{Pair{Int,Int}}) = map(e->Pair(encode(g, e.first), encode(g, e.second)), elist)
 
 # Setindex for vertex properties
 Base.setindex!(g::Graph, val, label, propname) = setvprop!(g, resolve(g, label), propname, val)
 
 # Setindex for edge properties
 Base.setindex!(g::Graph, val, e::Pair, propname) = seteprop!(g, resolve(g, e)..., propname, val)
-
 
 
 ################################################# FILTERING #################################################################
