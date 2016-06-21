@@ -1,6 +1,7 @@
 ################################################# FILE DESCRIPTION #########################################################
 
-# This file contains a SparseMatrix implemenation of the PropertyModule interface. 
+# This file contains a SparseMatrix implemenation of the PropertyModule interface. This module is currently very slow for 
+# large datasets. It would be more advisable to use DictArrPM.
 
 ################################################# IMPORT/EXPORT ############################################################
 
@@ -91,6 +92,27 @@ function setvprop!{K,V}(x::SparseMatrixPM{K,V}, v::VertexID, prop, val)
    nothing
 end
 
+function setvprop!{K,V}(x::SparseMatrixPM{K,V}, vlist::AbstractVector, vals::Vector, propname)
+   length(vlist) == length(vals) || error("Lenght of value vector must equal the number of vertices in the graph")
+   push!(vprops(x), propname)
+   D = data(x)
+
+   for i in eachindex(vlist, vals)
+      v = vlist[i]
+      d = D[v,v]
+      d[propname] = vals[i]
+      D[v,v] = d
+   end
+   nothing
+end
+
+
+function setvprop!{K,V}(x::SparseMatrixPM{K,V}, vlist::AbstractVector, f::Function, propname)
+   setvprop!(x, vlist, map(f, vlist), propname)
+end
+
+
+
 function seteprop!{K,V}(x::SparseMatrixPM{K,V}, u::VertexID, v::VertexID, props::Dict)
    data(x)[v,v] = merge!(data(x)[u,v], props)
    push!(eprops(x), keys(props)...)
@@ -100,6 +122,19 @@ end
 function seteprop!{K,V}(x::SparseMatrixPM{K,V}, u::VertexID, v::VertexID, prop, val)
    data(x)[u,v] = push!(data(x)[u,v], prop=>val)
    push!(eprops(x), prop)
+   nothing
+end
+
+function seteprop!{K,V}(x::SparseMatrixPM{K,V}, f::Function, propname, edges)
+   push!(eprops(x), propname)
+   D = data(x)
+
+   for e in edges
+      u,v = e
+      d = D[u,v]
+      d[propname] = f(u,v)
+      D[u,v] = d
+   end
    nothing
 end
 

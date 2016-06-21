@@ -95,6 +95,24 @@ function setvprop!{K,V}(x::PureDictPM{K,V}, v::VertexID, prop, val)
    nothing
 end
 
+# Should be fast.
+function setvprop!{K,V}(x::PureDictPM{K,V}, vlist::AbstractVector, vals::Vector, propname)
+   length(vlist) == length(vals) || error("Lenght of value vector must equal the number of vertices in the graph")
+   push!(vprops(x), propname)
+   D = data(x)
+
+   for i in eachindex(vlist, vals)
+      get!(D, vlist[i], Dict{K,V}())[propname] = vals[i]
+   end
+   nothing
+end
+
+function setvprop!{K,V}(x::PureDictPM{K,V}, vlist::AbstractVector, f::Function, propname)
+   setvprop!(x, vlist, map(f, vlist), propname)
+   nothing
+end
+
+
 function seteprop!{K,V}(x::PureDictPM{K,V}, u::VertexID, v::VertexID, props::Dict)
    for (key,val) in props
       seteprop!(x, u, v, key, val)
@@ -107,6 +125,16 @@ function seteprop!{K,V}(x::PureDictPM{K,V}, u::VertexID, v::VertexID, prop, val)
    D[prop] = val
    nothing
 end
+
+# Should be fast.
+function seteprop!{K,V}(x::PureDictPM{K,V}, f::Function, propname, edges)
+   push!(eprops(x), propname)
+   for e in edges
+      get!(data(x), e, Dict{K,V}())[propname] = f(e...)
+   end
+   nothing
+end
+
 
 ################################################# SUBGRAPH #################################################################
 

@@ -117,6 +117,19 @@ function setvprop!{K,V}(x::DictArrPM{K,V}, v::VertexID, prop, val)
    nothing
 end
 
+# Should be fast.
+function setvprop!{K,V}(x::DictArrPM{K,V}, vlist::AbstractVector, vals::Vector, propname)
+   length(vlist) == length(vals) || error("Lenght of value vector must equal the number of vertices in the graph")
+   vdata(x)[propname] = vals
+   nothing
+end
+
+function setvprop!{K,V}(x::DictArrPM{K,V}, vlist::AbstractVector, f::Function, propname)
+   setvprop!(x, vlist, map(f, vlist), propname)
+   nothing
+end
+
+
 function seteprop!{K,V}(x::DictArrPM{K,V}, u::VertexID, v::VertexID, props::Dict)
    for (key,val) in props
       seteprop!(x, u, v, key, val)
@@ -127,6 +140,17 @@ function seteprop!{K,V}(x::DictArrPM{K,V}, u::VertexID, v::VertexID, prop, val)
    get!(edata(x), prop, default_eprop(V, nv(x)))[u,v] = val
    nothing
 end
+
+# Should be fast.
+function seteprop!{K,V}(x::DictArrPM{K,V}, f::Function, propname, edges)
+   sv = get!(edata(x), propname, default_eprop(V, nv(x)))
+   for e in edges
+      u,v = e
+      sv[u,v] = f(u,v)
+   end
+   nothing
+end
+
 
 ################################################# SUBGRAPH #################################################################
 

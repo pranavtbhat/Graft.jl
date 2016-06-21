@@ -91,6 +91,25 @@ function setvprop!{K,V}(x::NDSparsePM{K,V}, v::VertexID, prop, val)
    nothing
 end
 
+# Should be fast.
+function setvprop!{K,V}(x::NDSparsePM{K,V}, vlist::AbstractVector, vals::Vector, propname)
+   length(vlist) == length(vals) || error("Lenght of value vector must equal the number of vertices in the graph")
+   push!(vprops(x), propname)
+   D = data(x)
+
+   for i in eachindex(vlist, vals)
+      u = vlist[i]
+      D[u,u,propname] = vals[i]
+   end
+   nothing
+end
+
+function setvprop!{K,V}(x::NDSparsePM{K,V}, vlist::AbstractVector, f::Function, propname)
+   setvprop!(x, vlist, map(f, vlist), propname)
+end
+
+
+
 function seteprop!{K,V}(x::NDSparsePM{K,V}, u::VertexID, v::VertexID, props::Dict)
    for (key,val) in props
       seteprop!(x, u, v, key, val)
@@ -100,6 +119,17 @@ end
 function seteprop!{K,V}(x::NDSparsePM{K,V}, u::VertexID, v::VertexID, prop, val)
    push!(eprops(x), prop)
    setindex!(data(x), val, u, v, prop)
+   nothing
+end
+
+function seteprop!{K,V}(x::NDSparsePM{K,V}, f::Function, propname, edges)
+   push!(eprops(x), propname)
+   D = data(x)
+
+   for e in edges
+      u,v = e
+      D[u,v,propname] = f(u,v)
+   end
    nothing
 end
 

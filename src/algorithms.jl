@@ -5,7 +5,7 @@
 ################################################# IMPORT/EXPORT ############################################################
 export
 # Traversals
-bfs, dfs,
+bfs, bfs_subgraph, dfs, dfs_subgraph,
 # Connectivity
 is_connected, is_strongly_connected, is_weakly_connected, strongly_connected_components, condensation,
 # Shortest Paths
@@ -25,27 +25,26 @@ end
 
 Base.getindex(x::EdgePropInterface, s::Int, d::Int) = geteprop(x.data, s, d, x.propname)
 Base.size(x::EdgePropInterface) = (x.nv, x.nv)
-Base.transpose(x::EdgePropInterface) = EdgePropInterface(x.nv, x.data', x.propname)
-Base.ctranspose(x::EdgePropInterface) = EdgePropInterface(x.nv, x.data', x.propname)
+@interface Base.transpose(x::EdgePropInterface)
+@interface Base.ctranspose(x::EdgePropInterface)
 
 
 ################################################# TRAVERSALS ###############################################################
 
-function bfs(g::Graph, seed)
+function bfs(g::Graph, seed::Vector{Int})
    N = nv(g)
 
-   parvec = Array(Int, N)
-   fill!(parvec, -1)
+   parvec = fill(-1, N)
    parvec[seed] = 0
 
-   Q = Deque(N)
-   push!(Q, seed)
+   Q = copy(seed)
+   sizehint!(Q, N)
 
    u = 0
 
    while !isempty(Q)
       u = shift!(Q)
-      @inbounds for v in fadj(g, u)
+      for v in fadj(g, u)
          parvec[v] != -1 && continue
          parvec[v] = u
          push!(Q, v)
@@ -53,6 +52,22 @@ function bfs(g::Graph, seed)
    end
 
    parvec
+end
+
+bfs(g::Graph, seed::AbstractVector) = bfs(g, collect(seed))
+bfs(g::Graph, seed::Int) = bfs(g, Int[seed])
+
+function bfs_subgraph{AM,PM}(g::Graph{AM,PM}, seed)
+   parvec = bfs(g, seed)
+   vlist = find(x->x>0, parvec)
+
+   h = Graph{AM,PM}(nv(g))
+
+   for i in vlist
+      addedge!(h, parvec[i], i)
+   end
+
+   h
 end
 
 function dfs(g::Graph, root)
@@ -63,8 +78,8 @@ function dfs(g::Graph, root)
 
    order = fill(-1, N)
 
-   S = Stack(N)
-   push!(S, root)
+   S = Int[root]
+   sizehint!(S, N)
 
    count = 0
    u = 0
@@ -86,6 +101,19 @@ function dfs(g::Graph, root)
    parvec, order
 end
 
+function dfs_subgraph{AM,PM}(g::Graph{AM,PM}, root)
+   parvec, = dfs(g, root)
+   vlist = find(x->x>0, parvec)
+
+   h = Graph{AM,PM}(nv(g))
+
+   for i in vlist
+      addedge!(h, parvec[i], i)
+   end
+
+   h
+end
+
 ################################################# Connectivity ########################################################
 
 if CAN_USE_LG
@@ -93,7 +121,7 @@ if CAN_USE_LG
    is_strongly_connected(g::Graph{LightGraphsAM}) = LightGraphs.is_strongly_connected(data(adjmod(g)))
    is_weakly_connected(g::Graph{LightGraphsAM})= LightGraphs.is_weakly_connected(data(adjmod(g)))
    strongly_connected_components(g::Graph{LightGraphsAM})= LightGraphs.strongly_connected_components(data(adjmod(g)))
-   condensation(g::Graph{LightGraphsAM})= LightGraphs.condensation(data(adjmod(g)))
+   condensation(g::Graph{LightGraphsAM})= LightGraphsAM(LightGraphs.condensation(data(adjmod(g))))
 end
 
 ################################################# Shortest Paths ######################################################
@@ -105,7 +133,6 @@ if CAN_USE_LG
    dijkstra_shortest_paths(g::Graph{LightGraphsAM}, s::Int) = LightGraphs.dijkstra_shortest_paths(data(adjmod(g)), s)
    dijkstra_shortest_paths(g::Graph{LightGraphsAM}, s::Int, propname) = LightGraphs.dijkstra_shortest_paths(data(adjmod(g)), s, EdgePropInterface(g, propname))
 
-   bellman_ford_shortest_paths(g::Graph{LightGraphsAM}, s::Int) = LightGraphs.bellman_ford_shortest_paths(data(adjmod(g)), s)
    bellman_ford_shortest_paths(g::Graph{LightGraphsAM}, s::Int, propname) = LightGraphs.bellman_ford_shortest_paths(data(adjmod(g)), s, EdgePropInterface(g, propname))
 
    sssp(g::Graph{LightGraphsAM}, s::Int) = dijkstra_shortest_paths(g, s).dists

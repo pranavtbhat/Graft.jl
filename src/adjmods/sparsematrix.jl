@@ -23,7 +23,7 @@ function SparseMatrixAM(nv=0)
 end
 
 function SparseMatrixAM(nv::Int, ne::Int)
-   m = sprandbool(nv, nv, ne/(nv*nv))
+   m = sprandbool(nv, nv, ne/(nv*(nv-1)))
    fdata = triu(m,1) | tril(m,-1)
    rdata = fdata'
    SparseMatrixAM(nv, nnz(fdata), fdata, rdata)
@@ -66,6 +66,15 @@ end
 
 Base.collect(x::EdgeIteratorCSC) = Pair{VertexID,VertexID}[e for e in x]
 
+function Base.sizehint!(x::SparseMatrixAM, n::Int)
+   sizehint!(fdata(x).nzval, n)
+   sizehint!(fdata(x).rowval, n)
+
+   sizehint!(rdata(x).nzval, n)
+   sizehint!(rdata(x).rowval, n)
+   nothing
+end
+
 ################################################# INTERFACE IMPLEMENTATION ##################################################
 
 nv(x::SparseMatrixAM) = x.nv
@@ -80,12 +89,12 @@ Base.size(x::SparseMatrixAM) = (x.nv, x.ne)
 
 function fadj(x::SparseMatrixAM, v::Int)
    M = fdata(x)
-   M.rowval[nzrange(M, v)]
+   slice(M.rowval, nzrange(M, v))
 end
 
 function badj(x::SparseMatrixAM, v::Int)
    M = rdata(x)
-   M.rowval[nzrange(M, v)]
+   slice(M.rowval, nzrange(M, v))
 end
 
 hasedge(x::SparseMatrixAM, u::VertexID, v::VertexID) = fdata(x)[u,v]

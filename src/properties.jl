@@ -24,16 +24,24 @@ Base.zero(::Type{Any}) = nothing
 @interface rmvertex!{K,V}(x::PropertyModule{K,V}, v::VertexID)
 @interface addedge!{K,V}(x::PropertyModule{K,V}, u::VertexID, v::VertexID)
 @interface rmedge!{K,V}(x::PropertyModule{K,V}, u::VertexID, v::VertexID)
+
 @interface listvprops{K,V}(x::PropertyModule{K,V})
 @interface listeprops{K,V}(x::PropertyModule{K,V})
+
 @interface getvprop{K,V}(x::PropertyModule{K,V}, v::VertexID)
 @interface getvprop{K,V}(x::PropertyModule{K,V}, v::VertexID, propname)
+
 @interface geteprop{K,V}(x::PropertyModule{K,V}, u::VertexID, v::VertexID)
 @interface geteprop{K,V}(x::PropertyModule{K,V}, u::VertexID, v::VertexID, propname)
+
 @interface setvprop!{K,V}(x::PropertyModule{K,V}, v::VertexID, props::Dict)
 @interface setvprop!{K,V}(x::PropertyModule{K,V}, v::VertexID, propname, val)
+@interface setvprop!{K,V}(x::PropertyModule{K,V}, vlist::AbstractVector, vals::Vector, propname)
+@interface setvprop!{K,V}(x::PropertyModule{K,V}, vlist::AbstractVector, f::Function, propname)
+
 @interface seteprop!{K,V}(x::PropertyModule{K,V}, u::VertexID, v::VertexID, props::Dict)
 @interface seteprop!{K,V}(x::PropertyModule{K,V}, u::VertexID, v::VertexID, propname, val)
+@interface seteprop!{K,V}(x::PropertyModule{K,V}, f::Function, propname, edges)
 
 ################################################# SUBGRAPHING ##############################################################
 
@@ -44,13 +52,13 @@ Base.zero(::Type{Any}) = nothing
 ################################################# IMPLEMENTATIONS ##########################################################
 
 # Sparse Implementation
-include("sparse/sparsematrixpm.jl")
+include("propmods/sparsematrix.jl")
 
 # NDSparse Implementation
-include("ndsparse/propertymodule.jl")
+include("propmods/ndsparse.jl")
 
 # Pure Dict Implementation
-include("dict/puredictpm.jl")
+include("propmods/puredict.jl")
 
 # Dictionary-Array Implementation
-include("dict/dictarrpm.jl")
+include("propmods/dictarr.jl")
