@@ -4,34 +4,37 @@
 
 ############################################################################################################################
 
-for AM in subtypes(AdjacencyModule)
-   for PM in subtypes(PropertyModule)
-      @testset "Query tests for Graph{$AM,$PM}" begin
-         g = parsegraph("testgraph.txt", :TGF, Graph{AM,PM})
+for PM in subtypes(PropertyModule)
+   @testset "Query tests for Graph{SparseMatrixAM,$PM}" begin
+      g = Graph{SparseMatrixAM,PM}(10, 90)
+      labels = ["$i" for i in 1:10]
+      setlabel!(g, labels)
 
-         @test setlabel!(g, "name") == nothing
+      @test g[:] == labels
+      
+      @test length(g[=>]) == ne(g)
 
-         @test resolve(g, "Abel") == 1
-         
-         @test length(g[:]) == 10
-         @test length(g[:,:]) == 28
+      @test g["1"=>:] == ["$i" for i in 2:10]
 
-         @test g["Abel"] == getvprop(g, 1)
+      # Vertex Properties
+      g["1", "p1"] = 1
+      g["1"] = Dict("p4"=>4, "p5"=>5)
+      g[:, "p2"] = 2 * ones(Int, 10)
+      g[:,:] = [Dict("p3"=>3) for i in 1:10]
 
-         @test g["Abel"=>"Bharath"] == geteprop(g, 1, 2)
+      @test g["1"] == ["p$i" => i for i in 1:5]
+      @test g[:,"p2"] == 2 * ones(Int, 10)
+      @test g[:,:] == getvprop(g, :)
 
-         @test g["Abel", :] == ["Bharath", "Camila"]
 
-         @test g[:, "Abel"] == ["Bharath", "Camila"]
+      g["1"=>"2", "p1"] = 1
+      g["1"=>"2"] = Dict("p2"=>2)
+      g[=>, "p3"] = 3 * ones(Int, 90)
+      g[=>, :] = [Dict("p4"=>4) for i in 1:90]
 
-         g["Abel", "a"] = 5
-         @test getvprop(g, 1, "a") == 5
-
-         g["Abel"=>"Bharath", "b"] = 10
-         @test geteprop(g, 1, 2, "b") == 10
-
-         @test g[collect(vertices(g))] == g[:]
-         @test g[collect(edges(g))] == g[:,:]
-      end
+      @test g["1"=>"2"] == ["p$i" => i for i in 1:4]
+      @test g["1"=>"2", "p1"] == 1
+      @test g[=>, "p3"] == 3 *  ones(Int, 90)
+      @test g[=>, :] == geteprop(g, :)
    end
 end

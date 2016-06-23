@@ -21,10 +21,10 @@ for pmtype in subtypes(PropertyModule)
 
       @test setvprop!(g, 11, Dict("name" => "Kamath", "age" => 32)) == nothing
       @test getvprop(g, 11) == Dict("name" => "Kamath", "age" => 32)
-      @test setvprop!(g, 12, "age", 37) == nothing
+      @test setvprop!(g, 12, 37, "age") == nothing
       @test getvprop(g, 12, "age") == 37
       @test seteprop!(g, 11, 12, Dict("relationship" => "brother")) == nothing
-      @test seteprop!(g, 11, 12, "duration", 15) == nothing
+      @test seteprop!(g, 11, 12, 15, "duration") == nothing
       @test geteprop(g, 11, 12) == Dict("relationship" => "brother", "duration" => 15)
 
       # @test rmvertex!(g, 1) == nothing
@@ -35,13 +35,13 @@ for pmtype in subtypes(PropertyModule)
       # @test isempty(geteprop(g, 11, 12))
 
 
-      @test setvprop!(g, "index", collect(1 : 12)) == nothing
+      @test setvprop!(g, :, collect(1 : 12), "index") == nothing
       @test sum([getvprop(g, v, "index") for v in 1 : nv(g)]) == 78
 
-      @test setvprop!(g, "favdigit", v->v % 9) == nothing
+      @test setvprop!(g, :, v->v % 9, "favdigit") == nothing
       @test isa(Int[getvprop(g, v, "favdigit") for v in 1 : nv(g)], Vector{Int})
 
-      @test seteprop!(g, "weight", (u,v)->u+v) == nothing
+      @test seteprop!(g, :, (u,v)->u+v, "weight") == nothing
       @test isa(Int[geteprop(g, u, v, "weight") for (u,v) in edges(g)], Vector{Int})
    end
 end

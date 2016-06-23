@@ -1,6 +1,6 @@
 ################################################# FILE DESCRIPTION #########################################################
 
-# This file contains the SparseMatrixAM adjacency module, as well as an implementation of the AdjacencyModule interface.
+# This file contains the SparseMatrixAM adjacency module.
  
 ################################################# IMPORT/EXPORT ############################################################
 export
@@ -10,7 +10,7 @@ type SparseMatrixAM <: AdjacencyModule
    nv::Int
    ne::Int
    fdata::SparseMatrixCSC{Bool, Int}
-   rdata::SparseMatrixCSC{Bool, Int}
+   bdata::SparseMatrixCSC{Bool, Int}
 end
 
 
@@ -18,22 +18,22 @@ end
 
 function SparseMatrixAM(nv=0)
    fdata = spzeros(Bool, nv, nv)
-   rdata = spzeros(Bool, nv, nv)
-   SparseMatrixAM(nv, 0, fdata, rdata)
+   bdata = spzeros(Bool, nv, nv)
+   SparseMatrixAM(nv, 0, fdata, bdata)
 end
 
 function SparseMatrixAM(nv::Int, ne::Int)
    m = sprandbool(nv, nv, ne/(nv*(nv-1)))
    fdata = triu(m,1) | tril(m,-1)
-   rdata = fdata'
-   SparseMatrixAM(nv, nnz(fdata), fdata, rdata)
+   bdata = fdata'
+   SparseMatrixAM(nv, nnz(fdata), fdata, bdata)
 end
 
 ################################################# ACCESSORS ################################################################
 
 @inline fdata(x::SparseMatrixAM) = x.fdata
 
-@inline rdata(x::SparseMatrixAM) = x.rdata
+@inline bdata(x::SparseMatrixAM) = x.bdata
 
 ################################################# INTERNAL IMPLEMENTATION ##################################################
 
@@ -64,68 +64,102 @@ function Base.next(x::EdgeIteratorCSC, t)
    end
 end
 
-Base.collect(x::EdgeIteratorCSC) = Pair{VertexID,VertexID}[e for e in x]
+function Base.collect(x::EdgeIteratorCSC)
+   elist = EdgeID[]
+   sizehint!(elist, ne(x.am))
 
-function Base.sizehint!(x::SparseMatrixAM, n::Int)
-   sizehint!(fdata(x).nzval, n)
-   sizehint!(fdata(x).rowval, n)
+   M = x.am.fdata
+   for u in vertices(x.am)
+      append!(elist, map(v->u=>v, M.rowval[nzrange(M, u)]))
+   end
 
-   sizehint!(rdata(x).nzval, n)
-   sizehint!(rdata(x).rowval, n)
-   nothing
+   elist
 end
 
 ################################################# INTERFACE IMPLEMENTATION ##################################################
 
+Base.deepcopy(x::SparseMatrixAM) = SparseMatrixAM(nv(x), ne(x), deepcopy(fdata(x)), deepcopy(bdata(x)))
+
+
+
 nv(x::SparseMatrixAM) = x.nv
-
 ne(x::SparseMatrixAM) = x.ne
-
 Base.size(x::SparseMatrixAM) = (x.nv, x.ne)
 
-@inline vertices(x::SparseMatrixAM) = UnitRange{Int}(1, nv(x))
 
+
+@inline vertices(x::SparseMatrixAM) = UnitRange{Int}(1, nv(x))
 @inline edges(x::SparseMatrixAM) = EdgeIteratorCSC(x)
 
-function fadj(x::SparseMatrixAM, v::Int)
+
+
+@inline hasvertex(x::SparseMatrixAM, v::VertexID) = 1 <= v <= nv(x)
+
+function hasedge(x::SparseMatrixAM, u::VertexID, v::VertexID)
+   hasvertex(x, u) && hasvertex(x, v) && fdata(x)[v,u]
+end
+@inline hasedge(x::SparseMatrixAM, e::EdgeID) = hasedge(x, e...)
+
+function fadj(x::SparseMatrixAM, v::VertexID)
    M = fdata(x)
    slice(M.rowval, nzrange(M, v))
 end
 
-function badj(x::SparseMatrixAM, v::Int)
-   M = rdata(x)
+function badj(x::SparseMatrixAM, v::VertexID)
+   M = bdata(x)
    slice(M.rowval, nzrange(M, v))
 end
 
-hasedge(x::SparseMatrixAM, u::VertexID, v::VertexID) = fdata(x)[u,v]
+outdegree(x::SparseMatrixAM, v::VertexID) = length(nzrange(fdata(x), v))
+indegree(x::SparseMatrixAM, v::VertexID) = length(nzrange(bdata(x), v))
+
+
 
 function addvertex!(x::SparseMatrixAM, numv::Int = 1)
    x.fdata = grow(fdata(x), numv)
-   x.rdata = grow(rdata(x), numv)
+   x.bdata = grow(bdata(x), numv)
    x.nv += numv
    nothing
 end
 
-# Does not remove the vertex, simply deletes all the edges attached to it.
-function rmvertex!(x::SparseMatrixAM, v::Int)
-   setindex!(fdata(x), false, v, :)
-   setindex!(fdata(x), false, :, v)
-   setindex!(rdata(x), false, :, v)
-   setindex!(rdata(x), false, v, :)
+function rmvertex!(x::SparseMatrixAM, vs)
+   x.fdata = remove_cols(fdata(x), vs)
+   x.bdata = remove_cols(bdata(x), vs)
+   x.nv -= length(vs)
+   x.ne = nnz(fdata(x))
    nothing
 end
 
 function addedge!(x::SparseMatrixAM, u::Int, v::Int)
-   x.ne += 1
    fdata(x)[v,u] = true
-   rdata(x)[u,v] = true
+   bdata(x)[u,v] = true
+   x.ne += 1
    nothing
+end
+@inline addedge!(x::SparseMatrixAM, e::EdgeID) = addedge!(x, e...)
+
+function addedge!(x::SparseMatrixAM, elist::AbstractVector{EdgeID})
+   for e in elist
+      addedge!(x, e)
+   end
 end
 
 function rmedge!(x::SparseMatrixAM, u::Int, v::Int)
    x.ne -= 1
    fdata(x)[v,u] = false
-   rdata(x)[u,v] = false
+   bdata(x)[u,v] = false
+   nothing
+end
+rmedge!(x::SparseMatrixAM, e::EdgeID) = rmedge!(x, e...)
+
+function rmedge!(x::SparseMatrixAM, elist::AbstractVector{EdgeID})
+   fd = fdata(x)
+   bd = bdata(x)
+   for e in elist
+      x.ne -= 1
+      fd[e...] = false
+      bd[e...] = false
+   end
    nothing
 end
 
@@ -137,11 +171,8 @@ function subgraph(x::SparseMatrixAM, vlist::AbstractVector{VertexID})
    SparseMatrixAM(length(vlist), nnz(M), M, M')
 end
 
-function subgraph{I<:Integer}(x::SparseMatrixAM, elist::Vector{Pair{I,I}})
-   M = spzeros(size(fdata(x))...)
-   for e in elist
-      M[e.second,e.first] = true
-   end
+function subgraph(x::SparseMatrixAM, elist::AbstractVector{EdgeID})
+   M = init_spmx(nv(x), elist, fill(true, length(elist)))
    SparseMatrixAM(nv(x), nnz(M), M, M')
 end
 

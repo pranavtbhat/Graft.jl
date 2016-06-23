@@ -6,35 +6,32 @@
 
 
 for AM in subtypes(AdjacencyModule)
-   g = parsegraph("testgraph.txt", :TGF, Graph{AM,NullModule})
    @testset "AdjacencyModule interface for $AM" begin
+      g = Graph{AM,NullModule}(10, 90)
       @test nv(g) == 10
-      @test ne(g) == 28
-      @test size(g) == (10, 28)
+      @test ne(g) == 90
+      @test size(g) == (10,90)
       @test vertices(g) == 1 : 10
 
-      elist = []
-      for e in edges(g)
-         push!(elist, e)
-      end
-      @test length(elist) == 28
-      @test sum([hasedge(g, e...) for e in elist]) == 28
+      @test all(e->hasedge(g, e), edges(g))
 
-      @test fadj(g, 1) == [2, 3]
-      @test fadj(g, 4) == [3, 5, 6, 7, 8, 9, 10]
+      @test fadj(g, 1) == collect(2:10)
+      @test badj(g, 10) == collect(1:9)
       
-      @test badj(g, 3) == [1, 2, 4]
-      @test badj(g, 10) == [4, 9]
-      
-      @test addvertex!(g) == nothing
-      @test nv(g) == 11
+      @test addvertex!(g, 2) == nothing
+      @test nv(g) == 12
       
       @test addedge!(g, 10, 11) == nothing
-      @test ne(g) == 29
+      @test addedge!(g, [EdgeID(10, 12), EdgeID(11, 12)]) == nothing
+      @test ne(g) == 93
       
-      @test rmedge!(g, 10, 11) == nothing
-      @test ne(g) == 28
-      
-      @test rmvertex!(g, 11) == nothing
+      @test rmedge!(g, 11, 12) == nothing
+      @test rmedge!(g, [EdgeID(10, 12), EdgeID(10, 11)]) == nothing
+      @test ne(g) == 90
+
+      @test rmvertex!(g, [11, 12]) == nothing
+      @test rmvertex!(g, 10) == nothing
+      @test nv(g) == 9
+      @test ne(g) == 72
    end
 end

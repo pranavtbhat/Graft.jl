@@ -37,7 +37,7 @@ function parsegraph_tgf(filename::AbstractString, graph_type)
          propname = join(args[i])
          val = join(args[i+1])
          val = isnumber(val) ? parse(Int, val) : val
-         setvprop!(g, v, propname, val)
+         setvprop!(g, v, val, propname)
       end
    end
 
@@ -48,7 +48,7 @@ function parsegraph_tgf(filename::AbstractString, graph_type)
          propname = join(args[i])
          val = join(args[i+1])
          val = isnumber(val) ? parse(Int, val) : val
-         seteprop!(g, v1, v2, propname, val) 
+         seteprop!(g, v1, v2, val, propname) 
       end
    end
 

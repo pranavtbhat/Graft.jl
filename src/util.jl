@@ -8,7 +8,9 @@ export
 # Types
 NullModule, CustomIterator,
 # Type Aliases
-VertexID, EdgeID, PropID, SparseArray,
+Edge, VertexID, EdgeID, PropID, SparseArray,
+# SparseMatrixCSC
+remove_cols, grow, init_spmx,
 # Macros
 redirect,
 # Constants
@@ -19,11 +21,8 @@ MAX_VERTEX, MAX_EDGE, MAX_GRAPH_SIZE
 """ Datatype used to store vertex id numbers """
 typealias VertexID Int
 
-""" Datatype used to store edge id numbers. (Change to Int128 if necessary) """
-typealias EdgeID Int
-
-""" Datatype used to store property indices """
-typealias PropID Int
+""" Datatype used to store edges """
+typealias EdgeID Pair{VertexID,VertexID}
 
 ################################################# CONSTANTS ################################################################
 
@@ -49,14 +48,14 @@ nv(x::NullModule) = Void()
 ne(x::NullModule) = Void()
 Base.size(x::NullModule) = Void()
 vertices(x::NullModule) = Void()
-edges(x::NullModule, u::VertexID, v::VertexID) = Void()
-hasedge(x::NullModule, u::VertexID, v::VertexID) = Void()
-fadj(x::NullModule, v::VertexID) = Void()
-badj(x::NullModule, v::VertexID) = Void()
-addvertex!(x::NullModule) = Void()
-rmvertex!(x::NullModule, v::VertexID) = Void()
-addedge!(x::NullModule, u::VertexID, v::VertexID) = Void()
-rmedge!(x::NullModule, u::VertexID, v::VertexID) = Void()
+edges(x::NullModule, args...) = Void()
+hasedge(x::NullModule, args...) = Void()
+fadj(x::NullModule, args...) = Void()
+badj(x::NullModule, args...) = Void()
+addvertex!(x::NullModule, args...) = Void()
+rmvertex!(x::NullModule, args...) = Void()
+addedge!(x::NullModule, args...) = Void()
+rmedge!(x::NullModule, args...) = Void()
 
 # Properties
 listvprops(x::NullModule) = Void()
@@ -80,16 +79,45 @@ subgraph(x::NullModule, args...) = x
 
 ################################################# SPARSEMATRIXCSC ##########################################################
 
-# Since SparseMatrixCSC maintains a colptr field, equal to the size of the matrix, arbitrarily high sizes cannot be 
-# maintained. Therefore, the SparseMatrix must grow, for each vertex added. Maybe a more sophisticated approach (like
-# binary probing) can reduce the amortized allocation count?
+# Remove columns from a sparsematrix
+function remove_cols{Tv,Ti}(x::SparseMatrixCSC{Tv,Ti}, v::Union{Int,AbstractVector{Int}})
+   setindex!(x, 0, v, :)
+   setindex!(x, 0, :, v)
+   setindex!(x, 0, :, v)
+   setindex!(x, 0, v, :)
 
+   m = x.m - length(v)
+   SparseMatrixCSC{Tv,Ti}(m, m, deleteat!(x.colptr, v), x.rowval, x.nzval)
+end
+
+# Grow a sparsematrix along the diagonal
 function grow{Tv,Ti}(x::SparseMatrixCSC{Tv,Ti}, sz::Int)
    colptr = x.colptr
    SparseMatrixCSC{Tv,Ti}(x.m+sz, x.n+sz, append!(colptr, fill(colptr[end], sz)), x.rowval, x.nzval)
 end
 
-# No shrink required as of now.
+# Construct a sparsematrix using a list of edges.
+function init_spmx{Tv}(nv::Int, elist::Vector{EdgeID}, vals::Vector{Tv})
+   nzval = vals
+   rowval = map(x->x.second, elist)
+   vlist = map(x->x.first, elist)
+   len = length(vlist)
+
+   colptr = Array{Int}(nv+1)
+   i = 1
+   colptr[1] = 1
+
+   for c in 2 : nv
+      i = searchsortedfirst(vlist, c, i+1, len, Base.Order.Forward)
+      colptr[c] = i
+   end
+
+   colptr[nv+1] = len + 1
+
+   SparseMatrixCSC{Tv,Int}(nv, nv, colptr, rowval, nzval)
+end
+
+
 ################################################# MACROS ###################################################################
 
 getvarname(x::Expr) = x.args[1]

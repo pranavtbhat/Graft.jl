@@ -10,11 +10,11 @@ for PM in subtypes(PropertyModule)
       g = Graph{SparseMatrixAM,PM}(10, 90)
 
       # Only vertex filtering
-      setvprop!(g, "id", v->v)
+      setvprop!(g, :, v->v, "id")
       @test nv(filter(g, "v.id <= 5")) == 5
       @test nv(filter(g, "v.id > 7")) == 3      
 
-      setvprop!(g, "txt", v->"hi")
+      setvprop!(g, :, v->"hi", "txt")
       @test nv(filter(g, "v.txt == hi")) == 10
 
       # Mutliple conditions
@@ -22,10 +22,10 @@ for PM in subtypes(PropertyModule)
       @test nv(filter(g, "v.id <= 10", "v.txt == hi")) == 10
 
       # Only edge filtering
-      seteprop!(g, "id", (u,v)->u)
+      seteprop!(g, :, (u,v)->u, "id")
       @test ne(filter(g, "e.id <= 5")) == 45
 
-      seteprop!(g, "weight", (u,v)->u+v)
+      seteprop!(g, :, (u,v)->u+v, "weight")
       @test ne(filter(g, "e.weight <= 10")) == 40
 
       # Multiple conditions

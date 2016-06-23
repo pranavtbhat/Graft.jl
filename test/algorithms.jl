@@ -7,7 +7,7 @@ if ParallelGraphs.CAN_USE_LG
 
    @testset "LightGraphs Edge Interface" begin
       g = SimpleGraph(10,90)
-      seteprop!(g, "weight", (u,v)->rand(1:10))
+      seteprop!(g, :, (u,v)->rand(1:10), "weight")
 
       ei = ParallelGraphs.EdgePropInterface(g, "weight")
       @test ei[1,10] == geteprop(g, 1, 10, "weight")
@@ -54,7 +54,7 @@ if ParallelGraphs.CAN_USE_LG
 
    @testset "LightGraphs Shortest Paths" begin
       g = SimpleGraph(10, 90)
-      seteprop!(g, "weight", (u,v)->2)
+      seteprop!(g, :, (u,v)->2, "weight")
 
       @test a_star(g, 1, 10) == Pair[1=>10]
 

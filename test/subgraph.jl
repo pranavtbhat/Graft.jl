@@ -7,21 +7,16 @@
 for AM in subtypes(AdjacencyModule)
    for PM in subtypes(PropertyModule)
       @testset "Subgraph test for Graph{$AM,$PM}" begin
-         g = Graph{AM,PM}(20,60)
-         setvprop!(g, "id", collect(1:20))
-
+         g = Graph{AM,PM}(10,90)
+         setvprop!(g, :, collect(1:10), "id")
          eid = 1
-         seteprop!(g, "weight", (u,v)-> eid += 1)
+         seteprop!(g, :, (u,v)-> eid += 1, "weight")
+         setlabel!(g, "id")
 
-         h = subgraph(g, 5:15)
-
-         @test [getvprop(h, v, "id") for v in vertices(h)] == collect(5:15)
-
-         elist = []
-         for e in edges(h)
-            push!(elist, e)
-         end
-         @test isa(Int[geteprop(h, e..., "weight") for e in elist], Vector{Int})
+         h = subgraph(g, 3:8)
+         @test getvprop(h, :, "id") == collect(3:8)
+         @test resolve(h, 3) == 1
+         @test resolve(h, 8) == 6
       end
    end
 end

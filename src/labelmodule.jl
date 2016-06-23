@@ -13,11 +13,15 @@ setlabel!, resolve, encode
 
 type LabelModule{T}
    fmap::Dict{T,VertexID}
-   rmap::Vector{T}
+   rmap::Dict{VertexID,T}
+end
+
+function LabelModule()
+   LabelModule{Any}(Dict(), Dict())
 end
 
 function LabelModule{T}(labels::Vector{T})
-   LabelModule{T}([label=>i for (i,label) in enumerate(labels)], copy(labels))
+   LabelModule{T}([label=>i for (i,label) in enumerate(labels)], [i=>label for (i,label) in enumerate(labels)])
 end
 
 @inline fmap(x::LabelModule) = x.fmap
@@ -25,25 +29,63 @@ end
 
 ################################################# API ######################################################################
 
-function setlabel!{T}(x::LabelModule{T}, v::VertexID, label::T)
+function setlabel!(x::LabelModule, v::VertexID, label)
    fmap(x)[label] = v
    rmap(x)[v] = label
    nothing
 end
 
-function resolve{T}(x::LabelModule{T}, label::T)
+function setlabel!(x::LabelModule, vs::AbstractVector{VertexID}, ls::AbstractVector)
+   for (v,label) in zip(vs,ls)
+      fmap(x)[label] = v
+      rmap(x)[v] = label
+   end
+end
+
+
+
+function resolve(x::LabelModule, label)
    haskey(fmap(x), label) || error("Input Vertex identifier $label couldn't be resolved")
    fmap(x)[label]
 end
+@inline resolve(x::LabelModule, ls::AbstractVector) = map(l->resolve(x, l), ls)
 
-@inline resolve{T}(x::LabelModule{T}, e::Pair) = Pair{Int,Int}(resolve(x, e.first), resolve(x, e.second))
+function resolve(x::LabelModule, e::Pair)
+   EdgeID(resolve(x, e.first), resolve(x, e.second))
+end
+@inline resolve(x::LabelModule, es::AbstractVector{Pair}) = map(e->resolve(x, e), es)
 
-@inline encode{T}(x::LabelModule{T}, v::VertexID) = rmap(x)[v]
-encode{T}(x::LabelModule{T}, e::Pair{Int,Int}) = Pair{T,T}(encode(x, e.first), encode(x, e.second))
 
-function subgraph{T}(x::LabelModule{T}, vlist::AbstractVector{VertexID})
-   new_labels = rmap(x)[vlist]
+
+function encode(x::LabelModule, v::VertexID)
+   haskey(rmap(x), v) || error("Input Vertex identifier $label couldn't be resolved")
+   rmap(x)[v]
+end
+@inline encode(x::LabelModule, vs::AbstractVector{VertexID}) = map(v->encode(x, v), vs)
+
+function encode{T}(x::LabelModule{T}, e::EdgeID)
+   Pair{T,T}(encode(x, e.first), encode(x, e.second))
+end
+@inline encode(x::LabelModule, es::AbstractVector{EdgeID}) = map(e->encode(x, e), es)
+
+
+
+addvertex!(x::LabelModule, num::Int=1) = nothing
+
+function rmvertex!(x::LabelModule, vs)
+   for v in vs
+      label = rmpa(x)[v]
+      delete!(fmap(x), label)
+      delete!(rmap(x), v)
+   end
+end
+
+
+
+
+function subgraph(x::LabelModule, vlist::AbstractVector{VertexID})
+   new_labels = [rmap(x)[v] for v in vlist]
    LabelModule(new_labels)
 end
 
-subgraph{T}(x::LabelModule{T}, elist::Vector) = x
+subgraph(x::LabelModule, elist::AbstractVector{EdgeID}) = x

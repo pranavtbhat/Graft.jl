@@ -10,30 +10,37 @@ export
 vertex_filter, edge_filter
 ################################################# BASICS ###################################################################
 
-# Getindex for basics
-Base.getindex(g::Graph, ::Colon) = map(v->encode(g, v), vertices(g))
-Base.getindex(g::Graph, ::Colon, ::Colon) = map(e->encode(g, e), edges(g))
+# Getindex for vertex display
+Base.getindex(g::Graph, ::Colon) = encode(g, vertices(g))
 
 # Getindex for vertex properties
 Base.getindex(g::Graph, label) = getvprop(g, resolve(g, label))
+Base.getindex(g::Graph, ::Colon, propname) = getvprop(g, :, propname)
+Base.getindex(g::Graph, ::Colon, ::Colon) = getvprop(g, :)
+
+# Getindex for edge display
+Base.getindex(g::Graph, ::Type{Pair}) = encode(g, collect(edges(g)))
 
 # Getindex of edge properties
-Base.getindex(g::Graph, e::Pair) = geteprop(g, resolve(g, e)...)
+Base.getindex(g::Graph, e::Pair) = geteprop(g, resolve(g, e))
+Base.getindex(g::Graph, e::Pair, propname) = geteprop(g, resolve(g, e), propname)
+Base.getindex(g::Graph, ::Type{Pair}, propname) = geteprop(g, :, propname)
+Base.getindex(g::Graph, ::Type{Pair}, ::Colon) = geteprop(g, :)
 
 # Getindex for adjacencies
-Base.getindex(g::Graph, label, ::Colon) = map(v->encode(g, v), fadj(g, resolve(g, label)))
-Base.getindex(g::Graph, ::Colon, label) = map(v->encode(g, v), badj(g, resolve(g, label)))
-
-# Getindex for subgraph
-Base.getindex(g::Graph, vlist::Vector{VertexID}) = map(v->encode(g, v), vlist)
-Base.getindex(g::Graph, elist::Vector{Pair{Int,Int}}) = map(e->encode(g, e), elist)
+Base.getindex{T}(g::Graph, e::Pair{T,Colon}) = encode(g, fadj(g, resolve(g, e.first)))
 
 # Setindex for vertex properties
-Base.setindex!(g::Graph, val, label, propname) = setvprop!(g, resolve(g, label), propname, val)
+Base.setindex!(g::Graph, val, label, propname) = setvprop!(g, resolve(g, label), val, propname)
+Base.setindex!(g::Graph, d::Dict, label) = setvprop!(g, resolve(g, label), d)
+Base.setindex!(g::Graph, vals::Vector, ::Colon, propname) = setvprop!(g, :, vals, propname)
+Base.setindex!(g::Graph, dlist::Vector, ::Colon, ::Colon) = setvprop!(g, :, dlist)
 
 # Setindex for edge properties
-Base.setindex!(g::Graph, val, e::Pair, propname) = seteprop!(g, resolve(g, e)..., propname, val)
-
+Base.setindex!(g::Graph, val, e::Pair, propname) = seteprop!(g, resolve(g, e)..., val, propname)
+Base.setindex!(g::Graph, d::Dict, e::Pair) = seteprop!(g, resolve(g, e), d)
+Base.setindex!(g::Graph, vals::Vector, ::Type{Pair}, propname) = seteprop!(g, :, vals, propname)
+Base.setindex!(g::Graph, dlist::Vector, ::Type{Pair}, ::Colon) = seteprop!(g, :, dlist)
 
 ################################################# FILTERING #################################################################
 
