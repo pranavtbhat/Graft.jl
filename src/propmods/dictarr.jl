@@ -154,14 +154,22 @@ listeprops(x::DictArrPM) = collect(keys(edata(x)))
 
 # Get all properties belonging to a vertex
 function getvprop(x::DictArrPM, v::VertexID)
-   [prop=>arr[v] for (prop,arr) in vdata(x)]
+   d = Dict()
+   for (prop,arr) in vdata(x)
+      if arr[v] != zero(eltype(arr))
+         d[prop] = arr[v]
+      end
+   end
+   d
 end
 
 # Get a dictionary of vertex properties for an input vertex list
 function getvprop(x::DictArrPM, vlist::AbstractVector{VertexID})
    res = [Dict() for v in vlist]
    for (key,arr) in vdata(x), (i,v) in enumerate(vlist)
-      res[i][key] = arr[v]
+      if arr[v] != zero(eltype(arr))
+         res[i][key] = arr[v]
+      end
    end
    res
 end
@@ -180,7 +188,13 @@ end
 
 # Get all properties belonging to an edge
 function geteprop(x::DictArrPM, u::VertexID, v::VertexID)
-   [prop=>arr[v,u] for (prop,arr) in edata(x)]
+   d = Dict()
+   for (prop,arr) in edata(x)
+      if arr[v,u] != zero(eltype(arr))
+         d[prop] =arr[v,u]
+      end
+   end
+   d
 end
 @inline geteprop(x::DictArrPM, e::EdgeID) = geteprop(x, e...)
 
@@ -195,7 +209,10 @@ end
 function geteprop(x::DictArrPM, elist::AbstractVector{EdgeID})
    res = [Dict() for i in 1 : length(elist)]
    for (key,arr) in edata(x), (i,e) in enumerate(elist)
-      res[i][key] = arr[e...]
+      u,v = e
+      if arr[v,u] != zero(eltype(arr))
+         res[i][key] = arr[v,u]
+      end
    end
    res
 end
@@ -204,7 +221,7 @@ end
 function geteprop(x::DictArrPM, elist::AbstractVector{EdgeID}, propname)
    haskey(edata(x), propname) || fill(nothing, length(elist))
    sv = edata(x)[propname]
-   [sv[e...] for e in elist]
+   [sv[v,u] for (u,v) in elist]
 end
 
 
@@ -284,7 +301,7 @@ end
 
 # Set a property for a list of edges
 function seteprop!(x::DictArrPM, elist::AbstractVector{EdgeID}, vals::Vector, propname)
-   propmote_edge_type!(x::DictArrPM, val, propname)
+   propmote_edge_type!(x::DictArrPM, vals, propname)
    sv = edata(x)[propname]
    for (i,e) in enumerate(elist)
       u,v=e
@@ -295,7 +312,7 @@ end
 
 # Map onto a property for a list of edges
 function seteprop!(x::DictArrPM, elist::AbstractVector{EdgeID}, f::Function, propname)
-   seteprop!(x, elist, map(f, 1 : nv(x)), propname)
+   seteprop!(x, elist, map(e->f(e...), elist), propname)
 end
 
 # Set a property for all edges
@@ -306,7 +323,7 @@ end
 
 # Map onto a property for all edges
 function seteprop!(x::DictArrPM, ::Colon, elist::AbstractVector{EdgeID}, f::Function, propname)
-   seteprop!(x, :, elist, map(x->f(x...), elist), propname)
+   seteprop!(x, :, elist, map(e->f(e...), elist), propname)
 end
 
 ################################################# SUBGRAPH #################################################################

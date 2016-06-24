@@ -12,18 +12,17 @@ LabelModule,
 setlabel!, resolve, encode
 
 type LabelModule{T}
+   nv::Int
    fmap::Dict{T,VertexID}
-   rmap::Dict{VertexID,T}
+   rmap::Vector{T}
 end
 
-function LabelModule()
-   LabelModule{Any}(Dict(), Dict())
+function LabelModule{T}(nv, labels::Vector{T})
+   nv != length(labels) && error("Number of labels should equal number of vertices")
+   LabelModule{T}(nv, [label=>i for (i,label) in enumerate(labels)], labels)
 end
 
-function LabelModule{T}(labels::Vector{T})
-   LabelModule{T}([label=>i for (i,label) in enumerate(labels)], [i=>label for (i,label) in enumerate(labels)])
-end
-
+@inline nv(x::LabelModule) = x.nv
 @inline fmap(x::LabelModule) = x.fmap
 @inline rmap(x::LabelModule) = x.rmap
 
@@ -58,7 +57,7 @@ end
 
 
 function encode(x::LabelModule, v::VertexID)
-   haskey(rmap(x), v) || error("Input Vertex identifier $label couldn't be resolved")
+   isdefined(rmap(x), v) || error("$v hasn't been assigned a label")
    rmap(x)[v]
 end
 @inline encode(x::LabelModule, vs::AbstractVector{VertexID}) = map(v->encode(x, v), vs)
@@ -70,22 +69,34 @@ end
 
 
 
-addvertex!(x::LabelModule, num::Int=1) = nothing
-
-function rmvertex!(x::LabelModule, vs)
-   for v in vs
-      label = rmpa(x)[v]
-      delete!(fmap(x), label)
-      delete!(rmap(x), v)
-   end
+function addvertex!(x::LabelModule, num::Int=1)
+   resize!(rmap(x), nv(x) + num)
+   x.nv += num
+   nothing
 end
 
+function rmvertex!(x::LabelModule, vs)
+   fm = fmap(x)
+   rm = rmap(x)
 
+   for v in vs
+      delete!(fm, rm[v])
+   end
 
+   deleteat!(rm, vs)
 
-function subgraph(x::LabelModule, vlist::AbstractVector{VertexID})
-   new_labels = [rmap(x)[v] for v in vlist]
-   LabelModule(new_labels)
+   for v in minimum(vs) : length(rm)
+      fmap(x)[rm[v]] = v
+   end
+
+   
+
+   x.nv -= length(vs)
+   nothing
+end
+
+function subgraph{T}(x::LabelModule{T}, vlist::AbstractVector{VertexID})
+   LabelModule(length(vlist), rmap(x)[vlist])
 end
 
 subgraph(x::LabelModule, elist::AbstractVector{EdgeID}) = x

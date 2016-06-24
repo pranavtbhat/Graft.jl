@@ -80,14 +80,10 @@ subgraph(x::NullModule, args...) = x
 ################################################# SPARSEMATRIXCSC ##########################################################
 
 # Remove columns from a sparsematrix
-function remove_cols{Tv,Ti}(x::SparseMatrixCSC{Tv,Ti}, v::Union{Int,AbstractVector{Int}})
-   setindex!(x, 0, v, :)
-   setindex!(x, 0, :, v)
-   setindex!(x, 0, :, v)
-   setindex!(x, 0, v, :)
-
-   m = x.m - length(v)
-   SparseMatrixCSC{Tv,Ti}(m, m, deleteat!(x.colptr, v), x.rowval, x.nzval)
+function remove_cols{Tv,Ti}(x::SparseMatrixCSC{Tv,Ti}, vs::Union{Int,AbstractVector{Int}})
+   vlist = collect(1 : x.m)
+   deleteat!(vlist, vs)
+   x[vlist,vlist]
 end
 
 # Grow a sparsematrix along the diagonal

@@ -276,7 +276,12 @@ function seteprop!(g::Graph, u::VertexID, v::VertexID, val, propname)
    seteprop!(propmod(g), u, v, val, propname)
 end
 
-function seteprop!(g::Graph, es::Union{EdgeID,AbstractVector{EdgeID}}, val, propname)
+function seteprop!(g::Graph, e::EdgeID, val, propname)
+   validate_edge(g, e)
+   seteprop!(propmod(g), e, val, propname)
+end
+
+function seteprop!(g::Graph, es::AbstractVector{EdgeID}, val, propname)
    validate_edge(g, es)
    length(es) == length(val) || error("Number of edges doesn't equal number of values")
    seteprop!(propmod(g), es, val, propname)
@@ -312,19 +317,24 @@ end
 
 function setlabel!{T}(g::Graph, labels::Vector{T})
    length(labels) == nv(g) || error("Incorrect number of labels provided")
-   g.labelmod = LabelModule(labels)
+   g.labelmod = LabelModule(nv(g), copy(labels))
    nothing
 end
 
 function setlabel!(g::Graph, f::Function)
    labels = [f(v) for v in vertices(g)]
-   g.labelmod = LabelModule(labels)
+   g.labelmod = LabelModule(nv(g), labels)
    nothing
 end
 
 function setlabel!(g::Graph, propname)
    labels = [getvprop(g, v, propname) for v in vertices(g)]
-   g.labelmod = LabelModule(labels)
+   g.labelmod = LabelModule(nv(g), labels)
+   nothing
+end
+
+function setlabel!(g::Graph)
+   g.labelmod = NullModule()
    nothing
 end
 
