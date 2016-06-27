@@ -78,34 +78,64 @@ println("bench_generation(V::Int, E::Int, tune_file = \"generation_params.jld\";
 
 
 ###
-# 
+# SETVPROP
 ###
 
-function bench_setprop(V::Int, E::Int, tune_file = "setprop_params.jld"; save_file = "", compare_file= "")
-   suite = BenchmarkGroup(["Setprop"])
+function bench_setvprop(V::Int, E::Int, tune_file = "setprop_params.jld"; save_file = "", compare_file= "")
+   suite = BenchmarkGroup(["Setvprop"])
 
-   suite["unit"] = BenchmarkGroup()
+   suite["Unit Single"] = BenchmarkGroup()
+   suite["Unit Dict  "] = BenchmarkGroup()
    for PM in subtypes(PropertyModule)
       val=randstring()
-      suite["unit"]["$PM"] = @benchmarkable setvprop!(g, v, "test1", $val) setup=(g=Graph{SparseMatrixAM,$PM}($V,$E); v=rand(1:$V))
+      d = Dict(1=>2, "1"=>2, "prop1"=>nothing, "prop2"=>randstring())
+      suite["Unit Single"]["$PM"] = @benchmarkable setvprop!(g, v, "test1", $val) setup=(g=Graph{SparseMatrixAM,$PM}($V,$E); v=rand(1:$V))
+      suite["Unit Dict  "]["$PM"] = @benchmarkable setvprop!(g, v, $d) setup=(g=Graph{SparseMatrixAM,$PM}($V,$E); v=rand(1:$V))
    end
 
-   suite["dict"] = BenchmarkGroup()
+   suite["Range Single"] = BenchmarkGroup()
+   suite["Range Dict  "] = BenchmarkGroup()
+   suite["Range Func  "] = BenchmarkGroup()
    for PM in subtypes(PropertyModule)
-      d = Dict("test1"=>1, "test2"=>"txt", "test3"=>3.0, "test4"=>nothing)
-      suite["dict"]["$PM"] = @benchmarkable setvprop!(g, v, $d) setup=(g=Graph{SparseMatrixAM,$PM}($V,$E); v=rand(1:$V))
+      range = div(V, 4) : div(V, 2)
+      arr=Array{Int}(length(range))
+      dlist = fill(Dict(1=>2, "1"=>2, "prop1"=>nothing, "prop2"=>randstring()), length(range))
+
+      suite["Range Single"]["$PM"] = @benchmarkable setvprop!(g, $range, $arr, "test1") setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
+      suite["Range Dict  "]["$PM"] = @benchmarkable setvprop!(g, $range, $dlist) setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
+      suite["Range Func  "]["$PM"] = @benchmarkable setvprop!(g, $range, v->rand([1, "1", 1.0, nothing]), "test1") setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
    end
 
-   suite["array"] = BenchmarkGroup()
+   suite["Array Single"] = BenchmarkGroup()
+   suite["Array Dict  "] = BenchmarkGroup()
+   suite["Array Func  "] = BenchmarkGroup()
    for PM in subtypes(PropertyModule)
-      suite["array"]["$PM"] = @benchmarkable setvprop!(g, "test1", arr) setup=(g=Graph{SparseMatrixAM,$PM}($V,$E); v=rand(1:$V); arr=Array{Int}($V))
+      vlist = rand(1:V, div(V, 4))
+      arr=Array{Int}(length(vlist))
+      dlist = fill(Dict(1=>2, "1"=>2, "prop1"=>nothing, "prop2"=>randstring()), length(vlist))
+
+      suite["Array Single"]["$PM"] = @benchmarkable setvprop!(g, $vlist, $arr, "test1") setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
+      suite["Array Dict  "]["$PM"] = @benchmarkable setvprop!(g, $vlist, $dlist) setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
+      suite["Array Func  "]["$PM"] = @benchmarkable setvprop!(g, $vlist, v->rand([1, "1", 1.0, nothing]), "test1") setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
+   end
+
+   suite["Colon Single"] = BenchmarkGroup()
+   suite["Colon Dict  "] = BenchmarkGroup()
+   suite["Colon Func  "] = BenchmarkGroup()
+   for PM in subtypes(PropertyModule)
+      arr=Array{Int}(V)
+      dlist = fill(Dict(1=>2, "1"=>2, "prop1"=>nothing, "prop2"=>randstring()), V)
+
+      suite["Colon Single"]["$PM"] = @benchmarkable setvprop!(g, :, $arr, "test1") setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
+      suite["Colon Dict  "]["$PM"] = @benchmarkable setvprop!(g, :, $dlist) setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
+      suite["Colon Func  "]["$PM"] = @benchmarkable setvprop!(g, :, v->rand([1, "1", 1.0, nothing]), "test1") setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
    end
 
    tune_suite(suite, tune_file)
    result = median(run(suite, seconds = 10))
-   for (key,val) in result
+   for key in sort(collect(keys(result)))
       println(key)
-      display(val)
+      display(result[key])
    end
    save_suite(result, save_file)
    compare_suite(result, compare_file)
