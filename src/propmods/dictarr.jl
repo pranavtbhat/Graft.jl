@@ -21,21 +21,6 @@ function DictArrPM(nv::Int=0)
    DictArrPM{Any,Any}(nv, Dict(), Dict())
 end
 
-# Complex constructor for optimized usage
-function DictArrPM(nv::Int, V::DataType, E::DataType)
-   vdata = Dict()
-   for field in fieldnames(V)
-      vdata[string(field)] = zeros(fieldtype(V, field), nv)
-   end
-
-   edata = Dict()
-   for field in fieldnames(E)
-      edata[string(field)] = spzeros(fieldtype(E, field), nv, nv)
-   end
-   DictArrPM{V,E}(nv, vdata, edata)
-end
-
-
 @inline nv(x::DictArrPM) = x.nv
 @inline vdata(x::DictArrPM) = x.vdata
 @inline edata(x::DictArrPM) = x.edata
@@ -97,6 +82,8 @@ function Base.deepcopy(x::DictArrPM)
    DictArrPM(nv(x), deepcopy(vdata(x)), deepcopy(edata(x)))
 end
 
+
+
 function addvertex!(x::DictArrPM, nv::Int=1)
    E = edata(x)
    for arr in values(vdata(x))
@@ -134,7 +121,7 @@ addedge!(x::DictArrPM, es::AbstractVector{EdgeID}) = nothing
 
 function rmedge!(x::DictArrPM, u::VertexID, v::VertexID)
    for arr in values(edata(x))
-      arr[v,u] = 0
+      delete_entry!(arr, u, v)
    end
    nothing
 end
@@ -185,6 +172,8 @@ function getvprop(x::DictArrPM, vlist::AbstractVector{VertexID}, propname)
    haskey(vdata(x), propname) || fill(nothing, length(vlist))
    vdata(x)[propname][vlist]
 end
+
+
 
 # Get all properties belonging to an edge
 function geteprop(x::DictArrPM, u::VertexID, v::VertexID)
@@ -328,13 +317,13 @@ end
 
 ################################################# SUBGRAPH #################################################################
 
-function subgraph{V,E}(x::DictArrPM{V,E}, vlist::AbstractVector{VertexID})
+function subgraph(x::DictArrPM, vlist::AbstractVector{VertexID})
    VD = [key=>arr[vlist] for (key,arr) in vdata(x)]
    ED = [key=>arr[vlist,vlist] for (key,arr) in edata(x)]
-   DictArrPM{V,E}(nv(x), VD, ED)
+   DictArrPM{Any,Any}(nv(x), VD, ED)
 end
 
-function subgraph{V,E}(x::DictArrPM{V,E}, elist::AbstractVector{EdgeID})
+function subgraph(x::DictArrPM, elist::AbstractVector{EdgeID})
    VD = deepcopy(vdata(x))
    ED = Dict()
 
@@ -343,5 +332,5 @@ function subgraph{V,E}(x::DictArrPM{V,E}, elist::AbstractVector{EdgeID})
       VD[key] = init_spmx(nv(x), elist, vals)
    end
    
-   DictArrPM{V,E}(nv(x), VD, ED)
+   DictArrPM{Any,Any}(nv(x), VD, ED)
 end

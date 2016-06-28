@@ -79,6 +79,47 @@ subgraph(x::NullModule, args...) = x
 
 ################################################# SPARSEMATRIXCSC ##########################################################
 
+# Delete an entry(s) from a sparsematrix. Based on setindex from Julia's SparseMatrixCSC
+function delete_entry!{Tv,Ti}(x::SparseMatrixCSC{Tv,Ti}, i::Int, j::Int)
+   rowval = x.rowval
+   nzval = x.nzval
+   colptr = x.colptr
+
+   r1 = Int(colptr[i])
+   r2 = Int(colptr[i+1]-1)
+
+   if r1 <= r2
+      r1 = searchsortedfirst(rowval, j, r1, r2, Base.Order.Forward)
+      if (r1 <= r2) && (rowval[r1] == j)
+         deleteat!(rowval, r1)
+         deleteat!(nzval, r1)
+         @simd for k = (i+1):(x.n+1)
+            @inbounds colptr[k] -= 1
+         end
+      end
+   end
+end
+
+function delete_entry!{Tv,Ti}(x::SparseMatrixCSC{Tv,Ti}, i::Int, ::Colon)
+   rowval = x.rowval
+   nzval = x.nzval
+   colptr = x.colptr
+
+   r1 = Int(colptr[i])
+   r2 = Int(colptr[i+1]-1)
+
+   if r1 <= r2
+      r = r1 : r2
+      deletat!(rowval, r)
+      deletat!(nzval, r)
+      @simd for k = (i+1):(x.n+1)
+         @inbounds colptr[k] -= length(r)
+      end
+   end
+end
+
+
+
 # Remove columns from a sparsematrix
 function remove_cols{Tv,Ti}(x::SparseMatrixCSC{Tv,Ti}, vs::Union{Int,AbstractVector{Int}})
    vlist = collect(1 : x.m)

@@ -79,16 +79,8 @@ Base.zero{T<:AbstractString}(::Type{T}) = ""
 ################################################# IMPLEMENTATIONS ##########################################################
 
 # Sparse Implementation
-# include("propmods/sparsematrix.jl")
+include("propmods/sparsedict.jl")
 
 # Dictionary-Array Implementation
 include("propmods/dictarr.jl")
-
-
-""" Unsupported Unfortunately """
-# # NDSparse Implementation
-# include("propmods/ndsparse.jl")
-
-# # Pure Dict Implementation
-# include("propmods/puredict.jl")
 
