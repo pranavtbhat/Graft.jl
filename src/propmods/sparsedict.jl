@@ -7,7 +7,7 @@
 
 export SparseDictPM
 
-type SparseDictPM{V,E} <: PropertyModule{V,E}
+type SparseDictPM{V,E} <: WeaklyTypedPM{V,E}
    vprops::Set{Any}
    eprops::Set{Any}
    vdata::Vector

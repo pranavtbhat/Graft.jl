@@ -7,7 +7,7 @@
 ################################################# IMPORT/EXPORT ############################################################
 export
 # Types
-PropertyModule,
+PropertyModule, StronglyTypedPM, WeaklyTypedPM,
 # Properties Interface
 listvprops, listeprops, getvprop, geteprop, setvprop!, seteprop!
 
@@ -17,6 +17,28 @@ abstract PropertyModule{V,E}
 Base.zero(::Type) = nothing
 Base.zero(::Type{Char}) = Char(0)
 Base.zero{T<:AbstractString}(::Type{T}) = ""
+
+# Subtypes to help out with tests
+
+abstract StronglyTypedPM{V,E} <: PropertyModule{V,E}
+abstract WeaklyTypedPM{V,E} <: PropertyModule{V,E}
+
+
+function default_vector{T}(::Type{T}, nv::Int)
+   if isa(zero(T), T)
+      zeros(T, nv)
+   else
+      fill!(Array{Any}(nv), nv)
+   end
+end
+
+function default_matrix{T}(::Type{T}, nv::Int)
+   if isa(zero(T), T)
+      spzeros(T, nv, nv)
+   else
+      spzeros(Any, nv, nv)
+   end
+end
 
 
 ################################################# INTERFACE ################################################################
@@ -78,9 +100,9 @@ Base.zero{T<:AbstractString}(::Type{T}) = ""
 
 ################################################# IMPLEMENTATIONS ##########################################################
 
-# Sparse Implementation
+# Array of Structures Implementations
 include("propmods/sparsedict.jl")
 
-# Dictionary-Array Implementation
+# Structure of Arrays Implementations
 include("propmods/dictarr.jl")
-
+include("propmods/typearr.jl")

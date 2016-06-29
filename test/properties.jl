@@ -5,73 +5,97 @@
 ############################################################################################################################
 
 
-for PM in subtypes(PropertyModule)
+for PM in PM_LIST
    @testset "Properties Interface for $PM" begin
-      g = Graph{SparseMatrixAM,PM}(10,90)
 
-      # Setvprop
-      setvprop!(g, 1, Dict("p1"=>1))
-      setvprop!(g, 1:10, [Dict("p2"=>2) for i in 1:10])
-      setvprop!(g, :, [Dict("p2"=>2) for i in 1:10])
-      setvprop!(g, 2, 1, "p1")
-      setvprop!(g, 1:10, 3 * ones(Int, 10), "p3")
-      setvprop!(g, 1:10, v->4, "p4")
-      setvprop!(g, :, 5 * ones(Int, 10), "p5")
-      setvprop!(g, :, v->6, "p6")
+      g = if PM <: StronglyTypedPM
+         Graph{SparseMatrixAM,PM{TestType,TestType}}(10,90)
+      else
+         Graph{SparseMatrixAM,PM}(10, 90)
+      end
 
-      # Getvprop
-      @test getvprop(g, 1) == ["p$i"=>i for i in 1:6]
-      @test getvprop(g, 3:10) == [Dict(["p$i"=>i for i in 2:6]...) for j in 3:10]
-      @test getvprop(g, 1, "p1") == 1
-      @test getvprop(g, 1:10, "p3") == 3 * ones(Int, 10)
-      @test getvprop(g, 1:10, "p4") == 4 * ones(Int, 10)
-      @test getvprop(g, 1:10, "p5") == 5 * ones(Int, 10)
-      @test getvprop(g, 1:10, "p6") == 6 * ones(Int, 10)
+      cmp = Array{Any}(10)
 
-      # List v prop
-      @test issubset(listvprops(g), ["p$i" for i in 1:6])
+      setvprop!(g, 1, Dict("f1"=>1))
+      if PM <: StronglyTypedPM
+         @test getvprop(g, 1) == TestType(1, 0.0, "", nothing, '\0')
+      else
+         @test getvprop(g, 1) == Dict("f1"=>1)
+      end
+      @test getvprop(g, 1, "f1") == 1
+
+      setvprop!(g, 1:10, [Dict("f1"=>1) for i in 1:10])
+      @test getvprop(g, 1:10, "f1") == getvprop(g, :, "f1") == fill!(cmp, 1)
+
+      setvprop!(g, :, [Dict("f2"=>2.0) for i in 1:10])
+      @test getvprop(g, :, "f2") == fill!(cmp, 2.0)
+
+      setvprop!(g, 2, "3", "f3")
+      @test getvprop(g, 2, "f3") == "3"
+
+      setvprop!(g, 1:10, fill("3", 10), "f3")
+      @test getvprop(g, 1:10, "f3") == fill!(cmp, "3")
+
+      setvprop!(g, 1:10, v->Colon(), "f4")
+      @test getvprop(g, 1:10, "f4")  == fill!(cmp, Colon())
+
+      setvprop!(g, :, fill('0', 10), "f5")
+      @test getvprop(g, :, "f5") == fill!(cmp, '0')
+
+      setvprop!(g, :, v->'5', "f5")
+
+      if PM <: StronglyTypedPM
+         @test all(getvprop(g, :) .== TestType(1, 2.0, "3", Colon(), '5'))
+      else
+         @test all(getvprop(g, :) .== Dict("f1"=>1, "f2"=>2.0, "f3"=>"3", "f4"=>Colon(), "f5"=>'5'))
+      end
+      
+      cmp = Array{Any}(10)
 
       elist = collect(edges(g))[11:20]
-      dlist = [Dict("p2"=>2) for i in 1:10]
+      dlist = [Dict("f1"=>1) for i in 1:10]
 
-      # Seteprop
-      seteprop!(g, 1, 2, Dict("p1"=>1))
-      seteprop!(g, 2=>3, Dict("p1"=>1))
+      seteprop!(g, 1, 2, Dict("f1"=>1))
+
+      if PM <: StronglyTypedPM
+         @test geteprop(g, 1, 2) == TestType(1, 0.0, "", nothing, '\0')
+      else
+         @test geteprop(g, 1, 2) == Dict("f1"=>1)
+      end
+
+      seteprop!(g, 2=>3, Dict("f1"=>1))
+      if PM <: StronglyTypedPM
+         @test geteprop(g, 2=>3) == TestType(1, 0.0, "", nothing, '\0')
+      else
+         @test geteprop(g, 2=>3) == Dict("f1"=>1)
+      end
+
       seteprop!(g, elist, dlist)
-      seteprop!(g, 3, 4, 2, "p2")
-      seteprop!(g, 5=>6, 2, "p2")
-      seteprop!(g, elist, 3 * ones(Int, 10), "p3")
-      seteprop!(g, elist, (u,v)->4, "p4")
-      
+      @test geteprop(g, elist) == dlist
 
-      # Geteprop
-      @test issubset(Dict("p1"=>1), geteprop(g, 1, 2))
-      @test issubset(Dict("p1"=>1), geteprop(g, 2=>3))
-      @test geteprop(g, 3, 4, "p2") == 2
-      @test geteprop(g, 5=>6, "p2") == 2
-      @test geteprop(g, elist, "p3") == 3 * ones(Int, 10)
-      @test geteprop(g, elist, "p4") == 4 * ones(Int, 10)
+      seteprop!(g, 3, 4, 2.0, "f2")
+      @test geteprop(g, 3, 4, "f2") == 2.0
 
-      # Rewrite
-      seteprop!(g, :, 5 * ones(Int, 90), "p5")
-      seteprop!(g, :, (u,v)->6, "p6")
+      seteprop!(g, 5=>6, 2.0, "f2")
+      @test geteprop(g, 5=>6, "f2") == 2.0
 
-      @test geteprop(g, :, "p5") == 5 * ones(Int, 90)
-      @test geteprop(g, :, "p6") == 6 * ones(Int, 90)
+      seteprop!(g, elist, fill(2.0, 10), "f2")
+      @test all(geteprop(g, elist, "f2") .== 2.0)
+
+      seteprop!(g, elist, (u,v)->"3", "f3")
+      @test all(geteprop(g, elist, "f3") .== "3")
+
+      seteprop!(g, :, fill(Colon(), 90), "f4")
+      @test all(geteprop(g, :, "f4") .== Colon())
+
+      seteprop!(g, :, (u,v)->'5', "f5")
+      @test all(geteprop(g, :, "f5") .== '5')
       
       # Adjacency Tests
       @test addvertex!(g) == nothing
       @test addvertex!(g, 2) == nothing
       @test addedge!(g, 11, 12) == nothing
       @test addedge!(g, EdgeID[12=>13, 11=>13]) == nothing
-
-      # Change data type test
-      setvprop!(g, 11, "p1", 1)
-      @test setvprop!(g, 12, "p1", "1") == nothing
-
-      seteprop!(g, 11, 12, "1", "p1")
-      @test seteprop!(g, 11, 13, 1, "p1") == nothing
-
 
       # Remove vertices and edges
       rmvertex!(g, 13) == nothing
@@ -81,7 +105,5 @@ for PM in subtypes(PropertyModule)
       rmvertex!(g, [11,12]) == nothing
       @test nv(g) == 10
       @test ne(g) == 90
-
-
    end
 end

@@ -4,9 +4,14 @@
 
 ############################################################################################################################
 
-for PM in subtypes(PropertyModule)
+for PM in PM_LIST
    @testset "Query tests for Graph{SparseMatrixAM,$PM}" begin
-      g = Graph{SparseMatrixAM,PM}(10, 90)
+      
+      g = if PM <: StronglyTypedPM
+         Graph{SparseMatrixAM,PM{TestType,TestType}}(10,90)
+      else
+         Graph{SparseMatrixAM,PM}(10, 90)
+      end
       labels = ["$i" for i in 1:10]
       setlabel!(g, labels)
 
@@ -17,24 +22,34 @@ for PM in subtypes(PropertyModule)
       @test g["1"=>:] == ["$i" for i in 2:10]
 
       # Vertex Properties
-      g["1", "p1"] = 1
-      g["1"] = Dict("p4"=>4, "p5"=>5)
-      g[:, "p2"] = 2 * ones(Int, 10)
-      g[:,:] = [Dict("p3"=>3) for i in 1:10]
+      g["1", "f1"] = 1
+      g["1"] = Dict("f4"=>Colon(), "f5"=>'5')
+      g[:, "f2"] = fill(2.0, 10)
+      g[:,:] = [Dict("f3"=>"3") for i in 1:10]
 
-      @test g["1"] == ["p$i" => i for i in 1:5]
-      @test g[:,"p2"] == 2 * ones(Int, 10)
+      if PM <: StronglyTypedPM
+         @test g["1"] == TestType(1, 2.0, "3", Colon(), '5')
+      else
+         @test g["1"] == Dict("f1"=>1, "f2"=>2.0, "f3"=>"3", "f4"=>Colon(), "f5"=>'5')
+      end
+
+      @test g[:,"f2"] == fill(2.0, 10)
       @test g[:,:] == getvprop(g, :)
 
+      # Edge Properties
+      g["1"=>"2", "f1"] = 1
+      g["1"=>"2"] = Dict("f2"=>2.0)
+      g[=>, "f3"] = fill("3", 90)
+      g[=>, :] = [Dict("f4"=>Colon(), "f5"=>'5') for i in 1:90]
 
-      g["1"=>"2", "p1"] = 1
-      g["1"=>"2"] = Dict("p2"=>2)
-      g[=>, "p3"] = 3 * ones(Int, 90)
-      g[=>, :] = [Dict("p4"=>4) for i in 1:90]
+      if PM <: StronglyTypedPM
+         @test g["1"=>"2"] == TestType(1, 2.0, "3", Colon(), '5')
+      else
+         @test g["1"=>"2"] == Dict("f1"=>1, "f2"=>2.0, "f3"=>"3", "f4"=>Colon(), "f5"=>'5')
+      end
 
-      @test g["1"=>"2"] == ["p$i" => i for i in 1:4]
-      @test g["1"=>"2", "p1"] == 1
-      @test g[=>, "p3"] == 3 *  ones(Int, 90)
+      @test g["1"=>"2", "f1"] == 1
+      @test g[=>, "f3"] == fill("3", 90)
       @test g[=>, :] == geteprop(g, :)
    end
 end

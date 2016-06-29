@@ -10,7 +10,7 @@ export
 # Types
 DictArrPM
 
-type DictArrPM{V,E} <: PropertyModule{V,E}
+type DictArrPM{V,E} <: WeaklyTypedPM{V,E}
    nv::Int
    vdata::Dict
    edata::Dict
@@ -26,22 +26,6 @@ end
 @inline edata(x::DictArrPM) = x.edata
 
 ################################################# INTERNAL IMPLEMENTATION ##################################################
-
-function default_vector{T}(::Type{T}, nv::Int)
-   if isa(zero(T), T)
-      zeros(T, nv)
-   else
-      fill(nothing, Array{Any}(nv))
-   end
-end
-
-function default_matrix{T}(::Type{T}, nv::Int)
-   if isa(zero(T), T)
-      spzeros(T, nv, nv)
-   else
-      spzeros(Any, nv, nv)
-   end
-end
 
 function propmote_vertex_type!{T}(x::DictArrPM, ::Type{T}, propname)
    D = vdata(x)
