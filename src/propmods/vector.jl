@@ -239,15 +239,35 @@ end
 
 
 # Get a dictionary of edge properties for an input edge list
-function geteprop(x::VectorPM, elist::AbstractVector{EdgeID})
-   map(e->geteprop(x, e), elist)
+function geteprop(x::VectorPM{Any,Any}, elist::AbstractVector{EdgeID})
+   dlist = [Dict() for i in 1:length(elist)]
+   for (key,arr) in edata(x)
+      vals = geteprop(x, elist, key)
+      for (i,d) in enumerate(dlist)
+         d[key] = vals[i]
+      end
+   end
+   dlist
+end
+
+function geteprop{V,E}(x::VectorPM{V,E}, elist::AbstractVector{EdgeID})
+   tlist = [zero(E) for i in 1:length(elist)]
+   for (key,arr) in edata(x)
+      propsym = Symbol(key)
+      vals = geteprop(x, elist, key)
+      for (i,t) in enumerate(tlist)
+         setfield!(t, propsym, vals[i])
+      end
+   end
+   tlist
 end
 
 
 # Get the value of property for an input edge list
 function geteprop(x::VectorPM, elist::AbstractVector{EdgeID}, propname)
    check_eprop(x, propname)
-   map(e->_geteprop(x, e, propname), elist)
+   sv = edata(x)[propname]
+   [sv[v,u] for (u,v) in  elist]
 end
 
 

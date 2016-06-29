@@ -43,18 +43,18 @@ function compare_suite(result, compare_file)
 end
 
 function display(result)
-   @printf "%-30s | %-10s | %-10s | %-10s\n" "Test" "Time Taken" "Memory" "GCTime"
-   println(join(['\u2014' for i in 1:57]))
+   @printf "%-30s | %-12s | %-12s | %-12s\n" "Test" "Time Taken" "Memory" "GCTime"
+   println(join(['\u2014' for i in 1:70]))
    for (key,item) in result
-      @printf "%-30s | %-10s | %-10s | %-10s\n" key[16:end] prettytime(item.time) prettymemory(item.memory) prettytime(item.gctime)
+      @printf "%-30s | %-12s | %-12s | %-12s\n" key[16:end] prettytime(item.time) prettymemory(item.memory) prettytime(item.gctime)
    end
    println()
    nothing
 end
 
 function display_compare(result)
-   @printf "%-30s | %-10s | %-10s\n" "Test" "Time Taken" "Memory"
-   println(join(['\u2014' for i in 1:45]))
+   @printf "%-30s | %-12s | %-12s\n" "Test" "Time Taken" "Memory"
+   println(join(['\u2014' for i in 1:50]))
    for (key,item) in result
       @printf "%-30s | %-10s | %-10s\n" key[16:end] prettydiff(item.ratio.time) prettydiff(item.ratio.memory)
    end
@@ -69,15 +69,18 @@ function bench_generation(V::Int, E::Int, tune_file = "generation_params.jld"; s
    suite = BenchmarkGroup(["Generation"])
 
    for AM in subtypes(AdjacencyModule)
-      suite["$AM"] = @benchmarkable ($AM($V, $E))
+      suite["$AM"] = @benchmarkable $AM($V, $E)
    end
 
    for PM in subtypes(PropertyModule)
-      suite["$PM"] = @benchmarkable ($PM($V))
+      for typ in [Any,TestType]
+         propmod = PM{typ,typ}
+         suite["$PM"] = @benchmarkable $propmod($V)
+      end
    end
 
    tune_suite(suite, tune_file)
-   result = median(run(suite, seconds = 10))
+   result = median(run(suite, seconds = 5))
    display(result)
    save_suite(result, save_file)
    compare_suite(result, compare_file)
@@ -90,7 +93,7 @@ println("bench_generation(V::Int, E::Int, tune_file = \"generation_params.jld\";
 # SETVPROP
 ###
 
-function bench_setvprop(V::Int, E::Int, tune_file = "setprop_params.jld"; save_file = "", compare_file= "")
+function bench_setvprop(V::Int, E::Int, tune_file = "setvprop_params.jld"; save_file = "", compare_file= "")
    suite = BenchmarkGroup(["Setvprop"])
 
    suite["Unit Single"] = BenchmarkGroup()
@@ -114,33 +117,36 @@ function bench_setvprop(V::Int, E::Int, tune_file = "setprop_params.jld"; save_f
    range = div(V, 4) : div(V, 2)
    vlist = rand(1:V, div(V, 4))
 
+   fn = v->rand([1, "1", 1.0, nothing])
+
    for PM in subtypes(PropertyModule)
       for typ in [Any,TestType]
-         suite["Unit Single"]["$(PM{typ,typ})"] = @benchmarkable setvprop!(g, v, "f3", $val) setup=(g=Graph{SparseMatrixAM,$PM}($V,$E); v=rand(1:$V))
-         suite["Unit Dict  "]["$(PM{typ,typ})"] = @benchmarkable setvprop!(g, v, $d) setup=(g=Graph{SparseMatrixAM,$PM}($V,$E); v=rand(1:$V))
+         propmod = PM{typ,typ}
+         suite["Unit Single"]["$propmod"] = @benchmarkable setvprop!(x, v, $val, "f3")          setup=(x=$propmod($V); v=rand(1:$V))
+         suite["Unit Dict  "]["$propmod"] = @benchmarkable setvprop!(x, v, $d)                  setup=(x=$propmod($V); v=rand(1:$V))
 
          arr=Array{Int}(length(range))
-         dlist = fill(Dict("f1"=>1, "f2"=>2.0, "f3"=>randstring(), "f4"=>nothing, "f5"=>'5'), length(range))
-         suite["Range Single"]["$(PM{typ,typ})"] = @benchmarkable setvprop!(g, $range, $arr, "f1") setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
-         suite["Range Dict  "]["$(PM{typ,typ})"] = @benchmarkable setvprop!(g, $range, $dlist) setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
-         suite["Range Func  "]["$(PM{typ,typ})"] = @benchmarkable setvprop!(g, $range, v->rand([1, "1", 1.0, nothing]), "f4") setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
+         dlist = fill(d, length(range))
+         suite["Range Single"]["$propmod"] = @benchmarkable setvprop!(x, $range, $arr, "f1")    setup=(x=$propmod($V))
+         suite["Range Dict  "]["$propmod"] = @benchmarkable setvprop!(x, $range, $dlist)        setup=(x=$propmod($V))
+         suite["Range Func  "]["$propmod"] = @benchmarkable setvprop!(x, $range, $fn, "f4")     setup=(x=$propmod($V))
 
          arr=Array{Int}(length(vlist))
-         dlist = fill(Dict("f1"=>1, "f2"=>2.0, "f3"=>randstring(), "f4"=>nothing, "f5"=>'5'), length(vlist))
-         suite["Array Single"]["$(PM{typ,typ})"] = @benchmarkable setvprop!(g, $vlist, $arr, "f1") setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
-         suite["Array Dict  "]["$(PM{typ,typ})"] = @benchmarkable setvprop!(g, $vlist, $dlist) setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
-         suite["Array Func  "]["$(PM{typ,typ})"] = @benchmarkable setvprop!(g, $vlist, v->rand([1, "1", 1.0, nothing]), "f4") setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
+         dlist = fill(d, length(vlist))
+         suite["Array Single"]["$propmod"] = @benchmarkable setvprop!(x, $vlist, $arr, "f1")    setup=(x=$propmod($V))
+         suite["Array Dict  "]["$propmod"] = @benchmarkable setvprop!(x, $vlist, $dlist)        setup=(x=$propmod($V))
+         suite["Array Func  "]["$propmod"] = @benchmarkable setvprop!(x, $vlist, $fn, "f4")     setup=(x=$propmod($V))
 
          arr=Array{Int}(V)
-         dlist = fill(Dict("f1"=>1, "f2"=>2.0, "f3"=>randstring(), "f4"=>nothing, "f5"=>'5'), V)
-         suite["Colon Single"]["$(PM{typ,typ})"] = @benchmarkable setvprop!(g, :, $arr, "f1") setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
-         suite["Colon Dict  "]["$(PM{typ,typ})"] = @benchmarkable setvprop!(g, :, $dlist) setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
-         suite["Colon Func  "]["$(PM{typ,typ})"] = @benchmarkable setvprop!(g, :, v->rand([1, "1", 1.0, nothing]), "f4") setup=(g=Graph{SparseMatrixAM,$PM}($V,$E))
+         dlist = fill(d, V)
+         suite["Colon Single"]["$propmod"] = @benchmarkable setvprop!(x, :, $arr, "f1")    setup=(x=$propmod($V))
+         suite["Colon Dict  "]["$propmod"] = @benchmarkable setvprop!(x, 1:$V, $dlist)        setup=(x=$propmod($V))
+         suite["Colon Func  "]["$propmod"] = @benchmarkable setvprop!(x, :, $fn, "f4")     setup=(x=$propmod($V))
       end
    end
 
    tune_suite(suite, tune_file)
-   result = median(run(suite, seconds = 10))
+   result = median(run(suite, seconds = 5))
    for key in sort(collect(keys(result)))
       println(key)
       display(result[key])
@@ -149,5 +155,192 @@ function bench_setvprop(V::Int, E::Int, tune_file = "setprop_params.jld"; save_f
    compare_suite(result, compare_file)
    nothing
 end
-   
+println("bench_setvprop(V::Int, E::Int, tune_file = \"setprop_params.jld\"; save_file = \"\", compare_file= \"\")")
 
+
+###
+# GETVPROP
+###
+
+function bench_getvprop(V::Int, E::Int, tune_file = "getvprop_params.jld"; save_file = "", compare_file= "")
+   suite = BenchmarkGroup(["Getvprop"])
+
+   suite["Unit Single"] = BenchmarkGroup()
+   suite["Unit Dict  "] = BenchmarkGroup()
+
+   suite["Range Single"] = BenchmarkGroup()
+   suite["Range Dict  "] = BenchmarkGroup()
+
+   suite["Array Single"] = BenchmarkGroup()
+   suite["Array Dict  "] = BenchmarkGroup()
+
+   suite["Colon Single"] = BenchmarkGroup()
+   suite["Colon Dict  "] = BenchmarkGroup()
+
+   val=randstring()
+   d = Dict("f1"=>1, "f2"=>2.0, "f3"=>randstring(), "f4"=>nothing, "f5"=>'5')
+
+   range = div(V, 4) : div(V, 2)
+   vlist = rand(1:V, div(V, 4))
+   
+   props = ["f1", "f2", "f3", "f4", "f5"]
+
+   for PM in subtypes(PropertyModule)
+      for typ in [Any,TestType]
+         propmod = PM{typ,typ}
+
+         g = Graph{SparseMatrixAM,propmod}(V, E)
+
+         setvprop!(g, :, v->rand(Int), "f1")
+         setvprop!(g, :, v->rand(), "f2")
+         setvprop!(g, :, v->randstring(), "f3")
+         setvprop!(g, :, v->rand(3), "f4")
+         setvprop!(g, :, v->rand(Char), "f5")
+
+
+         suite["Unit Single"]["$propmod"] = @benchmarkable getvprop($g, v, prop)                setup=(v=rand(1:$V); prop=rand($props))
+         suite["Unit Dict  "]["$propmod"] = @benchmarkable getvprop($g, v)                      setup=(v=rand(1:$V))
+
+         suite["Range Single"]["$propmod"] = @benchmarkable getvprop($g, $range, prop)          setup=(prop=rand($props))
+         suite["Range Dict  "]["$propmod"] = @benchmarkable getvprop($g, $range)
+
+         suite["Array Single"]["$propmod"] = @benchmarkable getvprop($g, $vlist, prop)          setup=(prop=rand($props))
+         suite["Array Dict  "]["$propmod"] = @benchmarkable getvprop($g, $vlist)
+
+         suite["Colon Single"]["$propmod"] = @benchmarkable getvprop($g, :, prop)               setup=(prop=rand($props))
+         suite["Colon Dict  "]["$propmod"] = @benchmarkable getvprop($g, :) 
+      end
+   end
+
+   tune_suite(suite, tune_file)
+   result = median(run(suite, seconds = 5))
+   for key in sort(collect(keys(result)))
+      println(key)
+      display(result[key])
+   end
+   save_suite(result, save_file)
+   compare_suite(result, compare_file)
+   nothing
+end
+println("bench_getvprop(V::Int, E::Int, tune_file = \"getvprop_params.jld\"; save_file = \"\", compare_file= \"\")")
+
+
+
+###
+# SETEPROP
+###
+
+function bench_seteprop(V::Int, E::Int, tune_file = "seteprop_params.jld"; save_file = "", compare_file= "")
+   suite = BenchmarkGroup(["Seteprop"])
+
+   suite["Unit Single"] = BenchmarkGroup()
+   suite["Unit Dict  "] = BenchmarkGroup()
+
+   suite["Array Single"] = BenchmarkGroup()
+   suite["Array Dict  "] = BenchmarkGroup()
+   suite["Array Func  "] = BenchmarkGroup()
+
+   suite["Colon Single"] = BenchmarkGroup()
+   suite["Colon Dict  "] = BenchmarkGroup()
+   suite["Colon Func  "] = BenchmarkGroup()
+
+   val=randstring()
+   d = Dict("f1"=>1, "f2"=>2.0, "f3"=>randstring(), "f4"=>nothing, "f5"=>'5')
+
+   am = SparseMatrixAM(V, E)
+   es = collect(edges(am))
+   elist = rand(es, div(E, 4))
+   fn = (u,v)->rand([1, "1", 1.0, nothing])
+
+   for PM in subtypes(PropertyModule)
+      for typ in [Any,TestType]
+         propmod = PM{typ,typ}
+
+         suite["Unit Single"]["$propmod"] = @benchmarkable seteprop!(x, e, $val, "f3")          setup=(x=$propmod($V); e=rand($es))
+         suite["Unit Dict  "]["$propmod"] = @benchmarkable seteprop!(x, e, $d)                  setup=(x=$propmod($V); e=rand($es))
+
+         arr=Array{Int}(length(elist))
+         dlist = fill(d, length(elist))
+         suite["Array Single"]["$propmod"] = @benchmarkable seteprop!(x, $elist, $arr, "f1")    setup=(x=$propmod($V))
+         suite["Array Dict  "]["$propmod"] = @benchmarkable seteprop!(x, $elist, $dlist)        setup=(x=$propmod($V))
+         suite["Array Func  "]["$propmod"] = @benchmarkable seteprop!(x, $elist, $fn, "f4")     setup=(x=$propmod($V))
+
+         arr=Array{Int}(E)
+         dlist = fill(d, E)
+         suite["Colon Single"]["$propmod"] = @benchmarkable seteprop!(x, :, $es, $arr, "f1")    setup=(x=$propmod($V))
+         suite["Colon Dict  "]["$propmod"] = @benchmarkable seteprop!(x, $es, $dlist)           setup=(x=$propmod($V))
+         suite["Colon Func  "]["$propmod"] = @benchmarkable seteprop!(x, :, $es, $fn, "f4")     setup=(x=$propmod($V))
+      end
+   end
+
+   tune_suite(suite, tune_file)
+   result = median(run(suite, seconds = 5))
+   for key in sort(collect(keys(result)))
+      println(key)
+      display(result[key])
+   end
+   save_suite(result, save_file)
+   compare_suite(result, compare_file)
+   nothing
+end
+println("bench_seteprop(V::Int, E::Int, tune_file = \"seteprop_params.jld\"; save_file = \"\", compare_file= \"\")")
+
+
+
+###
+# GETEPROP
+###
+
+function bench_geteprop(V::Int, E::Int, tune_file = "geteprop_params.jld"; save_file = "", compare_file= "")
+   suite = BenchmarkGroup(["Getvprop"])
+
+   suite["Unit Single"] = BenchmarkGroup()
+   suite["Unit Dict  "] = BenchmarkGroup()
+
+   suite["Array Single"] = BenchmarkGroup()
+   suite["Array Dict  "] = BenchmarkGroup()
+
+   suite["Colon Single"] = BenchmarkGroup()
+   suite["Colon Dict  "] = BenchmarkGroup()
+
+   am = SparseMatrixAM(V, E)
+   es = collect(edges(am))
+   elist = rand(es, div(E, 4))
+   
+   props = ["f1", "f2", "f3", "f4", "f5"]
+
+   for PM in subtypes(PropertyModule)
+      for typ in [Any,TestType]
+         propmod = PM{typ,typ}
+
+         x = propmod(V)
+
+         seteprop!(x, :, es, (u,v)->rand(Int), "f1")
+         seteprop!(x, :, es, (u,v)->rand(), "f2")
+         seteprop!(x, :, es, (u,v)->randstring(), "f3")
+         seteprop!(x, :, es, (u,v)->rand(3), "f4")
+         seteprop!(x, :, es, (u,v)->rand(Char), "f5")
+
+
+         suite["Unit Single"]["$propmod"] = @benchmarkable geteprop($x, e, prop)                setup=(e=rand($es); prop=rand($props))
+         suite["Unit Dict  "]["$propmod"] = @benchmarkable geteprop($x, e)                      setup=(e=rand($es))
+
+         suite["Array Single"]["$propmod"] = @benchmarkable geteprop($x, $elist, prop)          setup=(prop=rand($props))
+         suite["Array Dict  "]["$propmod"] = @benchmarkable geteprop($x, $elist)
+
+         suite["Colon Single"]["$propmod"] = @benchmarkable geteprop($x, $es, prop)               setup=(prop=rand($props))
+         suite["Colon Dict  "]["$propmod"] = @benchmarkable geteprop($x, $es) 
+      end
+   end
+
+   tune_suite(suite, tune_file)
+   result = median(run(suite, seconds = 5))
+   for key in sort(collect(keys(result)))
+      println(key)
+      display(result[key])
+   end
+   save_suite(result, save_file)
+   compare_suite(result, compare_file)
+   nothing
+end
+println("bench_geteprop(V::Int, E::Int, tune_file = \"geteprop_params.jld\"; save_file = \"\", compare_file= \"\")")
