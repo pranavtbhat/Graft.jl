@@ -47,10 +47,10 @@ end
 @inline labelmod(g::Graph) = g.labelmod
 
 if CAN_USE_LG
-   typealias SimpleGraph Graph{LightGraphsAM,DictArrPM}
+   typealias SimpleGraph Graph{LightGraphsAM,VectorPM}
 end
 
-typealias SparseGraph Graph{SparseMatrixAM, DictArrPM}
+typealias SparseGraph Graph{SparseMatrixAM, VectorPM}
 
 ################################################# HELPERS ##############################################################
 

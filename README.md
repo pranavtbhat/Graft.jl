@@ -31,7 +31,7 @@ The `PropertyModule` will be responsible for maintaining information attached to
 ParallelGraphs has the following `PropertyModule`s implemented:
 - `PureDictPM` : Two separate Dictionary of Dictionaries are used to maintain vertex and edge properties.
 - `NDSparsePM` : Uses N-Dimensional Sparse arrays from *[NDSparseData.jl](https://github.com/JuliaComputing/NDSparseData.jl)* to store vertex/edge properties.
-- `DictArrPM`  : Maintains separate dictionaries for Vertex and Edge Properties, that map property names onto arrays of values. Can be thought of as a Dictionary of Arrays. (Similar to Structure of Arrays).
+- `VectorPM`  : Maintains separate dictionaries for Vertex and Edge Properties, that map property names onto arrays of values. Can be thought of as a Dictionary of Arrays. (Similar to Structure of Arrays).
 - `SparseMatrixPM` : A SparseMatrixCSC maps vertices and edges onto property dictionaries. Can be thought of as arrays of dictionaries.
 
 

@@ -8,8 +8,6 @@ end
 using ParallelGraphs
 
 
-const PM_LIST = [DictArrPM, SparseDictPM, TypeArrPM]
-
 type TestType
    f1::Int
    f2::Float64

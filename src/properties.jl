@@ -13,17 +13,29 @@ listvprops, listeprops, getvprop, geteprop, setvprop!, seteprop!
 
 abstract PropertyModule{V,E}
 
-# Zeroing to help out with data storage
-Base.zero(::Type) = nothing
+
+################################################# DEFAULT VALUES ###########################################################
+
+# Char
 Base.zero(::Type{Char}) = Char(0)
+
+# String
 Base.zero{T<:AbstractString}(::Type{T}) = ""
 
-# Subtypes to help out with tests
+# Dict
+Base.zero(::Type{Dict}) = Dict()
+Base.zero{K,V}(::Type{Dict{K,V}}) = Dict{K,V}()
 
-abstract StronglyTypedPM{V,E} <: PropertyModule{V,E}
-abstract WeaklyTypedPM{V,E} <: PropertyModule{V,E}
+# Arrays
+Base.zero{T,N}(x::Type{Array{T,N}}) = zeros(T, zeros(Int, N)...)
 
+# User defined types
+Base.zero{T}(::Type{T}) = T([zero(fieldtype(T, field)) for field in fieldnames(T)]...)
 
+# Everything else
+Base.zero(::Type{Any}) = nothing
+
+# Array of default values
 function default_vector{T}(::Type{T}, nv::Int)
    if isa(zero(T), T)
       zeros(T, nv)
@@ -32,6 +44,7 @@ function default_vector{T}(::Type{T}, nv::Int)
    end
 end
 
+# Matrix of default values
 function default_matrix{T}(::Type{T}, nv::Int)
    if isa(zero(T), T)
       spzeros(T, nv, nv)
@@ -101,8 +114,7 @@ end
 ################################################# IMPLEMENTATIONS ##########################################################
 
 # Array of Structures Implementations
-include("propmods/sparsedict.jl")
+include("propmods/linear.jl")
 
 # Structure of Arrays Implementations
-include("propmods/dictarr.jl")
-include("propmods/typearr.jl")
+include("propmods/vector.jl")
