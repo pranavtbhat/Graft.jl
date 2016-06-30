@@ -4,34 +4,51 @@
 
 ############################################################################################################################
 
-for AM in subtypes(AdjacencyModule)
-   for PM in subtypes(PropertyModule)
-      @testset "Query tests for Graph{$AM,$PM}" begin
-         g = parsegraph("testgraph.txt", :TGF, Graph{AM,PM})
-
-         @test setlabel!(g, "name") == nothing
-
-         @test resolve(g, "Abel") == 1
+for PM in subtypes(PropertyModule)
+   for typ in [Any,TestType]
+      @testset "Query tests for Graph{SparseMatrixAM,$PM}" begin
          
-         @test length(g[:]) == 10
-         @test length(g[:,:]) == 28
+         g = Graph{SparseMatrixAM,PM{typ,typ}}(10,90)
 
-         @test g["Abel"] == getvprop(g, 1)
+         labels = ["$i" for i in 1:10]
+         setlabel!(g, labels)
 
-         @test g["Abel"=>"Bharath"] == geteprop(g, 1, 2)
+         @test g[:] == labels
+         
+         @test length(g[=>]) == ne(g)
 
-         @test g["Abel", :] == ["Bharath", "Camila"]
+         @test g["1"=>:] == ["$i" for i in 2:10]
 
-         @test g[:, "Abel"] == ["Bharath", "Camila"]
+         # Vertex Properties
+         g["1", "f1"] = 1
+         g["1"] = Dict("f4"=>Colon(), "f5"=>'5')
+         g[:, "f2"] = fill(2.0, 10)
+         g[:,:] = [Dict("f3"=>"3") for i in 1:10]
 
-         g["Abel", "a"] = 5
-         @test getvprop(g, 1, "a") == 5
+         if typ == Any
+            @test g["1"] == Dict("f1"=>1, "f2"=>2.0, "f3"=>"3", "f4"=>Colon(), "f5"=>'5')
+         else
+            @test g["1"] == TestType(1, 2.0, "3", Colon(), '5')
+         end
 
-         g["Abel"=>"Bharath", "b"] = 10
-         @test geteprop(g, 1, 2, "b") == 10
+         @test g[:,"f2"] == fill(2.0, 10)
+         @test g[:,:] == getvprop(g, :)
 
-         @test g[collect(vertices(g))] == g[:]
-         @test g[collect(edges(g))] == g[:,:]
+         # Edge Properties
+         g["1"=>"2", "f1"] = 1
+         g["1"=>"2"] = Dict("f2"=>2.0)
+         g[=>, "f3"] = fill("3", 90)
+         g[=>, :] = [Dict("f4"=>Colon(), "f5"=>'5') for i in 1:90]
+
+         if typ == Any
+            @test g["1"=>"2"] == Dict("f1"=>1, "f2"=>2.0, "f3"=>"3", "f4"=>Colon(), "f5"=>'5')
+         else
+            @test g["1"=>"2"] == TestType(1, 2.0, "3", Colon(), '5')
+         end
+
+         @test g["1"=>"2", "f1"] == 1
+         @test g[=>, "f3"] == fill("3", 90)
+         @test g[=>, :] == geteprop(g, :)
       end
    end
 end

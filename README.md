@@ -1,7 +1,7 @@
 # ParallelGraphs
 
 [![Build Status](https://travis-ci.org/pranavtbhat/ParallelGraphs.jl.svg?branch=master)](https://travis-ci.org/pranavtbhat/ParallelGraphs.jl)
-[![codecov.io](http://codecov.io/github/pranavtbhat/ParallelGraphs.jl/)](http://codecov.io/github/pranavtbhat/ParallelGraphs.jl)
+[![codecov.io](http://codecov.io/github/pranavtbhat/ParallelGraphs.jl/coverage.svg?branch=master)](http://codecov.io/github/pranavtbhat/ParallelGraphs.jl)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/pranavtbhat/ParallelGraphs.jl/master/LICENSE.md)
 
 *Presentation available [here](https://pranavtbhat.github.io/ParallelGraphs.jl/#/)*
@@ -10,7 +10,7 @@ ParallelGraphs hopes to be a general purpose graph processing framework. Some of
 - Storing and querying vertex or edge properties. ParallelGraphs allows the assignment of key-value pairs to vertices and edges, which can be used in various graph algorithms.
 - Vertex Labelling. ParallelGraphs allows users to refer to vertices using arbitrary Julia types.
 - Graph DB queries(WIP). ParallelGraphs will support SQL-like queries for graphs, such as filtering on vertex and edge properties.
-- Massive Graph Analysis(WIP). ParallelGraphs will leverage [ComputeFramework](https://github.com/shashi/ComputeFramework.jl) to allow for the parallel processing of very large graphs.
+- Massive Graph Analysis(WIP). ParallelGraphs will leverage [Dagger.jl](https://github.com/JuliaParallel/Dagger.jl) to allow for the parallel processing of very large graphs.
 
 Every Graph type in ParallelGraphs is built with three separate modular components:
 - An `AdjacencyModule` that stores all structural information in the graph. All structural queries are redirected to the `AdjacencyModule` in the graph.
@@ -26,23 +26,28 @@ ParallelGraphs has the following `AdjacencyModule`s implemented:
 - `SparseMatrixAM` : This module maintains a matrix in the Compressed Sparse Column format (`SparseMatrixCSC`), and is expected to be more compact than `LightGraphsAM`. However, this module will not support as many algorithms.
 
 ## PropertyModule
-The `PropertyModule` will be responsible for maintaining information attached to vertices and edges. Methods implemented on the Property Module will allow the user to fetch vertex/edge data and execute SQL like queries. 
+The `PropertyModule` will be responsible for maintaining vertex and edge metadata. A Property Module is parameterized by two templates:
 
-ParallelGraphs has the following `PropertyModule`s implemented:
-- `PureDictPM` : Two separate Dictionary of Dictionaries are used to maintain vertex and edge properties.
-- `NDSparsePM` : Uses N-Dimensional Sparse arrays from *[NDSparseData.jl](https://github.com/JuliaComputing/NDSparseData.jl)* to store vertex/edge properties.
-- `DictArrPM`  : Maintains separate dictionaries for Vertex and Edge Properties, that map property names onto arrays of values. Can be thought of as a Dictionary of Arrays. (Similar to Structure of Arrays).
-- `SparseMatrixPM` : A SparseMatrixCSC maps vertices and edges onto property dictionaries. Can be thought of as arrays of dictionaries.
+- `V` : The vertex descriptor. 
+- `E` : The edge descriptor.
 
+If you know the field names and their types beforehand, you can pass them in as a User defined type and get better performance. However, if you cannot anticipate the number or types of the fields, pass in type `Any` to use a ditctionary instead.
 
+ParallelGraphs provides two separate implementations:
+- `LinearPM` : Based on the Array of Structures paradigm. 
+- `VectorPM` : Based on the Structure of Arrays paragigm. 
 
 ## Graph Types
 ParallelGraphs allows users to mix and match Adjacency and Property modules to create graph structures that suit their needs. A graph can be created using the parametric constructor.
 
 ```julia
-g = Graph{SparseMatrixAM,SparseMatrixPM}()          # Create an empty graph
-g = Graph{SparseMatrixAM,SparseMatrixPM}(100)       # Create a graph with 100 vertices
-g = Graph{SparseMatrixAM,SparseMatrixPM}(100, 500)  # Create a graph with 500 edges.
+
+# Create smaller graphs
+g = Graph{LightGraphsAM,VectorPM}()                   # Create an empty graph
+g = Graph{LightGraphsAM,VectorPM}(100)                # Create a graph with 100 vertices
+
+# Create Large Sparse Graphs
+g = Graph{SparseMatrixAM,LinearPM}(1000000, 10000000) # Create a graph with 1M vertices and 10M edges.
 ```
 
 For less picky users, ParallelGraphs provides two typealiases:

@@ -5,43 +5,112 @@
 ############################################################################################################################
 
 
-for pmtype in subtypes(PropertyModule)
-   @testset "Properties Interface for $pmtype" begin
-      g = parsegraph("testgraph.txt", :TGF, Graph{SparseMatrixAM, pmtype})
-      @test listvprops(g) == ["name", "age"]
-      @test listeprops(g) == ["relationship"]
-      @test getvprop(g, 1) == Dict("name" => "Abel", "age" => 32)
-      @test getvprop(g, 9, "name") == "Ignacio"
-      @test geteprop(g, 1, 2) == Dict("relationship" => "father")
-      @test geteprop(g, 7, 6, "relationship") == "friend"
+for PM in subtypes(PropertyModule)
+   for typ in [Any,TestType]
+      @testset "Properties Interface for $(PM{typ,typ})" begin
 
-      addvertex!(g)
-      addvertex!(g)
-      addedge!(g, 11, 12)
+         g = Graph{SparseMatrixAM,PM{typ,typ}}(10,90)
 
-      @test setvprop!(g, 11, Dict("name" => "Kamath", "age" => 32)) == nothing
-      @test getvprop(g, 11) == Dict("name" => "Kamath", "age" => 32)
-      @test setvprop!(g, 12, "age", 37) == nothing
-      @test getvprop(g, 12, "age") == 37
-      @test seteprop!(g, 11, 12, Dict("relationship" => "brother")) == nothing
-      @test seteprop!(g, 11, 12, "duration", 15) == nothing
-      @test geteprop(g, 11, 12) == Dict("relationship" => "brother", "duration" => 15)
+         cmp = Array{Any}(10)
 
-      # @test rmvertex!(g, 1) == nothing
-      # @test isempty(getvprop(g, 1))
-      # @test isempty(geteprop(g, 1, 2))
+         setvprop!(g, 1, Dict("f1"=>1))
+         
+         if typ == Any
+            @test getvprop(g, 1) == Dict("f1"=>1)
+         else
+            @test getvprop(g, 1) == TestType(1, 0.0, "", nothing, '\0')
+         end
 
-      # @test rmedge!(g, 11, 12) == nothing
-      # @test isempty(geteprop(g, 11, 12))
+         @test getvprop(g, 1, "f1") == 1
 
+         setvprop!(g, 1:10, [Dict("f1"=>1) for i in 1:10])
+         @test getvprop(g, 1:10, "f1") == getvprop(g, :, "f1") == fill!(cmp, 1)
 
-      @test setvprop!(g, "index", collect(1 : 12)) == nothing
-      @test sum([getvprop(g, v, "index") for v in 1 : nv(g)]) == 78
+         setvprop!(g, :, [Dict("f2"=>2.0) for i in 1:10])
+         @test getvprop(g, :, "f2") == fill!(cmp, 2.0)
 
-      @test setvprop!(g, "favdigit", v->v % 9) == nothing
-      @test isa(Int[getvprop(g, v, "favdigit") for v in 1 : nv(g)], Vector{Int})
+         setvprop!(g, 2, "3", "f3")
+         @test getvprop(g, 2, "f3") == "3"
 
-      @test seteprop!(g, "weight", (u,v)->u+v) == nothing
-      @test isa(Int[geteprop(g, u, v, "weight") for (u,v) in edges(g)], Vector{Int})
+         setvprop!(g, 1:10, fill("3", 10), "f3")
+         @test getvprop(g, 1:10, "f3") == fill!(cmp, "3")
+
+         setvprop!(g, 1:10, v->Colon(), "f4")
+         @test getvprop(g, 1:10, "f4")  == fill!(cmp, Colon())
+
+         setvprop!(g, :, fill('0', 10), "f5")
+         @test getvprop(g, :, "f5") == fill!(cmp, '0')
+
+         setvprop!(g, :, v->'5', "f5")
+
+         if typ == Any
+            @test all(getvprop(g, :) .== Dict("f1"=>1, "f2"=>2.0, "f3"=>"3", "f4"=>Colon(), "f5"=>'5'))
+         else
+            @test all(getvprop(g, :) .== TestType(1, 2.0, "3", Colon(), '5'))
+         end
+         
+         cmp = Array{Any}(10)
+
+         elist = collect(edges(g))[11:20]
+         dlist = [Dict("f1"=>1) for i in 1:10]
+         typlist = fill(TestType(1, 0.0, "", nothing, '\0'), 10)
+
+         seteprop!(g, 1, 2, Dict("f1"=>1))
+
+         if typ == Any
+            @test geteprop(g, 1, 2) == Dict("f1"=>1)
+         else
+            @test geteprop(g, 1, 2) == TestType(1, 0.0, "", nothing, '\0')
+         end
+
+         seteprop!(g, 2=>3, Dict("f1"=>1))
+
+         if typ == Any
+            @test geteprop(g, 2=>3) == Dict("f1"=>1)
+         else
+            @test geteprop(g, 2=>3) == TestType(1, 0.0, "", nothing, '\0')
+         end
+
+         seteprop!(g, elist, dlist)
+
+         if typ == Any
+            @test geteprop(g, elist) == dlist
+         else
+            @test geteprop(g, elist) == typlist
+         end
+
+         seteprop!(g, 3, 4, 2.0, "f2")
+         @test geteprop(g, 3, 4, "f2") == 2.0
+
+         seteprop!(g, 5=>6, 2.0, "f2")
+         @test geteprop(g, 5=>6, "f2") == 2.0
+
+         seteprop!(g, elist, fill(2.0, 10), "f2")
+         @test all(geteprop(g, elist, "f2") .== 2.0)
+
+         seteprop!(g, elist, (u,v)->"3", "f3")
+         @test all(geteprop(g, elist, "f3") .== "3")
+
+         seteprop!(g, :, fill(Colon(), 90), "f4")
+         @test all(geteprop(g, :, "f4") .== Colon())
+
+         seteprop!(g, :, (u,v)->'5', "f5")
+         @test all(geteprop(g, :, "f5") .== '5')
+         
+         # Adjacency Tests
+         @test addvertex!(g) == nothing
+         @test addvertex!(g, 2) == nothing
+         @test addedge!(g, 11, 12) == nothing
+         @test addedge!(g, EdgeID[12=>13, 11=>13]) == nothing
+
+         # Remove vertices and edges
+         rmvertex!(g, 13) == nothing
+         @test nv(g) == 12
+
+         rmedge!(g, 11, 12) == nothing
+         rmvertex!(g, [11,12]) == nothing
+         @test nv(g) == 10
+         @test ne(g) == 90
+      end
    end
 end
