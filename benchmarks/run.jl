@@ -43,20 +43,20 @@ function compare_suite(result, compare_file)
 end
 
 function display(result)
-   @printf "%-30s | %-12s | %-12s | %-12s\n" "Test" "Time Taken" "Memory" "GCTime"
+   @printf "%-50s | %-12s | %-12s | %-12s\n" "Test" "Time Taken" "Memory" "GCTime"
    println(join(['\u2014' for i in 1:70]))
    for (key,item) in result
-      @printf "%-30s | %-12s | %-12s | %-12s\n" key[16:end] prettytime(item.time) prettymemory(item.memory) prettytime(item.gctime)
+      @printf "%-50s | %-12s | %-12s | %-12s\n" key[16:end] prettytime(item.time) prettymemory(item.memory) prettytime(item.gctime)
    end
    println()
    nothing
 end
 
 function display_compare(result)
-   @printf "%-30s | %-12s | %-12s\n" "Test" "Time Taken" "Memory"
+   @printf "%-50s | %-12s | %-12s\n" "Test" "Time Taken" "Memory"
    println(join(['\u2014' for i in 1:50]))
    for (key,item) in result
-      @printf "%-30s | %-10s | %-10s\n" key[16:end] prettydiff(item.ratio.time) prettydiff(item.ratio.memory)
+      @printf "%-50s | %-10s | %-10s\n" key[16:end] prettydiff(item.ratio.time) prettydiff(item.ratio.memory)
    end
    println()
    nothing
@@ -344,3 +344,95 @@ function bench_geteprop(V::Int, E::Int, tune_file = "geteprop_params.jld"; save_
    nothing
 end
 println("bench_geteprop(V::Int, E::Int, tune_file = \"geteprop_params.jld\"; save_file = \"\", compare_file= \"\")")
+
+
+###
+# SUBGRAPH
+###
+
+function bench_subgraph(V::Int, E::Int, tune_file = "subgraph_params.jld"; save_file = "", compare_file= "")
+   suite = BenchmarkGroup(["Getvprop"])
+
+   suite["Range Quarter"] = BenchmarkGroup()
+   suite["Range Half   "] = BenchmarkGroup()
+
+   suite["Array Quarter"] = BenchmarkGroup()
+   suite["Array Half   "] = BenchmarkGroup()
+
+   suite["Edges Quarter"] = BenchmarkGroup()
+   suite["Edges Half   "] = BenchmarkGroup()
+
+   range_quarter = div(V, 2) : div(3*V, 4)
+   range_half    = div(V, 4) : div(3*V, 4)
+   range_full    = 1 : V
+
+   vlist         = collect(1 : V)  
+   array_full    = vlist[randperm(V)]
+   array_quarter = vlist[randperm(div(V, 4))]
+   array_half    = vlist[randperm(div(V, 2)) .+ div(V, 4)]
+
+   for AM in subtypes(AdjacencyModule)
+      am = AM(V, E+200)
+
+      es = collect(edges(am))
+      es_quarter = es[randperm(div(E, 4))]
+      es_half    = es[randperm(div(E, 2))]
+      es_full    = es[randperm(E)]
+
+      suite["Range Quarter"]["$AM"] = @benchmarkable subgraph($am, $range_quarter)
+      suite["Range Half   "]["$AM"] = @benchmarkable subgraph($am, $range_half)
+
+      suite["Array Quarter"]["$AM"] = @benchmarkable subgraph($am, $array_quarter)
+      suite["Array Half   "]["$AM"] = @benchmarkable subgraph($am, $array_half)
+
+      suite["Edges Quarter"]["$AM"] = @benchmarkable subgraph($am, $es_quarter)
+      suite["Edges Half   "]["$AM"] = @benchmarkable subgraph($am, $es_half)
+   end
+
+   am = LightGraphsAM(V, E)
+   es = collect(edges(am))
+
+   for PM in subtypes(PropertyModule)
+      for typ in [Any, TestType]
+
+         propmod = PM{typ,typ}
+         x = propmod(V)
+
+         es_quarter = es[randperm(div(E, 4))]
+         es_half    = es[randperm(div(E, 2))]
+         es_full    = es[randperm(E)]
+
+         setvprop!(x, :, v->rand(Int), "f1")
+         setvprop!(x, :, v->rand(), "f2")
+         setvprop!(x, :, v->randstring(), "f3")
+         setvprop!(x, :, v->rand(3), "f4")
+         setvprop!(x, :, v->rand(Char), "f5")
+
+         seteprop!(x, :, es, (u,v)->rand(Int), "f1")
+         seteprop!(x, :, es, (u,v)->rand(), "f2")
+         seteprop!(x, :, es, (u,v)->randstring(), "f3")
+         seteprop!(x, :, es, (u,v)->rand(3), "f4")
+         seteprop!(x, :, es, (u,v)->rand(Char), "f5")
+
+         suite["Range Quarter"]["$propmod"] = @benchmarkable subgraph($x, $range_quarter)
+         suite["Range Half   "]["$propmod"] = @benchmarkable subgraph($x, $range_half)
+
+         suite["Array Quarter"]["$propmod"] = @benchmarkable subgraph($x, $array_quarter)
+         suite["Array Half   "]["$propmod"] = @benchmarkable subgraph($x, $array_half)
+
+         suite["Edges Quarter"]["$propmod"] = @benchmarkable subgraph($x, $es_quarter)
+         suite["Edges Half   "]["$propmod"] = @benchmarkable subgraph($x, $es_half)
+      end
+   end
+
+   tune_suite(suite, tune_file)
+   result = median(run(suite, seconds = 5))
+   for key in sort(collect(keys(result)))
+      println(key)
+      display(result[key])
+   end
+   save_suite(result, save_file)
+   compare_suite(result, compare_file)
+   nothing
+end
+println("bench_subgraph(V::Int, E::Int, tune_file = \"subgraph_params.jld\"; save_file = \"\", compare_file= \"\")")

@@ -444,7 +444,7 @@ function subgraph{V,E}(x::VectorPM{V,E}, elist::AbstractVector{EdgeID})
    ED = Dict()
 
    for (key,arr) in edata(x)
-      vals = [arr[e...] for e in elist]
+      vals = [arr[v,u] for (u,v) in elist]
       VD[key] = init_spmx(nv(x), elist, vals)
    end
    
