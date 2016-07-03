@@ -1,7 +1,5 @@
 module ParallelGraphs
 
-using NDSparseData
-
 const CAN_USE_LG = begin
    try
       import LightGraphs

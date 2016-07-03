@@ -1,7 +1,7 @@
 ################################################# FILE DESCRIPTION #########################################################
 
 # This file contains the SparseMatrixAM adjacency module.
- 
+
 ################################################# IMPORT/EXPORT ############################################################
 export
 SparseMatrixAM, VertexIteratorCSC
@@ -37,43 +37,88 @@ end
 
 ################################################# INTERNAL IMPLEMENTATION ##################################################
 
-type EdgeIteratorCSC
-   am::SparseMatrixAM
+type EdgeIterState
+   u::Int
+   i0::Int
+   done::Bool
 end
 
-Base.length(x::EdgeIteratorCSC) = x.am.ne
-Base.start(x::EdgeIteratorCSC) = (1, 1, 1)
-Base.done(x::EdgeIteratorCSC, t) = t[3] > nnz(x.am.fdata)
-
-function Base.show(io::IO, x::EdgeIteratorCSC)
-   write(io, "Edge Iterator with $(x.am.ne) values")
+type EdgeIterCSC <: AbstractVector{EdgeID}
+   m::Int
+   colptr::Vector{Int}
+   rowval::Vector{Int}
 end
 
-function Base.next(x::EdgeIteratorCSC, t)
-   m = x.am.fdata
-   u, vi, e = t
-   if vi in nzrange(m, u)
-      return (u => m.rowval[vi]), (u, vi+1, e+1)
+function EdgeIterCSC(x::SparseMatrixAM)
+   EdgeIterCSC(ne(x), x.fdata.colptr, x.fdata.rowval)
+end
+
+
+Base.size(x::EdgeIterCSC) = (x.m,)
+Base.length(x::EdgeIterCSC) = x.m
+Base.start(x::EdgeIterCSC) = EdgeIterState(1, 1, true)
+Base.done(x::EdgeIterCSC, state) = state.done
+
+function Base.next(x::EdgeIterCSC, state)
+   colptr = x.colptr
+   rowval = x.rowval
+   m = x.m
+
+   while(state.i0 > colptr[state.u+1]-1)
+      state.u += 1
+   end
+
+   e = EdgeID(state.u, rowval[state.i0])
+   state.i0 += 1
+
+   if state.i0 > m
+      state = start(x)
    else
-      u += 1
-      while u < x.am.nv && length(nzrange(m, u)) == 0
-         u += 1
-      end
-      vi = start(nzrange(m, u))
-      return (u=>m.rowval[vi]), (u, vi+1, e+1)
+      state.done = false
    end
+
+   e, state
 end
 
-function Base.collect(x::EdgeIteratorCSC)
-   elist = EdgeID[]
-   sizehint!(elist, ne(x.am))
+function Base.getindex(x::EdgeIterCSC, i0::Int)
+   j = 1
 
-   M = x.am.fdata
-   for u in vertices(x.am)
-      append!(elist, map(v->u=>v, M.rowval[nzrange(M, u)]))
+   colptr = x.colptr
+   rowval = x.rowval
+   m = x.m
+
+   while(j <= m && i0 > colptr[j+1] - 1)
+      j += 1
    end
 
+   EdgeID(j, rowval[i0])
+end
+
+
+Base.getindex(x::EdgeIterCSC, ::Colon) = collect(x)
+
+# Todo: Optimize range getindex
+
+function Base.collect(x::EdgeIterCSC) # STUD METHOD :P
+   elist = Vector{EdgeID}()
+   sizehint!(elist, x.m)
+
+   rowval = x.rowval
+   colptr = x.colptr
+   m = x.m
+   j = 1
+
+   for (i,v) in enumerate(rowval)
+      while(j <= m && i > colptr[j+1] - 1)
+         j += 1
+      end
+      push!(elist, EdgeID(j, v))
+   end
    elist
+end
+
+function Base.show(io::IO, x::EdgeIterCSC)
+   write(io, "Edge Iterator with $(x.am.ne) values")
 end
 
 ################################################# INTERFACE IMPLEMENTATION ##################################################
@@ -89,7 +134,7 @@ Base.size(x::SparseMatrixAM) = (x.nv, x.ne)
 
 
 @inline vertices(x::SparseMatrixAM) = UnitRange{Int}(1, nv(x))
-@inline edges(x::SparseMatrixAM) = EdgeIteratorCSC(x)
+@inline edges(x::SparseMatrixAM) = EdgeIterCSC(x)
 
 
 
@@ -175,4 +220,3 @@ function subgraph(x::SparseMatrixAM, elist::AbstractVector{EdgeID})
    M = init_spmx(nv(x), elist, fill(true, length(elist)))
    SparseMatrixAM(nv(x), nnz(M), M, M')
 end
-

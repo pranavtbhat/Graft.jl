@@ -1,7 +1,7 @@
 ################################################# FILE DESCRIPTION #########################################################
 
 # This file contains the LightGraphs adjacency module, as well as an implementation of the AdjacencyModule interface
- 
+
 ################################################# IMPORT/EXPORT ############################################################
 export
 LightGraphsAM
@@ -25,7 +25,55 @@ end
 
 ################################################# INTERNAL IMPLEMENTATION ##################################################
 
-Base.sizehint!(x::LightGraphsAM) = nothing
+# Make LG.EdgeIter an asbtractvector
+type EdgeIterLG <: AbstractVector{EdgeID}
+   eit::LightGraphs.EdgeIter
+end
+
+Base.length(x::EdgeIterLG) = x.eit.m
+Base.size(x::EdgeIterLG) = (x.eit.m,)
+
+
+Base.start(x::EdgeIterLG) = LightGraphs.EdgeIterState(1, 1, false)
+@inline Base.next(x::EdgeIterLG, state) = LightGraphs.next(x.eit, state)
+@inline Base.done(x::EdgeIterLG, state) = LightGraphs.done(x.eit, state)
+
+function Base.getindex(x::EdgeIterLG, i0::Int)
+   ecount = 0
+   ecount_ = 0
+   adj = x.eit.adj
+   u = 1
+
+   for u = eachindex(adj)
+      ecount_ += length(adj[u])
+      if ecount_ >= i0
+         break
+      else
+         ecount = ecount_
+      end
+   end
+
+   EdgeID(u, adj[u][i0-ecount])
+end
+
+Base.getindex(x::EdgeIterLG, ::Colon) = collect(x)
+
+function Base.collect(x::EdgeIterLG)
+   elist = Vector{EdgeID}()
+   sizehint!(elist, x.eit.m)
+
+   adj = x.eit.adj
+   for (u,vlist) in enumerate(adj)
+      for v in vlist
+         push!(elist, EdgeID(u, v))
+      end
+   end
+   elist
+end
+
+function Base.show(io::IO, x::EdgeIterLG)
+   write(io, "Edge Iterator with $(x.eit.m) values")
+end
 
 ################################################# INTERFACE IMPLEMENTATION #################################################
 
@@ -40,7 +88,7 @@ Base.sizehint!(x::LightGraphsAM) = nothing
 
 
 @inline vertices(x::LightGraphsAM) = LightGraphs.vertices(data(x))
-@inline edges(x::LightGraphsAM) = LightGraphs.edges(data(x))
+@inline edges(x::LightGraphsAM) = EdgeIterLG(LightGraphs.edges(data(x)))
 
 
 @inline hasvertex(x::LightGraphsAM, v::VertexID) = 1 <= v <= nv(x)
