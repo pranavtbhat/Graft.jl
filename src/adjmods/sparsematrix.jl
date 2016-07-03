@@ -11,6 +11,7 @@ type SparseMatrixAM <: AdjacencyModule
    ne::Int
    fdata::SparseMatrixCSC{Bool, Int}
    bdata::SparseMatrixCSC{Bool, Int}
+   adjvec::Vector{VertexID}
 end
 
 
@@ -19,14 +20,16 @@ end
 function SparseMatrixAM(nv=0)
    fdata = spzeros(Bool, nv, nv)
    bdata = spzeros(Bool, nv, nv)
-   SparseMatrixAM(nv, 0, fdata, bdata)
+   adjvec = zeros(VertexID, nv)
+   SparseMatrixAM(nv, 0, fdata, bdata, adjvec)
 end
 
 function SparseMatrixAM(nv::Int, ne::Int)
    m = sprandbool(nv, nv, ne/(nv*(nv-1)))
    fdata = triu(m,1) | tril(m,-1)
    bdata = fdata'
-   SparseMatrixAM(nv, nnz(fdata), fdata, bdata)
+   adjvec = zeros(VertexID, nv)
+   SparseMatrixAM(nv, nnz(fdata), fdata, bdata, adjvec)
 end
 
 ################################################# ACCESSORS ################################################################
@@ -147,12 +150,20 @@ end
 
 function fadj(x::SparseMatrixAM, v::VertexID)
    M = fdata(x)
-   slice(M.rowval, nzrange(M, v))
+   colptr = M.colptr
+   rowval = M.rowval
+   sz = colptr[v+1] - colptr[v]
+   resize!(x.adjvec, sz)
+   copy!(x.adjvec, 1, rowval, colptr[v], sz)
 end
 
 function badj(x::SparseMatrixAM, v::VertexID)
    M = bdata(x)
-   slice(M.rowval, nzrange(M, v))
+   colptr = M.colptr
+   rowval = M.rowval
+   sz = colptr[v+1] - colptr[v]
+   resize!(x.adjvec, sz)
+   copy!(x.adjvec, 1, rowval, colptr[v], sz)
 end
 
 outdegree(x::SparseMatrixAM, v::VertexID) = length(nzrange(fdata(x), v))
@@ -213,10 +224,10 @@ end
 function subgraph(x::SparseMatrixAM, vlist::AbstractVector{VertexID})
    vlen = length(vlist)
    M = fdata(x)[vlist,vlist]
-   SparseMatrixAM(length(vlist), nnz(M), M, M')
+   SparseMatrixAM(length(vlist), nnz(M), M, M', zeros(VertexID, vlen))
 end
 
 function subgraph(x::SparseMatrixAM, elist::AbstractVector{EdgeID})
    M = init_spmx(nv(x), elist, fill(true, length(elist)))
-   SparseMatrixAM(nv(x), nnz(M), M, M')
+   SparseMatrixAM(nv(x), nnz(M), M, M', zeros(VertexID, nv(x)))
 end
