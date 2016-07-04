@@ -2,11 +2,11 @@
 
 # This file contains a vectorized implementation of the PropertyModule interface. Separate dictionaries are maintained for
 # vertex and edge proerties. The vertex property dictionary maps onto arrays of values, while the edge property dictionary
-# maps onto sparesematrices of values. 
+# maps onto sparesematrices of values.
 
 ################################################# IMPORT/EXPORT ############################################################
 
-export 
+export
 # Types
 VectorPM
 
@@ -192,7 +192,7 @@ end
 
 # Get a dictionary of vertex properties for an input vertex list
 function getvprop(x::VectorPM, vlist::AbstractVector{VertexID})
-   map(v->getvprop(x, v), vlist)
+   [getvprop(x, v) for v in vlist]
 end
 
 
@@ -210,7 +210,7 @@ _getvprop(x::VectorPM, vlist::AbstractVector{VertexID}, propname) = vdata(x)[pro
 
 function getvprop(x::VectorPM, vlist::AbstractVector{VertexID}, propname)
    check_vprop(x, propname)
-   _getvprop(x, vlist, propname)   
+   _getvprop(x, vlist, propname)
 end
 
 ################################################# GETEPROP  ################################################################
@@ -309,6 +309,7 @@ end
 # Set a property for a list of vertices
 function _setvprop!(x::VectorPM, vlist::AbstractVector{VertexID}, vals::Vector, propname)
    vdata(x)[propname][vlist] = vals
+   nothing
 end
 
 function setvprop!(x::VectorPM{Any,Any}, vlist::AbstractVector{VertexID}, vals::Vector, propname)
@@ -324,13 +325,14 @@ end
 
 # Map onto a property for a list of vertices
 function setvprop!(x::VectorPM, vlist::AbstractVector{VertexID}, f::Function, propname)
-   setvprop!(x, vlist, map(f, vlist), propname)
+   setvprop!(x, vlist, [f(v) for v in vlist], propname)
 end
 
 
 # Set a property for all vertices
 function _setvprop!(x::VectorPM, ::Colon, vals::Vector, propname)
    vdata(x)[propname] = vals
+   nothing
 end
 
 function setvprop!(x::VectorPM{Any,Any}, ::Colon, vals::Vector, propname)
@@ -345,7 +347,8 @@ end
 
 # map onto a property for all vertices
 function setvprop!(x::VectorPM, ::Colon, f::Function, propname)
-   setvprop!(x, :, map(f, 1 : nv(x)), propname)
+   vals = [f(v) for v in 1 : nv(x)]
+   setvprop!(x, :, vals, propname)
 end
 
 
@@ -407,7 +410,7 @@ end
 
 # Map onto a property for a list of edges
 function seteprop!(x::VectorPM, elist::AbstractVector{EdgeID}, f::Function, propname)
-   seteprop!(x, elist, map(e->f(e...), elist), propname)
+   seteprop!(x, elist, [f(u,v) for (u,v) in elist], propname)
 end
 
 
@@ -427,7 +430,7 @@ end
 
 # Map onto a property for all edges
 function seteprop!(x::VectorPM, ::Colon, elist::AbstractVector{EdgeID}, f::Function, propname)
-   seteprop!(x, :, elist, map(e->f(e...), elist), propname)
+   seteprop!(x, :, elist, [f(u,v) for (u,v) in elist], propname)
 end
 
 
@@ -447,6 +450,6 @@ function subgraph{V,E}(x::VectorPM{V,E}, elist::AbstractVector{EdgeID})
       vals = [arr[v,u] for (u,v) in elist]
       VD[key] = init_spmx(nv(x), elist, vals)
    end
-   
+
    VectorPM{V,E}(nv(x), VD, ED)
 end

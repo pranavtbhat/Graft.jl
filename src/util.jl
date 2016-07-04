@@ -160,9 +160,9 @@ end
 getvarname(x::Expr) = x.args[1]
 getvarname(x::Symbol) = x
 
-""" 
-Declare that a function definition is an interface declaration. If multiple dispatch fails to find a more specialized 
-method, then throw a method undefinded error. 
+"""
+Declare that a function definition is an interface declaration. If multiple dispatch fails to find a more specialized
+method, then throw a method undefinded error.
 Borrowed from ComputeFramework.
 """
 macro interface(expr)
@@ -181,9 +181,81 @@ macro interface(expr)
     end)
 end
 
-################################################# UTILITIES ################################################################
+################################################# REPL DISPLAY ################################################################
 
-""" Throw an error that the method isn't supported on the given type """
-@inline function unsupported(t::DataType, fn::Function)
-   error("Method $fn isn't supported on datatype $t")
+function printval(io::IO, len::Int, x)
+   s = string(x)
+   if length(s) > 15
+      @printf "%-15s...  " join(s[1:15])
+   else
+      @printf "%-20s" s
+   end
+end
+
+drawhl(io::IO, len) = print(io, join(fill('\u2500', len)))
+drawvl(io::IO) = print(io, "\u2502")
+
+drawljunc(io::IO) = print(io, "\u251c")
+drawrjunc(io::IO) = print(io, "\u2524")
+drawtjunc(io::IO) = print(io, "\u252c")
+drawmjunc(io::IO) = print(io, "\u253c")
+drawbjunc(io::IO) = print(io, "\u2534")
+
+drawtlcorner(io::IO) = print(io, "\u250c")
+drawtrcorner(io::IO) = print(io, "\u2510")
+
+drawbrcorner(io::IO) = print(io, "\u2518")
+drawblcorner(io::IO) = print(io, "\u2514")
+
+drawboxhl(io::IO, len) = drawhl(io, len+2)
+
+function drawbox(io::IO, rows)
+   propcols = length(rows[1]) - 1
+   n = length(rows)
+
+   # Top
+   drawtlcorner(io)
+   drawhl(io, 20)
+   for i in 1:propcols
+      drawtjunc(io)
+      drawhl(io, 20)
+   end
+   drawtrcorner(io)
+
+   for row in rows
+      println(io)
+      drawvl(io)
+      printval(io, 20, row[1])
+      for val in row[2:end]
+         drawvl(io)
+         printval(io, 20, val)
+      end
+      drawvl(io)
+
+      if row == rows[end]
+         continue
+      end
+      # HLINE
+      println(io)
+      drawljunc(io)
+      drawhl(io, 20)
+      for val in row[2:end]
+         drawmjunc(io)
+         drawhl(io, 20)
+      end
+      drawrjunc(io)
+   end
+
+   println(io)
+
+   # Bottom
+   drawblcorner(io)
+   drawhl(io, 20)
+   for i in 1:propcols
+      drawbjunc(io)
+      drawhl(io, 20)
+   end
+   drawbrcorner(io)
+
+   println(io)
 end

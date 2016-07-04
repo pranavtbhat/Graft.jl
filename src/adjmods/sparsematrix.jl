@@ -26,7 +26,7 @@ end
 
 function SparseMatrixAM(nv::Int, ne::Int)
    m = sprandbool(nv, nv, ne/(nv*(nv-1)))
-   fdata = triu(m,1) | tril(m,-1)
+   fdata = m - spdiagm(diag(m), 0)
    bdata = fdata'
    adjvec = zeros(VertexID, nv)
    SparseMatrixAM(nv, nnz(fdata), fdata, bdata, adjvec)
@@ -211,10 +211,10 @@ rmedge!(x::SparseMatrixAM, e::EdgeID) = rmedge!(x, e...)
 function rmedge!(x::SparseMatrixAM, elist::AbstractVector{EdgeID})
    fd = fdata(x)
    bd = bdata(x)
-   for e in elist
+   for (u,v) in elist
       x.ne -= 1
-      fd[e...] = false
-      bd[e...] = false
+      fd[v,u] = false
+      bd[v,u] = false
    end
    nothing
 end
