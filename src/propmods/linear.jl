@@ -1,6 +1,6 @@
 ################################################# FILE DESCRIPTION #########################################################
 
-# This file contains a Linear implemenation of the PropertyModule interface. The module uses dictionaries or user 
+# This file contains a Linear implemenation of the PropertyModule interface. The module uses dictionaries or user
 # defined types depending on the constructor used.
 
 ################################################# IMPORT/EXPORT ############################################################
@@ -18,7 +18,7 @@ type LinearPM{V,E} <: PropertyModule{V,E}
       self.vprops = vprops
       self.eprops = eprops
       self.vdata = vdata
-      self.edata = edata 
+      self.edata = edata
       self
    end
 
@@ -104,7 +104,11 @@ function rmedge!(x::LinearPM, es::AbstractVector{EdgeID})
 end
 
 
-################################################# LIST PROPS ###############################################################
+################################################# PROPERTIES ##############################################################
+
+hasvprop(x::LinearPM, prop) = in(prop, vprops(x))
+haseprop(x::LinearPM, prop) = in(prop, eprops(x))
+
 
 listvprops(x::LinearPM) = collect(vprops(x))
 listeprops(x::LinearPM) = collect(eprops(x))
@@ -255,7 +259,7 @@ end
 function setvprop!(x::LinearPM, vlist::AbstractVector{VertexID}, f::Function, propname)
    check_vprop(x, propname)
    propsym  = Symbol(propname)
-   _setvprop!(x, vlist, f, propsym)   
+   _setvprop!(x, vlist, f, propsym)
 end
 
 
@@ -340,14 +344,14 @@ end
 
 
 # Set a property for a list of edges
-function seteprop!(x::LinearPM{Any,Any}, elist::AbstractVector{EdgeID}, vals::Vector, propname)
+function _seteprop!(x::LinearPM{Any,Any}, elist::AbstractVector{EdgeID}, vals::Vector, propname)
    push!(eprops(x), propname)
    for (e,val) in zip(elist,vals)
       _seteprop!(x, e, val, propname)
    end
 end
 
-function seteprop!(x::LinearPM, elist::AbstractVector{EdgeID}, vals::Vector, propname)
+function _seteprop!(x::LinearPM, elist::AbstractVector{EdgeID}, vals::Vector, propname)
    check_eprop(x, propname)
    propsym = Symbol(propname)
    for (e,val) in zip(elist,vals)
@@ -355,16 +359,19 @@ function seteprop!(x::LinearPM, elist::AbstractVector{EdgeID}, vals::Vector, pro
    end
 end
 
+seteprop!(x::LinearPM, elist::AbstractVector{EdgeID}, vals::Vector, propname) = _seteprop!(x, elist, vals, propname)
+seteprop!(x::LinearPM, es::EdgeIter, vals::Vector, propname) = _seteprop!(x, collect(es), vals, propname)
+
 
 # Map onto a property for a list of edges
-function seteprop!(x::LinearPM{Any,Any}, elist::AbstractVector{EdgeID}, f::Function, propname)
+function _seteprop!(x::LinearPM{Any,Any}, elist::AbstractVector{EdgeID}, f::Function, propname)
    push!(eprops(x), propname)
    for e in elist
       _seteprop!(x, e, f(e...), propname)
    end
 end
 
-function seteprop!(x::LinearPM, elist::AbstractVector{EdgeID}, f::Function, propname)
+function _seteprop!(x::LinearPM, elist::AbstractVector{EdgeID}, f::Function, propname)
    check_eprop(x, propname)
    propsym = Symbol(propname)
    for e in elist
@@ -372,16 +379,8 @@ function seteprop!(x::LinearPM, elist::AbstractVector{EdgeID}, f::Function, prop
    end
 end
 
-
-# Set a property for all edges
-function seteprop!(x::LinearPM, ::Colon, elist::AbstractVector{EdgeID}, vals::Vector, propname)
-   seteprop!(x, elist, vals, propname)
-end
-
-# Map onto a property for all edges
-function seteprop!(x::LinearPM, ::Colon, elist::AbstractVector{EdgeID}, f::Function, propname)
-   seteprop!(x, elist, f, propname)
-end
+seteprop!(x::LinearPM, elist::AbstractVector{EdgeID}, f::Function, propname) = _seteprop!(x, elist, f, propname)
+seteprop!(x::LinearPM, es::EdgeIter, f::Function, propname) = seteprop!(x, collect(es), f, propname)
 
 ################################################# SUBGRAPH #################################################################
 

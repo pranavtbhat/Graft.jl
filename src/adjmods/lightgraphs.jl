@@ -26,15 +26,20 @@ end
 ################################################# INTERNAL IMPLEMENTATION ##################################################
 
 # Make LG.EdgeIter an asbtractvector
-type EdgeIterLG <: AbstractVector{EdgeID}
+type EdgeIterLG <: EdgeIter
    eit::LightGraphs.EdgeIter
 end
 
 Base.length(x::EdgeIterLG) = x.eit.m
 Base.size(x::EdgeIterLG) = (x.eit.m,)
+Base.deepcopy(x::EdgeIterLG) = x
+Base.issorted(x::EdgeIterLG) = true
 
 
 Base.start(x::EdgeIterLG) = LightGraphs.EdgeIterState(1, 1, false)
+Base.endof(x::EdgeIterLG) = length(x)
+
+
 @inline Base.next(x::EdgeIterLG, state) = LightGraphs.next(x.eit, state)
 @inline Base.done(x::EdgeIterLG, state) = LightGraphs.done(x.eit, state)
 
@@ -71,6 +76,8 @@ function Base.collect(x::EdgeIterLG)
    elist
 end
 
+Base.showarray(io::IO, x::EdgeIterLG) = show(io, x)
+
 function Base.show(io::IO, x::EdgeIterLG)
    write(io, "Edge Iterator with $(x.eit.m) values")
 end
@@ -92,8 +99,26 @@ end
 
 
 @inline hasvertex(x::LightGraphsAM, v::VertexID) = 1 <= v <= nv(x)
+function hasvertex(x::LightGraphsAM, vs::AbstractVector{VertexID})
+   issorted(vs) && 1 <= start(vs) && last(vs) <= nv(x) && return true
+   for v in vs
+      hasvertex(x, v) || return false
+   end
+   return true
+end
+
+
+
 @inline hasedge(x::LightGraphsAM, u::VertexID, v::VertexID) = LightGraphs.has_edge(data(x), u, v)
 @inline hasedge(x::LightGraphsAM, e::EdgeID) = hasedge(x, e...)
+function hasedge(x::LightGraphsAM, es)
+   for e in es
+      hasedge(x, e) || return false
+   end
+   return true
+end
+
+
 @inline fadj(x::LightGraphsAM, v::VertexID) = LightGraphs.fadj(data(x), v)
 @inline badj(x::LightGraphsAM, v::VertexID) = LightGraphs.badj(data(x), v)
 @inline outdegree(x::LightGraphsAM, v::VertexID) = LightGraphs.outdegree(data(x), v)

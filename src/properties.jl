@@ -1,6 +1,6 @@
 ################################################# FILE DESCRIPTION #########################################################
 
-# ParallelGraphs allows the assignment of properties (key-value pairs) the the edges and vertices in a graph. Property 
+# ParallelGraphs allows the assignment of properties (key-value pairs) the the edges and vertices in a graph. Property
 # modules are parameterized by a vertex template V and an edge template E. These templates must be types, where the fields
 # and their types describe properties.
 
@@ -70,6 +70,8 @@ end
 @interface rmedge!{V,E}(x::PropertyModule{V,E}, e::EdgeID)
 @interface rmedge!{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID})
 
+@interface hasvprop{V,E}(x::PropertyModule{V,E}, prop)
+@interface haseprop{V,E}(x::PropertyModule{V,E}, prop)
 @interface listvprops{V,E}(x::PropertyModule{V,E})
 @interface listeprops{V,E}(x::PropertyModule{V,E})
 
@@ -102,8 +104,6 @@ end
 @interface seteprop!{V,E}(x::PropertyModule{V,E}, e::EdgeID, val, propname)
 @interface seteprop!{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID}, vals::Vector, propname)
 @interface seteprop!{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID}, f::Function, propname)
-@interface seteprop!{V,E}(x::PropertyModule{V,E}, ::Colon, elist::AbstractVector{EdgeID}, vals::Vector, propname)
-@interface seteprop!{V,E}(x::PropertyModule{V,E}, ::Colon, elist::AbstractVector{EdgeID}, f::Function, propname)
 
 ################################################# SUBGRAPHING ##############################################################
 

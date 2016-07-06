@@ -19,11 +19,11 @@ import Base: deepcopy
 # Package Wide Utilities
 include("util.jl")
 
-# Property Modules
-include("properties.jl")
-
 # Adjacency Modules
 include("adjacency.jl")
+
+# Property Modules
+include("properties.jl")
 
 # Vertex Labelling
 include("labelmodule.jl")

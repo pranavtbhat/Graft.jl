@@ -46,7 +46,7 @@ type EdgeIterState
    done::Bool
 end
 
-type EdgeIterCSC <: AbstractVector{EdgeID}
+type EdgeIterCSC <: EdgeIter
    m::Int
    colptr::Vector{Int}
    rowval::Vector{Int}
@@ -59,7 +59,14 @@ end
 
 Base.size(x::EdgeIterCSC) = (x.m,)
 Base.length(x::EdgeIterCSC) = x.m
+Base.deepcopy(x::EdgeIterCSC) = x
+Base.issorted(x::EdgeIterCSC) = true
+
 Base.start(x::EdgeIterCSC) = EdgeIterState(1, 1, true)
+
+# Hacky af
+Base.endof(x::EdgeIterCSC) = length(x)
+
 Base.done(x::EdgeIterCSC, state) = state.done
 
 function Base.next(x::EdgeIterCSC, state)
@@ -120,6 +127,8 @@ function Base.collect(x::EdgeIterCSC) # STUD METHOD :P
    elist
 end
 
+Base.showarray(io::IO, x::EdgeIterCSC) = show(io, x)
+
 function Base.show(io::IO, x::EdgeIterCSC)
    write(io, "Edge Iterator with $(x.am.ne) values")
 end
@@ -142,11 +151,28 @@ Base.size(x::SparseMatrixAM) = (x.nv, x.ne)
 
 
 @inline hasvertex(x::SparseMatrixAM, v::VertexID) = 1 <= v <= nv(x)
+function hasvertex(x::SparseMatrixAM, vs::AbstractVector{VertexID})
+   issorted(vs) && 1 <= start(vs) && last(vs) <= nv(x) && return true
+   for v in vs
+      hasvertex(x, v) || return false
+   end
+   return true
+end
+
+
+@inline hasedge(x::SparseMatrixAM, e::EdgeID) = hasedge(x, e...)
 
 function hasedge(x::SparseMatrixAM, u::VertexID, v::VertexID)
    hasvertex(x, u) && hasvertex(x, v) && fdata(x)[v,u]
 end
-@inline hasedge(x::SparseMatrixAM, e::EdgeID) = hasedge(x, e...)
+
+function hasedge(x::SparseMatrixAM, es)
+   for e in es
+      hasedge(x, e) || return false
+   end
+   return true
+end
+
 
 function fadj(x::SparseMatrixAM, v::VertexID)
    M = fdata(x)

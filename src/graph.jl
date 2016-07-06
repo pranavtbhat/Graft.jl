@@ -96,14 +96,14 @@ function validate_edge(g::Graph, elist::AbstractVector{EdgeID})
    end
    nothing
 end
-################################################# GRAPH API ############################################################
+################################################# MISC #####################################################################
 
 # Deepcopy
 Base.deepcopy{AM,PM}(g::Graph{AM,PM}) = Graph{AM,PM}(deepcopy(adjmod(g)), deepcopy(propmod(g)), deepcopy(labelmod(g)))
 
 
+################################################# ADJACENCY ################################################################
 
-# Adjacency
 """ The number of vertices in the graph """
 @inline nv(g::Graph) = nv(adjmod(g))
 
@@ -124,7 +124,7 @@ Base.deepcopy{AM,PM}(g::Graph{AM,PM}) = Graph{AM,PM}(deepcopy(adjmod(g)), deepco
 
 """ Check if u=>v is in the graph """
 @inline hasedge(g::Graph, u::VertexID, v::VertexID) = hasedge(adjmod(g), u, v)
-@inline hasedge(g::Graph, e::EdgeID) = hasedge(adjmod(g), e)
+@inline hasedge(g::Graph, es) = hasedge(adjmod(g), es)
 
 """ Vertex v's out-neighbors in the graph """
 @inline fadj(g::Graph, v::VertexID) = fadj(adjmod(g), v)
@@ -138,13 +138,14 @@ Base.deepcopy{AM,PM}(g::Graph{AM,PM}) = Graph{AM,PM}(deepcopy(adjmod(g)), deepco
 """ Get the indegree of a vertex """
 @inline indegree(g::Graph, v::VertexID) = indegree(adjmod(g), v)
 
-
+################################################# MUTATION ################################################################
 """ Add a vertex to the graph """
 function addvertex!(g::Graph, num::Int=1)
    addvertex!(adjmod(g), num)
    addvertex!(propmod(g), num)
    addvertex!(labelmod(g), num)
 end
+
 
 """ Remove a vertex from the graph """
 function rmvertex!(g::Graph, vs::Union{VertexID,AbstractVector{VertexID}})
@@ -153,6 +154,7 @@ function rmvertex!(g::Graph, vs::Union{VertexID,AbstractVector{VertexID}})
    rmvertex!(propmod(g), vs)
    rmvertex!(labelmod(g), vs)
 end
+
 
 """ Add an edge u->v to the graph """
 function addedge!(g::Graph, u::VertexID, v::VertexID)
@@ -167,6 +169,7 @@ function addedge!(g::Graph, es::Union{EdgeID,AbstractVector{EdgeID}})
    addedge!(propmod(g), es)
 end
 
+
 """ Remove edge u->v from the graph """
 function rmedge!(g::Graph, u::VertexID, v::VertexID)
    validate_edge(g, u, v)
@@ -180,8 +183,14 @@ function rmedge!(g::Graph, es::Union{EdgeID,AbstractVector{EdgeID}})
    rmedge!(propmod(g), es)
 end
 
+################################################# LIST PROPS ##############################################################
 
-# Properties
+""" Check if a graph has a vertex field """
+@inline hasvprop(g::Graph, prop) = hasvprop(propmod(g), prop)
+
+""" Check if a graph has an edge field """
+@inline haseprop(g::Graph, prop) = haseprop(propmod(g), prop)
+
 """ List the vertex properties contained in the graph """
 @inline listvprops(g::Graph) = listvprops(propmod(g))
 
@@ -189,6 +198,7 @@ end
 @inline listeprops(g::Graph) = listeprops(propmod(g))
 
 
+################################################# GETVPROP ###############################################################
 
 """ Return the properties of a particular vertex(s) in the graph """
 function getvprop(g::Graph, vs::Union{VertexID,AbstractVector{VertexID}})
@@ -197,11 +207,49 @@ function getvprop(g::Graph, vs::Union{VertexID,AbstractVector{VertexID}})
 end
 getvprop(g::Graph, ::Colon) = getvprop(propmod(g), vertices(g))
 
+
 function getvprop(g::Graph, vs::Union{VertexID,AbstractVector{VertexID}}, propname)
    validate_vertex(g, vs)
    getvprop(propmod(g), vs, propname)
 end
 getvprop(g::Graph, ::Colon, propname) = getvprop(propmod(g), vertices(g), propname)
+
+################################################# SETVPROP ################################################################
+
+""" Set the value for a vertex property """
+function setvprop!(g::Graph, vlist::Union{VertexID,AbstractVector{VertexID}}, dlist::Union{Dict,Vector})
+   validate_vertex(g, vlist)
+   setvprop!(propmod(g), vlist, dlist)
+end
+@inline setvprop!(g::Graph, ::Colon, dlist::Vector) = setvprop!(propmod(g), vertices(g), dlist)
+
+
+function _setvprop!(g::Graph, vs, val, propname)
+   validate_vertex(g, vs)
+   setvprop!(propmod(g), vs, val, propname)
+   nothing
+end
+@inline setvprop!(g::Graph, v::VertexID, val, propname) = _setvprop!(g, v, val, propname)
+@inline setvprop!(g::Graph, vs::AbstractVector{VertexID}, vals::AbstractVector, propname) = _setvprop!(g, vs, vals, propname)
+@inline setvprop!(g::Graph, vs::AbstractVector{VertexID}, val, propname) = _setvprop!(g, vs, fill(val, length(vs)), propname)
+
+
+function setvprop!(g::Graph, vlist::AbstractVector{VertexID}, f::Function, propname)
+   validate_vertex(g, vlist)
+   setvprop!(propmod(g), vlist, f, propname)
+end
+
+
+function setvprop!(g::Graph, ::Colon, vals::Vector, propname)
+   setvprop!(propmod(g), :, vals, propname)
+end
+@inline setvprop!(g::Graph, ::Colon, val, propname) = setvprop!(g, :, fill(val, nv(g)), propname)
+
+function setvprop!(g::Graph, ::Colon, f::Function, propname)
+   setvprop!(propmod(g), :, f, propname)
+end
+
+################################################# GETEPROP ################################################################
 
 """ Return the properties of a particular edge in the graph """
 function geteprop(g::Graph, u::VertexID, v::VertexID)
@@ -215,6 +263,7 @@ function geteprop(g::Graph, es::Union{EdgeID,AbstractVector{EdgeID}})
 end
 geteprop(g::Graph, ::Colon) = geteprop(propmod(g), collect(edges(g)))
 
+
 function geteprop(g::Graph, u::VertexID, v::VertexID, prop)
    validate_edge(g, u, v)
    geteprop(propmod(g), u, v, prop)
@@ -227,31 +276,7 @@ end
 geteprop(g::Graph, ::Colon, propname) = geteprop(propmod(g), collect(edges(g)), propname)
 
 
-""" Set the value for a vertex property """
-function setvprop!(g::Graph, vlist::Union{VertexID,AbstractVector{VertexID}}, dlist::Union{Dict,Vector})
-   validate_vertex(g, vlist)
-   setvprop!(propmod(g), vlist, dlist)
-end
-@inline setvprop!(g::Graph, ::Colon, dlist::Vector) = setvprop!(propmod(g), vertices(g), dlist)
-
-function setvprop!(g::Graph, vs::Union{VertexID,AbstractVector{VertexID}}, val, propname)
-   validate_vertex(g, vs)
-   setvprop!(propmod(g), vs, val, propname)
-end
-
-function setvprop!(g::Graph, vlist::AbstractVector{VertexID}, f::Function, propname)
-   validate_vertex(g, vlist)
-   setvprop!(propmod(g), vlist, f, propname)
-end
-
-function setvprop!(g::Graph, ::Colon, vals::Vector, propname)
-   setvprop!(propmod(g), :, vals, propname)
-end
-
-function setvprop!(g::Graph, ::Colon, f::Function, propname)
-   setvprop!(propmod(g), :, f, propname)
-end
-
+################################################# SETEPROP ################################################################
 
 """ Set the value for an edge property """
 function seteprop!(g::Graph, u::VertexID, v::VertexID, d::Dict)
@@ -259,6 +284,7 @@ function seteprop!(g::Graph, u::VertexID, v::VertexID, d::Dict)
    seteprop!(propmod(g), u, v, d)
 end
 
+# Dictionary Based
 function seteprop!(g::Graph, es::EdgeID, ds::Dict)
    validate_edge(g, es)
    seteprop!(propmod(g), es, ds)
@@ -271,6 +297,8 @@ function seteprop!(g::Graph, es::AbstractVector{EdgeID}, ds::Vector)
 end
 @inline seteprop!(g::Graph, ::Colon, ds::Vector) = seteprop!(propmod(g), collect(edges(g)), ds)
 
+
+# Single Value
 function seteprop!(g::Graph, u::VertexID, v::VertexID, val, propname)
    validate_edge(g, u, v)
    seteprop!(propmod(g), u, v, val, propname)
@@ -281,28 +309,41 @@ function seteprop!(g::Graph, e::EdgeID, val, propname)
    seteprop!(propmod(g), e, val, propname)
 end
 
-function seteprop!(g::Graph, es::AbstractVector{EdgeID}, val, propname)
+
+# List of values
+function seteprop!(g::Graph, es::AbstractVector{EdgeID}, vals::AbstractVector, propname)
    validate_edge(g, es)
-   length(es) == length(val) || error("Number of edges doesn't equal number of values")
-   seteprop!(propmod(g), es, val, propname)
+   length(es) == length(vals) || error("Number of edges doesn't equal number of values")
+   seteprop!(propmod(g), es, vals, propname)
 end
 
+function seteprop!(g::Graph, es::AbstractVector{EdgeID}, val, propname)
+   validate_edge(g, es)
+   seteprop!(propmod(g), es, fill(val, length(es)), propname)
+end
+
+function seteprop!(g::Graph, ::Colon, vals::Vector, propname)
+   ne(g) == length(vals) || error("Number of edges doesn't equal number of values")
+   seteprop!(propmod(g), edges(g), vals, propname)
+end
+
+function seteprop!(g::Graph, ::Colon, val, propname)
+   seteprop!(propmod(g), edges(g), fill(val, ne(g)), propname)
+end
+
+
+# Map
 function seteprop!(g::Graph, elist::AbstractVector{EdgeID}, f::Function, propname)
    validate_edge(g, elist)
    seteprop!(propmod(g), elist, f, propname)
 end
 
-function seteprop!(g::Graph, ::Colon, vals::Vector, propname)
-   ne(g) == length(vals) || error("Number of edges doesn't equal number of values")
-   seteprop!(propmod(g), :, collect(edges(g)), vals, propname)
-end
-
 function seteprop!(g::Graph, ::Colon, f::Function, propname)
-   seteprop!(propmod(g), :, collect(edges(g)), f, propname)
+   seteprop!(propmod(g), edges(g), f, propname)
 end
 
+################################################# LABELLING ################################################################
 
-# Labelling
 resolve(g::Graph, x) = resolve(labelmod(g), x)
 
 function encode(g::Graph, v::Union{VertexID,AbstractVector{VertexID}})

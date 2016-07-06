@@ -1,11 +1,11 @@
 ################################################# FILE DESCRIPTION #########################################################
 
-# This file contains the AdjacencyModule interface. The AdjacencyModule is expted to store all the structural information 
+# This file contains the AdjacencyModule interface. The AdjacencyModule is expted to store all the structural information
 # contained in the graph. The Adjacency module uses Integer indices to refer to vertices, in order to keep accesses fast.
- 
+
 ################################################# IMPORT/EXPORT ############################################################
 import Base: size
-export 
+export
 # Types
 AdjacencyModule,
 # AdjacencyModule Interface
@@ -25,10 +25,15 @@ abstract AdjacencyModule
 @interface edges(x::AdjacencyModule)
 
 @interface hasvertex(x::AdjacencyModule, v::VertexID)
+@interface hasvertex(x::AdjacencyModule, vs)
+
 @interface hasedge(x::AdjacencyModule, u::VertexID, v::VertexID)
-@interface hadedge(x::AdjacencyModule, e::EdgeID)
+@interface hasedge(x::AdjacencyModule, e::EdgeID)
+@interface hasedge(x::AdjacencyModule, es)
+
 @interface fadj(x::AdjacencyModule, v::VertexID)
 @interface badj(x::AdjacencyModule, v::VertexID)
+
 @interface outdegree(x::AdjacencyModule, v::VertexID)
 @interface indegree(x::AdjacencyModule, v::VertexID)
 
@@ -53,6 +58,11 @@ import Base: ==
 
 @interface subgraph(x::AdjacencyModule, elist::AbstractVector{EdgeID})
 
+################################################# EDGE ITERATION ##########################################################
+
+abstract EdgeIter <: AbstractVector{EdgeID}
+
+
 ################################################# IMPLEMENTATIONS #########################################################
 
 if CAN_USE_LG
@@ -60,4 +70,3 @@ if CAN_USE_LG
 end
 
 include("adjmods/sparsematrix.jl")
-

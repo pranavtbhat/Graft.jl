@@ -172,6 +172,9 @@ end
 
 ################################################# LIST PROPS ###############################################################
 
+hasvprop(x::VectorPM, prop) = haskey(vdata(x), prop)
+haseprop(x::VectorPM, prop) = haskey(edata(x), prop)
+
 listvprops(x::VectorPM{Any,Any}) = collect(keys(vdata(x)))
 listeprops(x::VectorPM{Any,Any}) = collect(keys(edata(x)))
 
@@ -407,6 +410,21 @@ function seteprop!(x::VectorPM, elist::AbstractVector{EdgeID}, vals::Vector, pro
    _seteprop!(x, elist, vals, propname)
 end
 
+# Set a property for all edges
+function _seteprop!(x::VectorPM, es::EdgeIter, vals::Vector, propname)
+   edata(x)[propname] = init_spmx(nv(x), collect(es), vals)
+   nothing
+end
+
+function seteprop!(x::VectorPM{Any,Any}, es::EdgeIter, vals::Vector, propname)
+   _seteprop!(x, es, vals, propname)
+end
+
+function seteprop!(x::VectorPM, es::EdgeIter, vals::Vector, propname)
+   check_eprop(x, propname)
+   _seteprop!(x, es, vals, propname)
+end
+
 
 # Map onto a property for a list of edges
 function seteprop!(x::VectorPM, elist::AbstractVector{EdgeID}, f::Function, propname)
@@ -414,23 +432,21 @@ function seteprop!(x::VectorPM, elist::AbstractVector{EdgeID}, f::Function, prop
 end
 
 
-# Set a property for all edges
-function _seteprop!(x::VectorPM, ::Colon, elist::AbstractVector{EdgeID}, vals::Vector, propname)
-   edata(x)[propname] = init_spmx(nv(x), elist, vals)
-end
-
-function seteprop!(x::VectorPM{Any,Any}, ::Colon, elist::AbstractVector{EdgeID}, vals::Vector, propname)
-   _seteprop!(x, :, elist, vals, propname)
-end
-
-function seteprop!(x::VectorPM, ::Colon, elist::AbstractVector{EdgeID}, vals::Vector, propname)
-   check_eprop(x, propname)
-   _seteprop!(x, :, elist, vals, propname)
-end
-
 # Map onto a property for all edges
-function seteprop!(x::VectorPM, ::Colon, elist::AbstractVector{EdgeID}, f::Function, propname)
-   seteprop!(x, :, elist, [f(u,v) for (u,v) in elist], propname)
+function _seteprop!(x::VectorPM, es::EdgeIter, f::Function, propname)
+   elist = collect(es)
+   vals = [f(u,v) for (u,v) in elist]
+   edata(x)[propname] = init_spmx(nv(x), elist, vals)
+   nothing
+end
+
+function seteprop!(x::VectorPM{Any,Any}, es::EdgeIter, f::Function, propname)
+   _seteprop!(x, es, f, propname)
+end
+
+function seteprop!(x::VectorPM, es::EdgeIter, f::Function, propname)
+   check_eprop(x, propname)
+   _seteprop!(x, es, f, propname)
 end
 
 

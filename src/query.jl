@@ -13,121 +13,67 @@ vertex_filter, edge_filter
 # Vertex descriptor and queries
 include("query/vertex.jl")
 
-# # Edge descriptor and queries
-# include("query/edge.jl")
+# Edge descriptor and queries
+include("query/edge.jl")
 
 
+# Make the graph type iterable
+Base.start(g::Graph) = 1
+Base.done(g::Graph, i) = i == 3
 
-# ################################################# BASICS ###################################################################
-# # Getindex for vertex display
-# Base.getindex(g::Graph, ::Colon) = encode(g, vertices(g))
-#
-# # Getindex for vertex properties
-# Base.getindex(g::Graph, label) = getvprop(g, resolve(g, label))
-# Base.getindex(g::Graph, ::Colon, propname) = getvprop(g, :, propname)
-# Base.getindex(g::Graph, ::Colon, ::Colon) = getvprop(g, :)
-#
-# # Getindex for edge display
-# Base.getindex(g::Graph, ::Type{Pair}) = encode(g, collect(edges(g)))
-#
-# # Getindex of edge properties
-# Base.getindex(g::Graph, e::Pair) = geteprop(g, resolve(g, e))
-# Base.getindex(g::Graph, e::Pair, propname) = geteprop(g, resolve(g, e), propname)
-# Base.getindex(g::Graph, ::Type{Pair}, propname) = geteprop(g, :, propname)
-# Base.getindex(g::Graph, ::Type{Pair}, ::Colon) = geteprop(g, :)
-#
-# # Getindex for adjacencies
-# Base.getindex{T}(g::Graph, e::Pair{T,Colon}) = encode(g, fadj(g, resolve(g, e.first)))
-#
-# # Setindex for vertex properties
-# Base.setindex!(g::Graph, val, label, propname) = setvprop!(g, resolve(g, label), val, propname)
-# Base.setindex!(g::Graph, d::Dict, label) = setvprop!(g, resolve(g, label), d)
-# Base.setindex!(g::Graph, vals::Vector, ::Colon, propname) = setvprop!(g, :, vals, propname)
-# Base.setindex!(g::Graph, dlist::Vector, ::Colon, ::Colon) = setvprop!(g, :, dlist)
-#
-# # Setindex for edge properties
-# Base.setindex!(g::Graph, val, e::Pair, propname) = seteprop!(g, resolve(g, e)..., val, propname)
-# Base.setindex!(g::Graph, d::Dict, e::Pair) = seteprop!(g, resolve(g, e), d)
-# Base.setindex!(g::Graph, vals::Vector, ::Type{Pair}, propname) = seteprop!(g, :, vals, propname)
-# Base.setindex!(g::Graph, dlist::Vector, ::Type{Pair}, ::Colon) = seteprop!(g, :, dlist)
-#
-# ################################################# FILTERING #################################################################
-#
-# function Base.filter(g::Graph, vts::ASCIIString...)
-#    vlist = vertices(g)
-#    elist = collect(edges(g))
-#
-#    for ts in vts
-#       if ismatch(r"v[.](\w+)", ts)
-#          # Vertex filter query
-#          vlist = vertex_filter(g, ts, vlist)
-#       elseif ismatch(r"e[.](\w+)", ts)
-#          # Edge filter query
-#          elist = edge_filter(g, ts, elist)
-#       else
-#          error("The input string couldn't be parsed. Please consult documentation")
-#       end
-#    end
-#
-#    if(length(elist) == ne(g))
-#       return subgraph(g, vlist)
-#    elseif(length(vlist) == nv(g))
-#       return subgraph(g, elist)
-#    else
-#       return subgraph(subgraph(g, elist), vlist)
-#    end
-# end
-#
-# function vertex_filter(g::Graph, ts::ASCIIString, vlist=vertices(g))
-#    fn = parse_vertex_query(ts)
-#    filter(v->fn(g, v), vlist)
-# end
-#
-# function edge_filter(g::Graph, ts::ASCIIString, elist=collect(edges(g)))
-#    fn = parse_edge_query(ts)
-#    filter(e->fn(g, e...), elist)
-# end
-#
-# # VertexFilter Query parsing
-# function parse_vertex_query(ts::ASCIIString)
-#    ts = strip(ts)
-#
-#    # Relational filtering on vertex property
-#    rvpf = r"^v[.](\w+)\s*(<|>|<=|>=|!=|==)\s*(\w+)$"
-#    ismatch(rvpf, ts) && return rvpf_filter(match(rvpf, ts))
-#
-#    error("The input string couldn't be parsed. Please consult documentation")
-# end
-#
-# function rvpf_filter(m)
-#    prop = join(m[1])
-#    op = parse(m[2])
-#    val = isnumber(m[3]) ? parse(m[3]) : join(m[3])
-#
-#    return (g,v) -> begin
-#       cmp = getvprop(g, v, prop)
-#       return cmp == nothing ? false : eval(op)(cmp, val)
-#    end
-# end
-#
-#
-# # EdgeFilter Query parsing
-# function parse_edge_query(ts::ASCIIString)
-#    ts = strip(ts)
-#    # Relational filtering on edge property
-#    repf = r"^e[.](\w+)\s*(<|>|<=|>=|!=|==)\s*(\w+)$"
-#    ismatch(repf, ts) && return repf_filter(match(repf, ts))
-#
-#    error("The input string couldn't be parsed. Please consult documentation")
-# end
-#
-# function repf_filter(m)
-#    prop = join(m[1])
-#    op = parse(m[2])
-#    val = isnumber(m[3]) ? parse(m[3]) : join(m[3])
-#
-#    return (g, u, v) -> begin
-#       cmp = geteprop(g, u, v, prop)
-#       return cmp == nothing ? false : eval(op)(cmp, val)
-#    end
-# end
+function Base.next(g::Graph, i)
+   i == 1 && return VertexDescriptor(g), 2
+   i == 2 && return EdgeDescriptor(g), 3
+   return nothing, 3
+end
+
+################################################# VERTEX SUBSETS ############################################################
+
+@inline vertex_subset(g::Graph, vs) = vertex_subset(vertices(g), vs)
+@inline vertex_subset(x::VertexDescriptor, vs) = vertex_subset(x.g, vertex_subset(x.vs, vs))
+
+@inline vertex_subset(::Colon, vs) = vs
+@inline vertex_subset(::Colon, ::Colon) = Colon()
+@inline vertex_subset(v::VertexID, ::Colon) = v
+@inline vertex_subset(v1::VertexID, v2) = v1 == v2 ? v2 : error("Invalid vertex indexing: $v1 <- $v2")
+@inline vertex_subset(vs::AbstractVector{VertexID}, ::Colon) = deepcopy(vs)
+@inline vertex_subset(vs::AbstractVector{VertexID}, v::VertexID) = in(v, vs) ? v : error("Invalid vertex indexing: $vs <- $v")
+@inline vertex_subset(vs1::AbstractVector{VertexID}, vs2::AbstractVector{VertexID}) = issubset(vs2, vs1) ? vs2 : error("Invalid vertex indexing: $vs2 <- $vs1")
+
+
+################################################# EDGE SUBSETS ##############################################################
+
+@inline edge_subset(g::Graph, is) = edge_subset(edges(g), is)
+@inline edge_subset(x::EdgeDescriptor, is) = edge_subset(x.es, is)
+
+@inline edge_subset(e::EdgeID, ::Colon) = e
+@inline edge_subset(e1::EdgeID, e2::EdgeID) = e1 == e2 ? e2 : error("Invalid edge indexing: $e1 <- $e2")
+@inline edge_subset(e::EdgeID, i) = i == 1 ? e : error("Invalid edge indexing: $e <- $i")
+
+@inline edge_subset(es::AbstractVector{EdgeID}, ::Colon) = deepcopy(es)
+@inline edge_subset(es::AbstractVector{EdgeID}, e::EdgeID) = e in es ? e : error("Invalid edge indexing: $es <- $e")
+function edge_subset(es::AbstractVector{EdgeID}, is)
+   try
+      es[is]
+   catch
+      error("Invalid edge indexing: $es <- $is")
+   end
+end
+
+
+################################################# PROPERTY SUBSETS ##########################################################
+
+@inline property_subset(g::Graph, props) = property_subset(listvprops(g), props)
+@inline property_subset(x::EdgeDescriptor, props) = property_subset(x.props, props)
+
+@inline property_subset(::Colon, props) = props
+@inline property_subset(::Colon, ::Colon) = Colon()
+
+@inline _property_subset(prop, ::Colon) = deepcopy(prop)
+@inline _property_subset(prop1, prop2) = prop1 == prop2 ? prop2 : error("Invalid property indexing $prop1 <- $prop2")
+@inline _property_subset(prop, props::AbstractVector) = error("Invalid property indexing $prop <- $props")
+@inline property_subset(p1, p2) = _property_subset(p1, p2) # Ambiguity fix
+
+@inline property_subset(props::AbstractVector, prop) = in(prop, props) ? prop : error("Invalid property indexing $props <- $prop")
+@inline property_subset(props1::AbstractVector, props2::AbstractVector) = issubset(props2, props1) ? props2 : error("Invalid property indexing $props1 <- $props2")
+@inline property_subset(props::AbstractVector, ::Colon) = deepcopy(props)
