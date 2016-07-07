@@ -58,6 +58,7 @@ import Base: ==
 
 @interface subgraph(x::AdjacencyModule, elist::AbstractVector{EdgeID})
 
+@interface subgraph(x::AdjacencyModule, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
 ################################################# EDGE ITERATION ##########################################################
 
 abstract EdgeIter <: AbstractVector{EdgeID}

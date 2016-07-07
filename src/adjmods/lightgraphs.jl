@@ -187,3 +187,8 @@ function subgraph(x::LightGraphsAM, elist::AbstractVector{EdgeID})
    end
    y
 end
+
+# Can't optimize without diving in.
+function subgraph(x::LightGraphsAM, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
+   subgraph(subgraph(x, elist), vlist)
+end

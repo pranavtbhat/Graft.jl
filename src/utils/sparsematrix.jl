@@ -65,20 +65,41 @@ end
 # Construct a sparsematrix using a list of edges.
 function init_spmx{Tv}(nv::Int, elist::Vector{EdgeID}, vals::Vector{Tv})
    nzval = vals
-   rowval = map(x->x.second, elist)
-   vlist = map(x->x.first, elist)
-   len = length(vlist)
+   m = length(elist)
+
+   rowval = Array{Int}(m)
+   vlist = Array{Int}(m)
+
+   for i in 1 : m
+      e = elist[i]
+      vlist[i] = e.first
+      rowval[i] = e.second
+   end
 
    colptr = Array{Int}(nv+1)
    i = 1
    colptr[1] = 1
 
    for c in 2 : nv
-      i = searchsortedfirst(vlist, c, i+1, len, Base.Order.Forward)
+      i = searchsortedfirst(vlist, c, i+1, m, Base.Order.Forward)
       colptr[c] = i
    end
 
-   colptr[nv+1] = len + 1
+   colptr[nv+1] = m + 1
 
    SparseMatrixCSC{Tv,Int}(nv, nv, colptr, rowval, nzval)
+end
+
+################################################# SPLICING ###################################################################
+# Pair-vector getindex for SparseMatrixCSC
+
+function splice_matrix{Tv,Ti}(x::SparseMatrixCSC{Tv,Ti}, elist::AbstractVector{EdgeID})
+   m = length(elist)
+   vals = Array{Tv}(m)
+   for i in 1 : m
+      u,v = elist[i]
+      vals[i] = x[v,u]
+   end
+
+   init_spmx(x.m, elist, vals)
 end

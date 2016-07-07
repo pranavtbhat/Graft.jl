@@ -392,12 +392,30 @@ end
 
 ################################################# SUBGRAPHS ################################################################
 
-""" Construct an induced subgraph containing the vertices provided """
+subgraph(g::Graph) = deepcopy(g)
+
 function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID})
    Graph{AM,PM}(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist), subgraph(labelmod(g), vlist))
 end
 
-""" Construct a subgraph from a list of edges """
 function subgraph{AM,PM}(g::Graph{AM,PM}, elist::AbstractVector{EdgeID})
-   Graph{AM,PM}(subgraph(adjmod(g), elist), subgraph(propmod(g), elist), subgraph(labelmod(g), elist))
+   Graph{AM,PM}(subgraph(adjmod(g), elist), subgraph(propmod(g), elist), deepcopy(labelmod(g)))
+end
+
+function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
+   Graph{AM,PM}(subgraph(adjmod(g), vlist, elist), subgraph(propmod(g), vlist, elist), subgraph(labelmod(g), vlist))
+end
+
+""" Construct an Subgraph """
+function subgraph{AM,PM}(
+      g::Graph{AM,PM},
+      vlist::AbstractVector{VertexID},
+      elist::AbstractVector{EdgeID},
+      vproplist::AbstractVector,
+      eproplist::AbstractVector
+   )
+   adjmod = subgraph(adjmod(g), vlist, elist)
+   propmod = subgraph(propmod(g), vlist, elist, proplist)
+   labelmod = subgraph(labelmod(g), vlist)
+   Graph{AM,PM}(adjmod, propmod, labelmod)
 end

@@ -112,8 +112,8 @@ propmote_edge_type!(x::VectorPM, val, propname) = propmote_edge_type!(x, typeof(
 
 ################################################# COPYING ##################################################################
 
-function Base.deepcopy(x::VectorPM)
-   VectorPM(nv(x), deepcopy(vdata(x)), deepcopy(edata(x)))
+function Base.deepcopy{V,E}(x::VectorPM{V,E})
+   VectorPM{V,E}(nv(x), deepcopy(vdata(x)), deepcopy(edata(x)))
 end
 
 ################################################# MUTATION #################################################################
@@ -460,12 +460,12 @@ end
 
 function subgraph{V,E}(x::VectorPM{V,E}, elist::AbstractVector{EdgeID})
    VD = deepcopy(vdata(x))
-   ED = Dict()
-
-   for (key,arr) in edata(x)
-      vals = [arr[v,u] for (u,v) in elist]
-      VD[key] = init_spmx(nv(x), elist, vals)
-   end
-
+   ED = [key=>splice_matrix(arr, elist) for (key,arr) in edata(x)]
    VectorPM{V,E}(nv(x), VD, ED)
+end
+
+function subgraph{V,E}(x::VectorPM{V,E}, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
+   VD = [key=>arr[vlist] for (key,arr) in vdata(x)]
+   ED = [key=>splice_matrix(arr, elist)[vlist,vlist] for (key,arr) in edata(x)]
+   VectorPM{V,E}(length(vlist), VD, ED)
 end

@@ -394,3 +394,8 @@ function subgraph{V,E}(x::LinearPM{V,E}, elist::AbstractVector{EdgeID})
    nv = length(vdata(x))
    LinearPM{V,E}(copy(vprops(x)), copy(eprops(x)), deepcopy(vdata(x)), init_spmx(nv, elist, evals))
 end
+
+function subgraph{V,E}(x::LinearPM{V,E}, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
+   M = splice_matrix(edata(x), elist)[vlist,vlist]
+   LinearPM{V,E}(copy(vprops(x)), copy(eprops(x)), vdata(x)[vlist], M)
+end

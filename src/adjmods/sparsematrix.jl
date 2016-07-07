@@ -135,7 +135,7 @@ end
 
 ################################################# INTERFACE IMPLEMENTATION ##################################################
 
-Base.deepcopy(x::SparseMatrixAM) = SparseMatrixAM(nv(x), ne(x), deepcopy(fdata(x)), deepcopy(bdata(x)))
+Base.deepcopy(x::SparseMatrixAM) = SparseMatrixAM(nv(x), ne(x), deepcopy(fdata(x)), deepcopy(bdata(x)), zeros(Int, nv(x)))
 
 
 
@@ -256,4 +256,11 @@ end
 function subgraph(x::SparseMatrixAM, elist::AbstractVector{EdgeID})
    M = init_spmx(nv(x), elist, fill(true, length(elist)))
    SparseMatrixAM(nv(x), nnz(M), M, M', zeros(VertexID, nv(x)))
+end
+
+function subgraph(x::SparseMatrixAM, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
+   M = init_spmx(nv(x), elist, fill(true, length(elist)))
+   M = M[vlist,vlist]
+   n = length(vlist)
+   SparseMatrixAM(n, nnz(M), M, M', zeros(VertexID, n))
 end
