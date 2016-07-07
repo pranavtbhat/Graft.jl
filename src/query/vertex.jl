@@ -18,15 +18,15 @@ end
 
 
 # Constructor for Iterator
-VertexDescriptor(g::Graph) = VertexDescriptor(g, :, :)
+VertexDescriptor(g::Graph) = VertexDescriptor(g, vertices(g), listvprops(g))
 
 # Vertex Subset
-VertexDescriptor(x::VertexDescriptor, v::VertexID) = VertexDescriptor(x.g, vertex_subset(x, v), :)
-VertexDescriptor(x::VertexDescriptor, vs::AbstractVector{VertexID}) = VertexDescriptor(x.g, vertex_subset(x, vs), :)
-VertexDescriptor(x::VertexDescriptor, ::Colon) = VertexDescriptor(x.g, vertex_subset(x, :), :)
+VertexDescriptor(x::VertexDescriptor, v::VertexID) = VertexDescriptor(x.g, vertex_subset(x, v), property_subset(x.props, :))
+VertexDescriptor(x::VertexDescriptor, vs::AbstractVector{VertexID}) = VertexDescriptor(x.g, vertex_subset(x, vs), property_subset(x.props, :))
+VertexDescriptor(x::VertexDescriptor, ::Colon) = VertexDescriptor(x.g, vertex_subset(x, :), property_subset(x.props, :))
 
 # Property Subset
-VertexDescriptor(x::VertexDescriptor, props) = VertexDescriptor(x.g, deepcopy(x.vs), property_subset(x, props))
+VertexDescriptor(x::VertexDescriptor, props) = VertexDescriptor(x.g, copy(x.vs), property_subset(x, props))
 
 ################################################# PROPERTY UNION #############################################################
 
@@ -35,16 +35,13 @@ VertexDescriptor(x::VertexDescriptor, props) = VertexDescriptor(x.g, deepcopy(x.
    nothing
 end
 
-@inline property_union(x::VertexDescriptor, xprop, prop) = xprop == prop ? prop : vcat(xprop, prop)
-@inline property_union(x::VertexDescriptor, xprop::AbstractVector, prop) = in(prop, xprop) ? xprop : vcat(xprop, prop)
-@inline property_union(x::VertexDescriptor, xprop::Colon, prop) = vcat(listvprops(x.g), prop)
-@inline property_union(x::VertexDescriptor, xprop::Colon, ::Colon) = Colon()
+@inline property_union(x::VertexDescriptor, xprop::AbstractVector, prop) = in(prop, xprop) ? xprop : vcat(prop, xprop)
 
 ################################################# SHOW ######################################################################
 
 function display_vertex_list(io::IO, x::VertexDescriptor)
-   props = x.props == Colon() ? sort(listvprops(x.g)) : sort(x.props)
-   vs = x.vs == Colon() ? vertices(x.g) : x.vs
+   vs = x.vs
+   props = sort(x.props)
 
    rows = []
    push!(rows, ["Vertex Label" map(string, props)...])
@@ -73,12 +70,18 @@ end
 
 ################################################# ITERATION #################################################################
 
-Base.length(x::VertexDescriptor) = x.vs == Colon() ? ne(x.g) : length(x.vs)
+Base.length(x::VertexDescriptor) = length(x.vs)
 Base.size(x::VertexDescriptor) = (length(x),)
 
-Base.start(x::VertexDescriptor) = x.vs == Colon() ? 1 : start(x.vs)
-Base.next(x::VertexDescriptor, v) = (encode(x.g, v), getvprop(x.g, v)), v+1
-Base.done(x::VertexDescriptor, v) = x.vs == Colon() ? v == nv(x.g) : v == last(x.vs)
+Base.start(x::VertexDescriptor) = x.vs == start(x.vs)
+Base.endof(x::VertexDescriptor) = endof(x.vs)
+
+function Base.next(x::VertexDescriptor, i)
+   v, i = next(x.vs, i)
+   (encode(x.g, v), getvprop(x.g, v)), i
+end
+
+Base.done(x::VertexDescriptor, i) = done(x.vs, i)
 
 
 ################################################# GETINDEX / SETINDEX #######################################################
@@ -107,7 +110,7 @@ end
 
 Base.select(x::VertexDescriptor, props...) = VertexDescriptor(x, collect(props))
 
-Base.select!(x::VertexDescriptor, props...) = property_union!(x, props)
+Base.select!(x::VertexDescriptor, props...) = property_union!(x, collect(props))
 
 ################################################# FILTER ####################################################################
 

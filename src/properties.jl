@@ -108,8 +108,10 @@ end
 ################################################# SUBGRAPHING ##############################################################
 
 @interface subgraph{V,E}(x::PropertyModule{V,E}, vlist::AbstractVector{VertexID})
+@interface subgraph{V,E}(x::PropertyModule{V,E}, vlist::AbstractVector{VertexID}, vproplist::AbstractVector)
 
 @interface subgraph{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID})
+@interface subgraph{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID}, eproplist::AbstractVector)
 
 @interface subgraph{V,E}(x::PropertyModule{V,E}, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
 ################################################# IMPLEMENTATIONS ##########################################################

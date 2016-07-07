@@ -388,12 +388,35 @@ function subgraph{V,E}(x::LinearPM{V,E}, vlist::AbstractVector{VertexID})
    LinearPM{V,E}(copy(vprops(x)), copy(eprops(x)), vdata(x)[vlist], edata(x)[vlist,vlist])
 end
 
+# Slow af. But to be fair, this module isn't expected to do this..
+function subgraph(x::LinearPM, vlist::AbstractVector{VertexID}, vproplist::AbstractVector)
+   y = LinearPM{Any,Any}(length(vdata(x)))
+   for prop in vproplist
+      vals = geteprop(x, :, prop)
+      setvprop!(y, :, vals, prop)
+   end
+   y
+end
+
+
+
 function subgraph{V,E}(x::LinearPM{V,E}, elist::AbstractVector{EdgeID})
    sv = edata(x)
    evals = [sv[v,u] for (u,v) in elist]
    nv = length(vdata(x))
    LinearPM{V,E}(copy(vprops(x)), copy(eprops(x)), deepcopy(vdata(x)), init_spmx(nv, elist, evals))
 end
+
+# Slow af. But to be fair, this module isn't expected to do this..
+function subgraph(x::LinearPM, elist::AbstractVector{VertexID}, eproplist::AbstractVector)
+   y = LinearPM{Any,Any}(length(edata(x)))
+   for prop in eproplist
+      vals = geteprop(x, :, prop)
+      setvprop!(y, :, vals, prop)
+   end
+   y
+end
+
 
 function subgraph{V,E}(x::LinearPM{V,E}, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
    M = splice_matrix(edata(x), elist)[vlist,vlist]

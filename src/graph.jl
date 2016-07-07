@@ -54,6 +54,7 @@ typealias SparseGraph Graph{SparseMatrixAM, VectorPM}
 
 ################################################# HELPERS ##############################################################
 
+# Vertex Validation
 function validate_vertex(g::Graph, v::VertexID)
    hasvertex(g, v) || error("Vertex $v isn't in the graph")
    nothing
@@ -72,6 +73,7 @@ function can_add_edge(g::Graph, u::VertexID, v::VertexID)
    nothing
 end
 
+# Edge Validation
 @inline can_add_edge(g::Graph, e::EdgeID) = can_add_edge(g, e...)
 
 function can_add_edge(g::Graph, elist::AbstractVector{EdgeID})
@@ -93,6 +95,30 @@ end
 function validate_edge(g::Graph, elist::AbstractVector{EdgeID})
    for e in elist
       validate_edge(g, e)
+   end
+   nothing
+end
+
+# Property Validation
+function validate_vertex_property(g::Graph, prop)
+   hasvprop(g, prop) || error("Vertex property $prop doesn't exist")
+   nothing
+end
+
+function validate_vertex_property(g::Graph, props::AbstractVector)
+   for prop in props
+      validate_vertex_property(g, prop)
+   end
+end
+
+function validate_edge_property(g::Graph, prop)
+   haseprop(g, prop) || error("Edge property $prop doesn't exist")
+   nothing
+end
+
+function validate_edge_property(g::Graph, props::AbstractVector)
+   for prop in props
+      validate_edge_property(g, prop)
    end
    nothing
 end
@@ -394,28 +420,28 @@ end
 
 subgraph(g::Graph) = deepcopy(g)
 
+# Vertex only
 function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID})
    Graph{AM,PM}(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist), subgraph(labelmod(g), vlist))
 end
 
+function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID}, vproplist::AbstractVector)
+   validate_vertex_property(g, vproplist)
+   Graph{AM,PM}(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist, vproplist), subgraph(labelmod(g), vlist))
+end
+
+# Edge only
 function subgraph{AM,PM}(g::Graph{AM,PM}, elist::AbstractVector{EdgeID})
+   validate_edge_property
    Graph{AM,PM}(subgraph(adjmod(g), elist), subgraph(propmod(g), elist), deepcopy(labelmod(g)))
 end
 
-function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
-   Graph{AM,PM}(subgraph(adjmod(g), vlist, elist), subgraph(propmod(g), vlist, elist), subgraph(labelmod(g), vlist))
+function subgraph{AM,PM}(g::Graph{AM,PM}, elist::AbstractVector{EdgeID}, eproplist::AbstractVector)
+   validate_edge_property(g, eproplist)
+   Graph{AM,PM}(subgraph(adjmod(g), elist), subgraph(propmod(g), elist, eproplist), deepcopy(labelmod(g)))
 end
 
-""" Construct an Subgraph """
-function subgraph{AM,PM}(
-      g::Graph{AM,PM},
-      vlist::AbstractVector{VertexID},
-      elist::AbstractVector{EdgeID},
-      vproplist::AbstractVector,
-      eproplist::AbstractVector
-   )
-   adjmod = subgraph(adjmod(g), vlist, elist)
-   propmod = subgraph(propmod(g), vlist, elist, proplist)
-   labelmod = subgraph(labelmod(g), vlist)
-   Graph{AM,PM}(adjmod, propmod, labelmod)
+# Vertex and Edge
+function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
+   Graph{AM,PM}(subgraph(adjmod(g), vlist, elist), subgraph(propmod(g), vlist, elist), subgraph(labelmod(g), vlist))
 end

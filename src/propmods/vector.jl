@@ -458,11 +458,25 @@ function subgraph{V,E}(x::VectorPM{V,E}, vlist::AbstractVector{VertexID})
    VectorPM{V,E}(nv(x), VD, ED)
 end
 
+function subgraph(x::VectorPM, vlist::AbstractVector{VertexID}, vproplist::AbstractVector)
+   VD = [prop=>vdata(x)[prop][vlist] for prop in vproplist]
+   ED = [key=>arr[vlist,vlist] for (key,arr) in edata(x)]
+   VectorPM{Any,Any}(nv(x), VD, ED)
+end
+
+
 function subgraph{V,E}(x::VectorPM{V,E}, elist::AbstractVector{EdgeID})
    VD = deepcopy(vdata(x))
    ED = [key=>splice_matrix(arr, elist) for (key,arr) in edata(x)]
    VectorPM{V,E}(nv(x), VD, ED)
 end
+
+function subgraph(x::VectorPM, elist::AbstractVector{EdgeID}, eproplist::AbstractVector)
+   VD = deepcopy(vdata(x))
+   ED = [prop=>splice_matrix(edata(x)[prop], elist) for prop in eproplist]
+   VectorPM{Any,Any}(nv(x), VD, ED)
+end
+
 
 function subgraph{V,E}(x::VectorPM{V,E}, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
    VD = [key=>arr[vlist] for (key,arr) in vdata(x)]

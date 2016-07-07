@@ -18,38 +18,34 @@ end
 
 
 # Constructor for Iterator
-EdgeDescriptor(g::Graph) = EdgeDescriptor(g, edges(g), :)
+EdgeDescriptor(g::Graph) = EdgeDescriptor(g, edges(g), listeprops(g))
 
 # Edge Subset
-EdgeDescriptor(x::EdgeDescriptor, e::EdgeID) = EdgeDescriptor(x.g, edge_subset(x, e), :)
-EdgeDescriptor(x::EdgeDescriptor, es::AbstractVector{EdgeID}) = EdgeDescriptor(x, edge_subset(x, es), :)
+EdgeDescriptor(x::EdgeDescriptor, e::EdgeID) = EdgeDescriptor(x.g, edge_subset(x, e), property_subset(x.props, :))
+EdgeDescriptor(x::EdgeDescriptor, es::AbstractVector{EdgeID}) = EdgeDescriptor(x, edge_subset(x, es), property_subset(x.props, :))
 
-EdgeDescriptor(x::EdgeDescriptor, is::Int) = EdgeDescriptor(x.g, edge_subset(x, is), :)
-EdgeDescriptor(x::EdgeDescriptor, is::AbstractVector{Int}) = EdgeDescriptor(x.g, edge_subset(x, is), :)
-EdgeDescriptor(x::EdgeDescriptor, is::Colon) = EdgeDescriptor(x.g, edge_subset(x, is), :)
+EdgeDescriptor(x::EdgeDescriptor, is::Int) = EdgeDescriptor(x.g, edge_subset(x, is), property_subset(x.props, :))
+EdgeDescriptor(x::EdgeDescriptor, is::AbstractVector{Int}) = EdgeDescriptor(x.g, edge_subset(x, is), property_subset(x.props, :))
+EdgeDescriptor(x::EdgeDescriptor, is::Colon) = EdgeDescriptor(x.g, edge_subset(x, is), property_subset(x.props, :))
 
 # Property Subset
-EdgeDescriptor(x::EdgeDescriptor, props) = EdgeDescriptor(x.g, deepcopy(x.es), property_subset(x, props))
+EdgeDescriptor(x::EdgeDescriptor, props) = EdgeDescriptor(x.g, copy(x.es), property_subset(x, props))
 
 
 ################################################# PROPERTY UNION #############################################################
 
 @inline function property_union!(x::EdgeDescriptor, prop)
-   x.props = property_union(x, x.props, prop)
+   x.props = property_union(x.props, prop)
    nothing
 end
 
-@inline property_union(x::EdgeDescriptor, xprop, prop) = xprop == prop ? prop : vcat(xprop, prop)
-@inline property_union(x::EdgeDescriptor, xprop::AbstractVector, prop) = in(prop, xprop) ? xprop : vcat(xprop, prop)
-@inline property_union(x::EdgeDescriptor, xprop::Colon, prop) = vcat(listeprops(x.g), prop)
-@inline property_union(x::EdgeDescriptor, xprop::Colon, ::Colon) = Colon()
+@inline property_union(xprop::AbstractVector, prop) = in(prop, xprop) ? xprop : vcat(xprop, prop)
 
 ################################################# SHOW ######################################################################
 
 function display_edge_list(io::IO, x::EdgeDescriptor)
-   props = x.props == Colon() ? sort(listeprops(x.g)) : sort(x.props)
-   es = x.es == Colon() ? edges(x.g) : x.es
-   es = isa(es, Pair) ? [es] : es
+   props = sort(x.props)
+   es = x.es
 
    rows = []
    push!(rows, ["Edge Label" map(string, props)...])
@@ -103,7 +99,7 @@ Base.getindex(x::EdgeDescriptor, is) = EdgeDescriptor(x, is)
 # Setindex!
 function Base.setindex!(x::EdgeDescriptor, val, propname)
    property_union!(x, propname)
-   setvprop!(x.g, x.es, val, propname)
+   seteprop!(x.g, x.es, val, propname)
 end
 
 ################################################# MAP #######################################################################
@@ -127,7 +123,7 @@ function Base.filter(x::EdgeDescriptor, conditions::ASCIIString...)
       fn = parse_edge_query(condition)
       es = filter(e->fn(x.g, e...), es)
    end
-   EdgeDescriptor(x.g, es, :)
+   EdgeDescriptor(x.g, es, property_subset(x, :))
 end
 
 function Base.filter!(x::EdgeDescriptor, conditions::ASCIIString...)
