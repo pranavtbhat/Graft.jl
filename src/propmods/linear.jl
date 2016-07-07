@@ -14,12 +14,7 @@ type LinearPM{V,E} <: PropertyModule{V,E}
    edata::SparseMatrixCSC
 
    function LinearPM(vprops::Set, eprops::Set, vdata::AbstractVector, edata::SparseMatrixCSC)
-      self = new()
-      self.vprops = vprops
-      self.eprops = eprops
-      self.vdata = vdata
-      self.edata = edata
-      self
+      new(vprops, eprops, vdata, edata)
    end
 
    function LinearPM(nv::Int=1)
@@ -390,10 +385,10 @@ end
 
 # Slow af. But to be fair, this module isn't expected to do this..
 function subgraph(x::LinearPM, vlist::AbstractVector{VertexID}, vproplist::AbstractVector)
-   y = LinearPM{Any,Any}(length(vdata(x)))
+   y = LinearPM{Any,Any}(Set{Any}(vproplist), copy(eprops(x)), [Dict() for v in vlist], edata(x)[vlist,vlist])
    for prop in vproplist
-      vals = geteprop(x, :, prop)
-      setvprop!(y, :, vals, prop)
+      vals = getvprop(x, vlist, prop)
+      setvprop!(y, vlist, vals, prop)
    end
    y
 end
@@ -401,18 +396,16 @@ end
 
 
 function subgraph{V,E}(x::LinearPM{V,E}, elist::AbstractVector{EdgeID})
-   sv = edata(x)
-   evals = [sv[v,u] for (u,v) in elist]
-   nv = length(vdata(x))
-   LinearPM{V,E}(copy(vprops(x)), copy(eprops(x)), deepcopy(vdata(x)), init_spmx(nv, elist, evals))
+   LinearPM{V,E}(copy(vprops(x)), copy(eprops(x)), deepcopy(vdata(x)), splice_matrix(edata(x), elist))
 end
 
 # Slow af. But to be fair, this module isn't expected to do this..
-function subgraph(x::LinearPM, elist::AbstractVector{VertexID}, eproplist::AbstractVector)
-   y = LinearPM{Any,Any}(length(edata(x)))
+function subgraph(x::LinearPM, elist::AbstractVector{EdgeID}, eproplist::AbstractVector)
+   nv = length(vdata(x))
+   y = LinearPM{Any,Any}(copy(vprops(x)), Set{Any}(eproplist), deepcopy(vdata(x)), spzeros(Dict, nv, nv))
    for prop in eproplist
-      vals = geteprop(x, :, prop)
-      setvprop!(y, :, vals, prop)
+      vals = geteprop(x, elist, prop)
+      seteprop!(y, elist, vals, prop)
    end
    y
 end
@@ -421,4 +414,45 @@ end
 function subgraph{V,E}(x::LinearPM{V,E}, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
    M = splice_matrix(edata(x), elist)[vlist,vlist]
    LinearPM{V,E}(copy(vprops(x)), copy(eprops(x)), vdata(x)[vlist], M)
+end
+
+_getfield(d::Dict, key) = d[key]
+_getfield(d, key) = getfield(d, Symbol(key))
+
+# PLEASE OPTIMIZE ME
+function subgraph(
+   x::LinearPM,
+   vlist::AbstractVector{VertexID},
+   elist::AbstractVector{EdgeID},
+   vproplist::AbstractVector,
+   eproplist::AbstractVector
+   )
+   nv = length(vlist)
+
+   VD = sizehint!(Vector{Dict}(), nv)
+
+   for v in vlist
+      d = Dict()
+      for prop in vproplist
+         d[prop] = _getfield(vdata(x)[v], prop)
+      end
+      push!(VD, d)
+   end
+
+   sv = splice_matrix(edata(x), elist)[vlist,vlist]
+   elist = sizehint!(Vector{EdgeID}(), nnz(sv))
+   nzval = sizehint!(Vector{Dict}(), nnz(sv))
+
+   for u in vlist
+      for v in sv.rowval[nzrange(sv, u)]
+         d = Dict()
+         for prop in eproplist
+            d[prop] = _getfield(sv[v,u], prop)
+         end
+         push!(elist, EdgeID(u,v))
+         push!(nzval, d)
+      end
+   end
+   ED = init_spmx(nv, elist, nzval)
+   LinearPM{Any,Any}(Set{Any}(vproplist), Set{Any}(eproplist), VD, ED)
 end

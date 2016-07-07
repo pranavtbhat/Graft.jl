@@ -90,6 +90,7 @@ function init_spmx{Tv}(nv::Int, elist::Vector{EdgeID}, vals::Vector{Tv})
    SparseMatrixCSC{Tv,Int}(nv, nv, colptr, rowval, nzval)
 end
 
+init_spmx(nv::Int, eit::AbstractVector{EdgeID}, vals::Vector) = init_spmx(nv, collect(eit), vals)
 ################################################# SPLICING ###################################################################
 # Pair-vector getindex for SparseMatrixCSC
 

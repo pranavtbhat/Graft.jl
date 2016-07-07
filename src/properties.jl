@@ -114,6 +114,13 @@ end
 @interface subgraph{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID}, eproplist::AbstractVector)
 
 @interface subgraph{V,E}(x::PropertyModule{V,E}, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
+@interface subgraph{V,E}(
+   x::PropertyModule{V,E},
+   vlist::AbstractVector{VertexID},
+   elist::AbstractVector{EdgeID},
+   vproplist::AbstractVector,
+   eproplist::AbstractVector
+)
 ################################################# IMPLEMENTATIONS ##########################################################
 
 # Array of Structures Implementations

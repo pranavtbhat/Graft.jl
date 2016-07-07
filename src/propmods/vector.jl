@@ -483,3 +483,15 @@ function subgraph{V,E}(x::VectorPM{V,E}, vlist::AbstractVector{VertexID}, elist:
    ED = [key=>splice_matrix(arr, elist)[vlist,vlist] for (key,arr) in edata(x)]
    VectorPM{V,E}(length(vlist), VD, ED)
 end
+
+function subgraph(
+   x::VectorPM,
+   vlist::AbstractVector{VertexID},
+   elist::AbstractVector{EdgeID},
+   vproplist::AbstractVector,
+   eproplist::AbstractVector
+   )
+   VD = [prop => vdata(x)[prop][vlist] for prop in vproplist]
+   ED = [prop => splice_matrix(edata(x)[prop], elist)[vlist,vlist] for prop in eproplist]
+   VectorPM{Any,Any}(length(vlist), VD, ED)
+end

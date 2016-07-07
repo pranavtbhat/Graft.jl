@@ -42,6 +42,10 @@ type Graph{AM,PM}
    end
 end
 
+function Graph{AM,PM}(am::AM, pm::PM, lm=NullModule())
+   Graph{AM,PM}(am, pm)
+end
+
 @inline adjmod(g::Graph) = g.adjmod
 @inline propmod(g::Graph) = g.propmod
 @inline labelmod(g::Graph) = g.labelmod
@@ -432,7 +436,6 @@ end
 
 # Edge only
 function subgraph{AM,PM}(g::Graph{AM,PM}, elist::AbstractVector{EdgeID})
-   validate_edge_property
    Graph{AM,PM}(subgraph(adjmod(g), elist), subgraph(propmod(g), elist), deepcopy(labelmod(g)))
 end
 
@@ -444,4 +447,18 @@ end
 # Vertex and Edge
 function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
    Graph{AM,PM}(subgraph(adjmod(g), vlist, elist), subgraph(propmod(g), vlist, elist), subgraph(labelmod(g), vlist))
+end
+
+function subgraph{AM,PM}(
+   g::Graph{AM,PM},
+   vlist::AbstractVector{VertexID},
+   elist::AbstractVector{EdgeID},
+   vproplist::AbstractVector,
+   eproplist::AbstractVector
+   )
+   Graph{AM,PM}(
+      subgraph(adjmod(g), vlist, elist),
+      subgraph(propmod(g), vlist, elist, vproplist, eproplist),
+      subgraph(labelmod(g), vlist)
+   )
 end

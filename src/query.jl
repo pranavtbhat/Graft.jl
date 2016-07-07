@@ -60,3 +60,22 @@ end
 @inline property_subset(props::AbstractVector, ::Colon) = copy(props)
 
 ################################################# SUBGRAPHING ################################################################
+
+Graph(x::VertexDescriptor) = subgraph(x.g, x.vs, x.props)
+
+Graph(x::EdgeDescriptor) = subgraph(x.g, x.es, x.props)
+
+# Pray that they were derived from the same graphs :P
+function Graph(V::VertexDescriptor, E::EdgeDescriptor)
+   g = V.g
+   vlist = V.vs
+   elist = E.es
+   vproplist = V.props
+   eproplist = E.props
+
+   am = subgraph(adjmod(g), vlist, elist)
+   pm = subgraph(propmod(g), vlist, elist, vproplist, eproplist)
+   lm = subgraph(labelmod(g), vlist)
+
+   Graph(am, pm, lm)
+end
