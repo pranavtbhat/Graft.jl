@@ -105,8 +105,8 @@ hasvprop(x::LinearPM, prop) = in(prop, vprops(x))
 haseprop(x::LinearPM, prop) = in(prop, eprops(x))
 
 
-listvprops(x::LinearPM) = collect(vprops(x))
-listeprops(x::LinearPM) = collect(eprops(x))
+listvprops(x::LinearPM{Any,Any}) = collect(vprops(x))
+listeprops(x::LinearPM{Any,Any}) = collect(eprops(x))
 
 
 listvprops{V,E}(x::LinearPM{V,E}) = map(string, fieldnames(V))
