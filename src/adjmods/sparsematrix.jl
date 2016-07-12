@@ -130,7 +130,7 @@ end
 Base.showarray(io::IO, x::EdgeIterCSC) = show(io, x)
 
 function Base.show(io::IO, x::EdgeIterCSC)
-   write(io, "Edge Iterator with $(x.am.ne) values")
+   write(io, "Edge Iterator with $(x.m) values")
 end
 
 ################################################# INTERFACE IMPLEMENTATION ##################################################

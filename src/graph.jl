@@ -260,7 +260,8 @@ function _setvprop!(g::Graph, vs, val, propname)
    nothing
 end
 @inline setvprop!(g::Graph, v::VertexID, val, propname) = _setvprop!(g, v, val, propname)
-@inline setvprop!(g::Graph, vs::AbstractVector{VertexID}, vals::AbstractVector, propname) = _setvprop!(g, vs, vals, propname)
+@inline setvprop!(g::Graph, vs::AbstractVector{VertexID}, vals::Vector, propname) = _setvprop!(g, vs, vals, propname)
+@inline setvprop!(g::Graph, vs::AbstractVector{VertexID}, vals::AbstractVector, propname) = _setvprop!(g, vs, collect(vals), propname)
 @inline setvprop!(g::Graph, vs::AbstractVector{VertexID}, val, propname) = _setvprop!(g, vs, fill(val, length(vs)), propname)
 
 
@@ -273,6 +274,7 @@ end
 function setvprop!(g::Graph, ::Colon, vals::Vector, propname)
    setvprop!(propmod(g), :, vals, propname)
 end
+@inline setvprop!(g::Graph, ::Colon, vals::AbstractVector, propname) = setvprop!(g, :, collect(vals), propname)
 @inline setvprop!(g::Graph, ::Colon, val, propname) = setvprop!(g, :, fill(val, nv(g)), propname)
 
 function setvprop!(g::Graph, ::Colon, f::Function, propname)
@@ -351,11 +353,13 @@ function seteprop!(g::Graph, es::AbstractVector{EdgeID}, val, propname)
    validate_edge(g, es)
    seteprop!(propmod(g), es, fill(val, length(es)), propname)
 end
+@inline seteprop!(g::Graph, es::AbstractVector{EdgeID}, vals::AbstractVector, propname) = seteprop!(propmod(g), es, collect(vals), propname)
 
 function seteprop!(g::Graph, ::Colon, vals::Vector, propname)
    ne(g) == length(vals) || error("Number of edges doesn't equal number of values")
    seteprop!(propmod(g), edges(g), vals, propname)
 end
+@inline seteprop!(g::Graph, ::Colon, vals::AbstractVector, propname) = seteprop!(g, :, collect(vals), propname)
 
 function seteprop!(g::Graph, ::Colon, val, propname)
    seteprop!(propmod(g), edges(g), fill(val, ne(g)), propname)

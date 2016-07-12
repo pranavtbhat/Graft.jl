@@ -43,7 +43,7 @@ function parse_vertex_query(x::Expr)
    end
 
    if x.head in [:call, :|, :&]
-      op = eval(vertex_query(x.args[1]))
+      op = eval((x.args[1]))
       a1 = parse_vertex_query(x.args[2])
       a2 = parse_vertex_query(x.args[3])
       return cvf(op, a1, a2)
@@ -101,7 +101,7 @@ function parse_edge_query(x::Expr)
    end
 
    if x.head in [:call, :|, :&]
-      op = eval(vertex_query(x.args[1]))
+      op = eval((x.args[1]))
       a1 = parse_edge_query(x.args[2])
       a2 = parse_edge_query(x.args[3])
       return cef(op, a1, a2)

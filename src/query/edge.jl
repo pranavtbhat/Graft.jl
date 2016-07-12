@@ -12,25 +12,29 @@ EdgeDescriptor
 """ Describes a subset of vertices and their properties """
 type EdgeDescriptor
    g::Graph
-   es
-   props
+   es::AbstractVector{EdgeID}
+   props::Vector
+   parent::Union{Void,EdgeDescriptor}
 end
 
 
 # Constructor for Iterator
-EdgeDescriptor(g::Graph) = EdgeDescriptor(g, edges(g), listeprops(g))
+EdgeDescriptor(g::Graph) = EdgeDescriptor(g, edges(g), listeprops(g), nothing)
 
 # Edge Subset
-EdgeDescriptor(x::EdgeDescriptor, e::EdgeID) = EdgeDescriptor(x.g, edge_subset(x, e), property_subset(x.props, :))
-EdgeDescriptor(x::EdgeDescriptor, es::AbstractVector{EdgeID}) = EdgeDescriptor(x, edge_subset(x, es), property_subset(x.props, :))
-
-EdgeDescriptor(x::EdgeDescriptor, is::Int) = EdgeDescriptor(x.g, edge_subset(x, is), property_subset(x.props, :))
-EdgeDescriptor(x::EdgeDescriptor, is::AbstractVector{Int}) = EdgeDescriptor(x.g, edge_subset(x, is), property_subset(x.props, :))
-EdgeDescriptor(x::EdgeDescriptor, is::Colon) = EdgeDescriptor(x.g, edge_subset(x, is), property_subset(x.props, :))
+EdgeDescriptor(x::EdgeDescriptor, ies) = EdgeDescriptor(x.g, edge_subset(x, ies), property_subset(x.props, :), x)
 
 # Property Subset
-EdgeDescriptor(x::EdgeDescriptor, props) = EdgeDescriptor(x.g, copy(x.es), property_subset(x, props))
+EdgeDescriptor(x::EdgeDescriptor, ies, props) = EdgeDescriptor(x.g, edge_subset(x, ies), property_subset(x, props), x)
 
+################################################# PROPERTY UNION #############################################################
+
+# Assume same graph for now
+(==)(x::EdgeDescriptor, y::EdgeDescriptor) = x.es == y.es && x.props == y.props
+
+# Orphan node in query tree
+Base.copy(x::EdgeDescriptor) = EdgeDescriptor(x.g, copy(x.es), copy(x.props), nothing)
+Base.deepcopy(x::EdgeDescriptor) = EdgeDescriptor(x.g, deepcopy(x.es), deepcopy(x.props), nothing)
 
 ################################################# PROPERTY UNION #############################################################
 
@@ -39,18 +43,27 @@ EdgeDescriptor(x::EdgeDescriptor, props) = EdgeDescriptor(x.g, copy(x.es), prope
    nothing
 end
 
-@inline property_union(xprop::AbstractVector, prop) = in(prop, xprop) ? xprop : vcat(xprop, prop)
+@inline property_union(xprop::Vector, prop) = in(prop, xprop) ? xprop : vcat(xprop, prop)
+
+function property_propagate!(x::EdgeDescriptor, propname)
+   property_union!(x, propname)
+   property_propagate!(x.parent, propname)
+end
+
+property_propagate!(x::Void, propname) = nothing
 
 ################################################# SHOW ######################################################################
 
 function display_edge_list(io::IO, x::EdgeDescriptor)
    props = sort(x.props)
    es = x.es
+   n = length(es)
+
+   println(io, "Edge Descriptor with $n edges and $(length(props)) properties")
 
    rows = []
    push!(rows, ["Edge Label" map(string, props)...])
 
-   n = length(es)
    if n <= 10
       for i in 1:min(n,10)
          push!(rows, [encode(x.g, es[i]) [string(geteprop(x.g, es[i], prop)) for prop in props]...])
@@ -75,7 +88,7 @@ end
 ################################################# ITERATION #################################################################
 
 Base.length(x::EdgeDescriptor) = length(x.es)
-Base.size(x::EdgeDescriptor) = (lenth(x),)
+Base.size(x::EdgeDescriptor) = (length(x),)
 
 Base.start(x::EdgeDescriptor) = start(x.es)
 Base.endof(x::EdgeDescriptor) = endof(x.es)
@@ -98,22 +111,35 @@ Base.getindex(x::EdgeDescriptor, is) = EdgeDescriptor(x, is)
 
 # Setindex!
 function Base.setindex!(x::EdgeDescriptor, val, propname)
-   property_union!(x, propname)
+   property_propagate!(x, propname)
    seteprop!(x.g, x.es, val, propname)
 end
 
 ################################################# MAP #######################################################################
 
+function Base.get(x::EdgeDescriptor, propname)
+   if(length(x) == 1)
+      geteprop(x.g, first(x.es), propname)
+   else
+      geteprop(x.g, x.es, propname)
+   end
+end
+
+################################################# MAP #######################################################################
+
 function Base.map!(f::Function, x::EdgeDescriptor, propname)
-   property_union!(x, propname)
+   property_propagate!(x, propname)
    seteprop!(x.g, x.es, f, propname)
 end
 
 ################################################# SELECT ####################################################################
 
-Base.select(x::EdgeDescriptor, props...) = EdgeDescriptor(x, collect(props))
+Base.select(x::EdgeDescriptor, props...) = EdgeDescriptor(x, x.es, collect(props))
 
-Base.select!(x::EdgeDescriptor, props...) = property_union!(x, props)
+function Base.select!(x::EdgeDescriptor, props...)
+   x.props = property_subset(x, collect(props))
+   x
+end
 
 ################################################# FILTER ####################################################################
 

@@ -14,7 +14,7 @@ end
 
 using Faker
 
-import Base: deepcopy
+import Base: deepcopy, ==
 
 # Package Wide Utilities
 include("util.jl")

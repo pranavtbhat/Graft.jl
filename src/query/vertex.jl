@@ -12,21 +12,30 @@ VertexDescriptor
 """ Describes a subset of vertices and their properties """
 type VertexDescriptor
    g::Graph
-   vs
-   props
+   vs::AbstractVector{VertexID}
+   props::Vector
+   parent::Union{Void,VertexDescriptor}
 end
 
 
 # Constructor for Iterator
-VertexDescriptor(g::Graph) = VertexDescriptor(g, vertices(g), listvprops(g))
+VertexDescriptor(g::Graph) = VertexDescriptor(g, vertices(g), listvprops(g), nothing)
 
 # Vertex Subset
-VertexDescriptor(x::VertexDescriptor, v::VertexID) = VertexDescriptor(x.g, vertex_subset(x, v), property_subset(x.props, :))
-VertexDescriptor(x::VertexDescriptor, vs::AbstractVector{VertexID}) = VertexDescriptor(x.g, vertex_subset(x, vs), property_subset(x.props, :))
-VertexDescriptor(x::VertexDescriptor, ::Colon) = VertexDescriptor(x.g, vertex_subset(x, :), property_subset(x.props, :))
+VertexDescriptor(x::VertexDescriptor, vs) = VertexDescriptor(x.g, vertex_subset(x, vs), property_subset(x.props, :), x)
 
 # Property Subset
-VertexDescriptor(x::VertexDescriptor, props) = VertexDescriptor(x.g, copy(x.vs), property_subset(x, props))
+VertexDescriptor(x::VertexDescriptor, vs, props) = VertexDescriptor(x.g, copy(x.vs), property_subset(x, props), x)
+
+################################################# MISC #######################################################################
+
+# Assume same graph for now
+(==)(x::VertexDescriptor, y::VertexDescriptor) = x.vs == y.vs && x.props == y.props
+
+# Orphan node in query tree
+Base.copy(x::VertexDescriptor) = VertexDescriptor(x.g, copy(x.vs), copy(x.props), nothing)
+Base.deepcopy(x::VertexDescriptor) = VertexDescriptor(x.g, deepcopy(x.vs), deepcopy(x.props), nothing)
+
 
 ################################################# PROPERTY UNION #############################################################
 
@@ -37,16 +46,25 @@ end
 
 @inline property_union(x::VertexDescriptor, xprop::AbstractVector, prop) = in(prop, xprop) ? xprop : vcat(prop, xprop)
 
+function property_propagate!(x::VertexDescriptor, propname)
+   property_union!(x, propname)
+   property_propagate!(x.parent, propname)
+end
+
+property_propagate!(x::Void, propname) = nothing
 ################################################# SHOW ######################################################################
 
 function display_vertex_list(io::IO, x::VertexDescriptor)
    vs = x.vs
    props = sort(x.props)
+   n = length(vs)
+
+   println(io, "Vertex Descriptor, with  $n Vertices and $(length(props)) Properties")
+   println(io)
 
    rows = []
    push!(rows, ["Vertex Label" map(string, props)...])
 
-   n = length(vs)
    if n <= 10
       for i in 1:min(n,10)
          push!(rows, [string(encode(x.g, vs[i])) [string(getvprop(x.g, vs[i], prop)) for prop in props]...])
@@ -95,22 +113,32 @@ Base.getindex(x::VertexDescriptor, ::Colon) = VertexDescriptor(x, :)
 
 # Setindex!
 function Base.setindex!(x::VertexDescriptor, val, propname)
-   property_union!(x, propname)
+   property_propagate!(x, propname)
    setvprop!(x.g, x.vs, val, propname)
 end
 
 ################################################# MAP #######################################################################
 
+function Base.get(x::VertexDescriptor, propname)
+   property_subset(x, propname)
+   length(x) == 1 ? getvprop(x.g, x.vs[1], propname) : getvprop(x.g, x.vs, propname)
+end
+
+################################################# MAP #######################################################################
+
 function Base.map!(f::Function, x::VertexDescriptor, propname)
-   property_union!(x, propname)
    setvprop!(x.g, x.vs, f, propname)
+   property_propagate!(x, propname)
 end
 
 ################################################# SELECT ####################################################################
 
-Base.select(x::VertexDescriptor, props...) = VertexDescriptor(x, collect(props))
+Base.select(x::VertexDescriptor, props...) = VertexDescriptor(x, copy(x.vs), collect(props))
 
-Base.select!(x::VertexDescriptor, props...) = property_union!(x, collect(props))
+function Base.select!(x::VertexDescriptor, props...)
+   x.props = property_subset(x.props, collect(props))
+   x
+end
 
 ################################################# FILTER ####################################################################
 

@@ -44,7 +44,7 @@ end
 
 @inline edge_subset(es::AbstractVector{EdgeID}, ::Colon) = copy(es)
 @inline edge_subset(es::AbstractVector{EdgeID}, i::Int) = try [es[i]] catch error("Invalid edge indexing: $es <- $i") end
-@inline edge_subset(es::AbstractVector{EdgeID}, is) = try es[i] catch error("Invalid edge indexing: $es <- $is") end
+@inline edge_subset(es::AbstractVector{EdgeID}, is) = try es[is] catch error("Invalid edge indexing: $es <- $is") end
 
 @inline edge_subset(es::AbstractVector{EdgeID}, e::EdgeID) = e in es ? [e] : error("Invalid edge indexing: $es <- $e")
 @inline edge_subset(es1::AbstractVector{EdgeID}, es2::AbstractVector{EdgeID}) = issubset(es2, es1) ? es2 : error("Invalid edge indexing: $es1 <- $es2")
