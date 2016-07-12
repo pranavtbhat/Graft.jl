@@ -53,17 +53,6 @@ end
 
 ################################################# INTERNAL IMPLEMENTATION ##################################################
 
-# Validate vertex property
-@inline function check_vprop(x::VectorPM, propname)
-   haskey(vdata(x), propname) || error("Vertex has no property: $propname")
-end
-
-# Validate edge property
-@inline function check_eprop(x::VectorPM, propname)
-   haskey(edata(x), propname) || error("Edge has no property: $propname")
-end
-
-
 # Initialize vprop array
 function init_vprop_dict(T::DataType, nv::Int)
    [string(field) => default_vector(fieldtype(T, field), nv) for field in fieldnames(T)]
@@ -74,13 +63,14 @@ function init_eprop_dict(T::DataType, nv::Int)
    [string(field) => default_matrix(fieldtype(T, field), nv) for field in fieldnames(T)]
 end
 
+################################################# VALIDATION ###############################################################
 
 # Perform a type join to ensure type compatibility with vprop array
-function propmote_vertex_type!{T}(x::VectorPM, ::Type{T}, propname)
+function propmote_vertex_type!{T}(x::VectorPM{Any,Any}, ::Type{T}, propname)
    D = vdata(x)
    if haskey(D, propname)
       arr = D[propname]
-      if !(eltype(arr) <: T)
+      if !(T <: eltype(arr))
          D[propname] = Array{typejoin(eltype(arr), T)}(arr)
       end
    else
@@ -89,22 +79,35 @@ function propmote_vertex_type!{T}(x::VectorPM, ::Type{T}, propname)
    nothing
 end
 
+# Reject invalid property names and types
+function propmote_vertex_type{T}(x::VectorPM, ::Type{T}, propname)
+   haskey(vdata(x), propname) || error("Illegal property name $propname")
+   (T <: eltype(vdata(x)[propname])) || error("Illegal data type $T for property $propname")
+   nothing
+end
+
 propmote_vertex_type!{T}(x::VectorPM, val::AbstractVector{T}, propname) = propmote_vertex_type!(x, T, propname)
 propmote_vertex_type!(x::VectorPM, val, propname) = propmote_vertex_type!(x, typeof(val), propname)
 
 
 # Perform a type join to ensure type compatibility with eprop array
-function propmote_edge_type!{T}(x::VectorPM, ::Type{T}, propname)
+function propmote_edge_type!{T}(x::VectorPM{Any,Any}, ::Type{T}, propname)
    D = edata(x)
    if haskey(D, propname)
       arr = D[propname]
-      if !(eltype(arr) <: T)
+      if !(T <: eltype(arr))
          D[propname] = SparseMatrixCSC{typejoin(eltype(arr), T), Int}(arr)
       end
    else
       D[propname] = default_matrix(T, nv(x))
    end
    nothing
+end
+
+# Reject invalid property names and types
+function propmote_edge_type{T}(x::VectorPM, ::Type{T}, propname)
+   haskey(edata(x), propname) || error("Illegal property name $propname")
+   (T <: eltype(edata(x)[propname])) || error("Illegal data type $T for property $propname")
 end
 
 propmote_edge_type!{T}(x::VectorPM, val::Vector{T}, propname) = propmote_edge_type!(x, T, propname)
@@ -180,99 +183,6 @@ listeprops(x::VectorPM{Any,Any}) = collect(keys(edata(x)))
 
 listvprops{V,E}(x::VectorPM{V,E}) = map(string, fieldnames(V))
 listeprops{V,E}(x::VectorPM{V,E}) = map(string, fieldnames(E))
-
-################################################# GETVPROP  ################################################################
-
-# Get all properties belonging to a vertex
-function getvprop(x::VectorPM{Any,Any}, v::VertexID)
-   [prop=>arr[v] for (prop,arr) in vdata(x)]
-end
-
-function getvprop{V,E}(x::VectorPM{V,E}, v::VertexID)
-   V([vdata(x)[string(field)][v] for field in fieldnames(V)]...)
-end
-
-
-# Get a dictionary of vertex properties for an input vertex list
-function getvprop(x::VectorPM, vlist::AbstractVector{VertexID})
-   [getvprop(x, v) for v in vlist]
-end
-
-
-# Get the value for a property for a vertex
-_getvprop(x::VectorPM, v::VertexID, propname) = vdata(x)[propname][v]
-
-function getvprop(x::VectorPM, v::VertexID, propname)
-   check_vprop(x, propname)
-   _getvprop(x, v, propname)
-end
-
-
-# Get the value for a property for a list of vertices
-_getvprop(x::VectorPM, vlist::AbstractVector{VertexID}, propname) = vdata(x)[propname][vlist]
-
-function getvprop(x::VectorPM, vlist::AbstractVector{VertexID}, propname)
-   check_vprop(x, propname)
-   _getvprop(x, vlist, propname)
-end
-
-################################################# GETEPROP  ################################################################
-
-# Get all properties belonging to an edge
-function geteprop(x::VectorPM{Any,Any}, u::VertexID, v::VertexID)
-   [prop => arr[v,u] for (prop,arr) in edata(x)]
-end
-
-function geteprop{V,E}(x::VectorPM{V,E}, u::VertexID, v::VertexID)
-   E([edata(x)[string(field)][v,u] for field in fieldnames(E)]...)
-end
-
-@inline geteprop(x::VectorPM, e::EdgeID) = geteprop(x, e...)
-
-
-# Get the value of a property for an edge
-_geteprop(x::VectorPM, u::VertexID, v::VertexID, propname) = edata(x)[propname][v,u]
-_geteprop(x::VectorPM, e::EdgeID, propname) = _geteprop(x, e..., propname)
-
-function geteprop(x::VectorPM, u::VertexID, v::VertexID, propname)
-   check_eprop(x, propname)
-   _geteprop(x, u, v, propname)
-end
-@inline geteprop(x::VectorPM, e::EdgeID, propname) = geteprop(x, e..., propname)
-
-
-# Get a dictionary of edge properties for an input edge list
-function geteprop(x::VectorPM{Any,Any}, elist::AbstractVector{EdgeID})
-   dlist = [Dict() for i in 1:length(elist)]
-   for (key,arr) in edata(x)
-      vals = geteprop(x, elist, key)
-      for (i,d) in enumerate(dlist)
-         d[key] = vals[i]
-      end
-   end
-   dlist
-end
-
-function geteprop{V,E}(x::VectorPM{V,E}, elist::AbstractVector{EdgeID})
-   tlist = [zero(E) for i in 1:length(elist)]
-   for (key,arr) in edata(x)
-      propsym = Symbol(key)
-      vals = geteprop(x, elist, key)
-      for (i,t) in enumerate(tlist)
-         setfield!(t, propsym, vals[i])
-      end
-   end
-   tlist
-end
-
-
-# Get the value of property for an input edge list
-function geteprop(x::VectorPM, elist::AbstractVector{EdgeID}, propname)
-   check_eprop(x, propname)
-   sv = edata(x)[propname]
-   [sv[v,u] for (u,v) in  elist]
-end
-
 
 ################################################# SETVPROP  ################################################################
 

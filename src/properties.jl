@@ -121,6 +121,36 @@ end
    vproplist::AbstractVector,
    eproplist::AbstractVector
 )
+
+################################################# VALIDATION ###############################################################
+
+function validate_vertex_property(x::PropertyModule, prop)
+   hasvprop(x, prop) || error("Vertex property $prop doesn't exist")
+   nothing
+end
+
+function validate_vertex_property(x::PropertyModule, props::AbstractVector)
+   for prop in props
+      validate_vertex_property(x, prop)
+   end
+end
+
+function validate_edge_property(x::PropertyModule, prop)
+   haseprop(x, prop) || error("Edge property $prop doesn't exist")
+   nothing
+end
+
+function validate_edge_property(x::PropertyModule, props::AbstractVector)
+   for prop in props
+      validate_edge_property(x, prop)
+   end
+end
+
+# Provision for new/existing vertex property
+@interface propmote_vertex_type!(x::PropertyModule, val, propname)
+
+# Provision for new/existing edge property
+@interface propmote_edge_type!(x::PropertyModule, val, propname)
 ################################################# IMPLEMENTATIONS ##########################################################
 
 # Array of Structures Implementations

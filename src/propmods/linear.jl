@@ -8,38 +8,50 @@
 export LinearPM
 
 type LinearPM{V,E} <: PropertyModule{V,E}
-   vprops::Set{Any}
-   eprops::Set{Any}
+   vprops::Dict{Any,DataType}
+   eprops::Dict{Any,DataType}
    vdata::Vector
    edata::SparseMatrixCSC
 
-   function LinearPM(vprops::Set, eprops::Set, vdata::AbstractVector, edata::SparseMatrixCSC)
+   function LinearPM(vprops::Dict, eprops::Dict, vdata::AbstractVector, edata::SparseMatrixCSC)
       new(vprops, eprops, vdata, edata)
    end
 
-   function LinearPM(nv::Int=1)
+   function LinearPM(nv::Int=0)
       self = new()
-      self.vprops = Set{Any}(map(string, fieldnames(V)))
-      self.eprops = Set{Any}(map(string, fieldnames(E)))
 
       if V == Any
+         self.vprops = Dict{Any,DataType}()
          self.vdata = [Dict() for i in 1:nv]
       else
+         self.vprops = Dict{Any,DataType}([string(field) => fieldtype(V, field) for field in fieldnames(V)]...)
          self.vdata = [zero(V) for i in 1:nv]
       end
 
       if E == Any
+         self.eprops = Dict{Any,DataType}()
          self.edata = spzeros(Dict, nv, nv)
       else
+         self.eprops = Dict{Any,DataType}([string(field) => fieldtype(E, field) for field in fieldnames(E)]...)
          self.edata = spzeros(E, nv, nv)
       end
 
+      self
+   end
+
+   function LinearPM(nv::Int, ne::Int)
+      self = LinearPM(nv)
+      sizehint!(self.edata, ne)
       self
    end
 end
 
 function LinearPM(nv::Int=0)
    LinearPM{Any,Any}(nv)
+end
+
+function LinearPM(ne::Int=0)
+   LinearPM{Any,Any}(nv,ne)
 end
 
 @inline vprops(x::LinearPM) = x.vprops
@@ -112,63 +124,22 @@ listeprops(x::LinearPM{Any,Any}) = collect(eprops(x))
 listvprops{V,E}(x::LinearPM{V,E}) = map(string, fieldnames(V))
 listeprops{V,E}(x::LinearPM{V,E}) = map(string, fieldnames(E))
 
-################################################# GETVPROP  ################################################################
 
-# Get all properties belonging to a vertex
-@inline getvprop(x::LinearPM, v::VertexID) = vdata(x)[v]
+################################################# VALIDATION ###############################################################
 
-
-# Get all properties for an input vertex list
-@inline getvprop(x::LinearPM, vlist::AbstractVector{VertexID}) = vdata(x)[vlist]
-
-
-# Get the value for a property for a vertex
-_getvprop(x::LinearPM{Any,Any}, v::VertexID, propname) = vdata(x)[v][propname]
-_getvprop(x::LinearPM, v::VertexID, propname) = getfield(getvprop(x, v), Symbol(propname))
-
-function getvprop(x::LinearPM, v::VertexID, propname)
-   check_vprop(x, propname)
-   _getvprop(x, v, propname)
+function propmote_vertex_type!{T}(x::LinearPM{Any,Any}, ::Type{T}, propname)
+   vprops(x)[propname] = typejoin(get!(vprops(x), propname, T), T)
+   nothing
 end
 
-
-# Get the value for a property for a list of vertices
-function getvprop(x::LinearPM, vlist::AbstractVector{VertexID}, propname)
-   check_vprop(x, propname)
-   map(v->_getvprop(x, v, propname), vlist)
+function propmote_vertex_type!{T}(x::LinearPM, ::Type{T}, propname)
+   haskey(vprops(x), propname) || error("Illegal property name $propname")
+   !(T <: vprops(x)[propname]) || error("Illegal data type $T for property $propname")
+   nothing
 end
 
-
-################################################# GETEPROP #################################################################
-
-# Get all properties belonging to an edge
-@inline geteprop(x::LinearPM, u::VertexID, v::VertexID) = edata(x)[v,u]
-@inline geteprop(x::LinearPM, e::EdgeID) = geteprop(x, e...)
-
-
-# Get the value of a property for an edge
-_geteprop(x::LinearPM{Any,Any}, u::VertexID, v::VertexID, propname) = geteprop(x, u, v)[propname]
-_geteprop(x::LinearPM, u::VertexID, v::VertexID, propname) = getfield(geteprop(x, u, v), Symbol(propname))
-_geteprop(x::LinearPM, e::EdgeID, propname) = _geteprop(x, e..., propname)
-
-function geteprop(x::LinearPM, u::VertexID, v::VertexID, propname)
-   check_eprop(x, propname)
-   _geteprop(x, u, v, propname)
-end
-@inline geteprop(x::LinearPM, e::EdgeID, propname) = geteprop(x, e..., propname)
-
-
-# Get a dictionary of edge properties for an input edge list
-function geteprop(x::LinearPM, elist::AbstractVector{EdgeID})
-   map(e->geteprop(x, e), elist)
-end
-
-# Get the value of property for an input edge list
-function geteprop(x::LinearPM, elist::AbstractVector{EdgeID}, propname)
-   check_eprop(x, propname)
-   map(e->_geteprop(x, e, propname), elist)
-end
-
+propmote_vertex_type(x::LinearPM, val, propname) = propmote_vertex_type(x, typeof(val), propname)
+propmote_vertex_type(x::LinearPM, vals::AbstractVector, propname) = propmote_vertex_type(x, eltype(vals), propname)
 
 ################################################# SETVPROP #################################################################
 

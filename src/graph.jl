@@ -56,76 +56,23 @@ end
 
 typealias SparseGraph Graph{SparseMatrixAM, VectorPM}
 
-################################################# HELPERS ##############################################################
+################################################# VALIDATION ################################################################
 
-# Vertex Validation
-function validate_vertex(g::Graph, v::VertexID)
-   hasvertex(g, v) || error("Vertex $v isn't in the graph")
-   nothing
-end
+# Vertex validation
+validate_vertex(g::Graph, vs) = validate_vertex(adjmod(g), vs)
 
-function validate_vertex(g::Graph, vlist::AbstractVector{VertexID})
-   for v in vlist
-      validate_vertex(g, v)
-   end
-   nothing
-end
+# Edge checking
+can_add_edge(g::Graph, u::VertexID, v::VertexID) = can_add_edge(adjmod(g), u, v)
+can_add_edge(g::Graph, es) = can_add_edge(adjmod(g), es)
 
-function can_add_edge(g::Graph, u::VertexID, v::VertexID)
-   validate_vertex(g, u)
-   validate_vertex(g, v)
-   nothing
-end
-
-# Edge Validation
-@inline can_add_edge(g::Graph, e::EdgeID) = can_add_edge(g, e...)
-
-function can_add_edge(g::Graph, elist::AbstractVector{EdgeID})
-   for (u,v) in elist
-      can_add_edge(g, u, v)
-   end
-end
-
-function validate_edge(g::Graph, u::VertexID, v::VertexID)
-   hasedge(g, u, v) || error("Edge $u=>$v isn't in the graph")
-   nothing
-end
-
-function validate_edge(g::Graph, e::EdgeID)
-   hasedge(g, e) || error("Edge $(e.first)=>$(e.second) isn't in the graph")
-   nothing
-end
-
-function validate_edge(g::Graph, elist::AbstractVector{EdgeID})
-   for e in elist
-      validate_edge(g, e)
-   end
-   nothing
-end
+# Edge validation
+validate_edge(g::Graph, u::VertexID, v::VertexID) = validate_edge(adjmod(g), u, v)
+validate_edge(g::Graph, es) = validate_edge(adjmod(g), es)
 
 # Property Validation
-function validate_vertex_property(g::Graph, prop)
-   hasvprop(g, prop) || error("Vertex property $prop doesn't exist")
-   nothing
-end
+validate_vertex_property(g::Graph, props) = validate_vertex_property(propmod(g), props)
+validate_edge_property(g::Graph, props) = validate_edge_property(propmod(g), props)
 
-function validate_vertex_property(g::Graph, props::AbstractVector)
-   for prop in props
-      validate_vertex_property(g, prop)
-   end
-end
-
-function validate_edge_property(g::Graph, prop)
-   haseprop(g, prop) || error("Edge property $prop doesn't exist")
-   nothing
-end
-
-function validate_edge_property(g::Graph, props::AbstractVector)
-   for prop in props
-      validate_edge_property(g, prop)
-   end
-   nothing
-end
 ################################################# MISC #####################################################################
 
 # Deepcopy
@@ -226,23 +173,6 @@ end
 
 """ List the edge properties contained in the graph """
 @inline listeprops(g::Graph) = listeprops(propmod(g))
-
-
-################################################# GETVPROP ###############################################################
-
-""" Return the properties of a particular vertex(s) in the graph """
-function getvprop(g::Graph, vs::Union{VertexID,AbstractVector{VertexID}})
-   validate_vertex(g, vs)
-   getvprop(propmod(g), vs)
-end
-getvprop(g::Graph, ::Colon) = getvprop(propmod(g), vertices(g))
-
-
-function getvprop(g::Graph, vs::Union{VertexID,AbstractVector{VertexID}}, propname)
-   validate_vertex(g, vs)
-   getvprop(propmod(g), vs, propname)
-end
-getvprop(g::Graph, ::Colon, propname) = getvprop(propmod(g), vertices(g), propname)
 
 ################################################# SETVPROP ################################################################
 

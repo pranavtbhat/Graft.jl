@@ -104,3 +104,12 @@ function splice_matrix{Tv,Ti}(x::SparseMatrixCSC{Tv,Ti}, elist::AbstractVector{E
 
    init_spmx(x.m, elist, vals)
 end
+
+################################################# SIZEHINT ###################################################################
+
+# Sizehint to help sparsematrix grow quickly
+function Base.sizehint!(x::SparseMatrixCSC, ne::Int)
+   sizehint!(x.rowval, ne)
+   sizehint!(x.nzval, ne)
+   x
+end

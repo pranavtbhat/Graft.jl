@@ -31,6 +31,9 @@ include("labelmodule.jl")
 # Basic Graph Definition
 include("graph.jl")
 
+# Core implementation
+include("core/getvprop.jl")
+
 # Querying
 include("query.jl")
 

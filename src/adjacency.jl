@@ -59,9 +59,55 @@ import Base: ==
 @interface subgraph(x::AdjacencyModule, elist::AbstractVector{EdgeID})
 
 @interface subgraph(x::AdjacencyModule, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
+
 ################################################# EDGE ITERATION ##########################################################
 
 abstract EdgeIter <: AbstractVector{EdgeID}
+
+################################################# VALIDATION ##############################################################
+
+###
+# VERTEX VALIDATION
+###
+function validate_vertex(x::AdjacencyModule, vs)
+   hasvertex(x, vs) || error("Invalid vertex(s) $vs")
+end
+
+
+###
+# EDGE CHECKING
+###
+function can_add_edge(x::AdjacencyModule, u::VertexID, v::VertexID)
+   validate_vertex(x, u)
+   validate_vertex(x, v)
+   nothing
+end
+
+can_add_edge(x::AdjacencyModule, e::EdgeID) = can_add_edge(x, e...)
+
+function can_add_edge(x::AdjacencyModule, es::AbstractVector{EdgeID})
+   for e in es
+      can_add_edge(x, e)
+   end
+end
+
+
+###
+# EDGE VALITION
+###
+
+function validate_edge(x::AdjacencyModule, u::VertexID, v::VertexID)
+   hasedge(x, u, v) || error("Edge $u=>$v isn't in the graph")
+   nothing
+end
+
+validate_edge(x::AdjacencyModule, e::EdgeID) = validate_edge(x, e...)
+
+function validate_edge(x:AdjacencyModule, elist::AbstractVector{EdgeID})
+   for e in elist
+      validate_edge(x, e)
+   end
+end
 
 
 ################################################# IMPLEMENTATIONS #########################################################
