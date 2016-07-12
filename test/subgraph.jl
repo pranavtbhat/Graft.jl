@@ -1,7 +1,7 @@
 ################################################# FILE DESCRIPTION #########################################################
 
 # This file contains tests for SubGraph operations.
- 
+
 ############################################################################################################################
 
 for AM in subtypes(AdjacencyModule)
@@ -12,8 +12,7 @@ for AM in subtypes(AdjacencyModule)
             g = Graph{AM,PM{typ,typ}}(10,90)
 
             setvprop!(g, :, collect(1:10), "f1")
-            eid = 0
-            seteprop!(g, :, (u,v)-> eid += 1, "f1")
+            seteprop!(g, :, 1:90, "f1")
             setlabel!(g, "f1")
 
             h = subgraph(g, 3:8)

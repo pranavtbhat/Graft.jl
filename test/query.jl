@@ -97,13 +97,13 @@ for PM in subtypes(PropertyModule)
 
          # Map
          map!((u,v)->1, E, "f1")
-         map!((u,v)->0.0, E[:], "f2")
-         map!((u,v)->false, E[1:45], "f4")
+         map!((u,v)->5.0, E[:], "f2")
+         map!((u,v)->true, E[1:45], "f4")
          map!((u,v)->"Center", E[45], "f3")
 
          @test get(E, "f1") == fill(1, 90)
-         @test get(E[:], "f2") == zeros(90)
-         @test get(E[1:45], "f4") == falses(45)
+         @test get(E[:], "f2") == fill(5.0, 90)
+         @test get(E[1:45], "f4") == trues(45)
          @test get(E[45], "f3") == "Center"
 
          # Select

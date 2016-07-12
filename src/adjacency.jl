@@ -103,7 +103,7 @@ end
 
 validate_edge(x::AdjacencyModule, e::EdgeID) = validate_edge(x, e...)
 
-function validate_edge(x:AdjacencyModule, elist::AbstractVector{EdgeID})
+function validate_edge(x::AdjacencyModule, elist::AbstractVector{EdgeID})
    for e in elist
       validate_edge(x, e)
    end

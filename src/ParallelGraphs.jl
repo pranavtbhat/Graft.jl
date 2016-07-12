@@ -33,6 +33,9 @@ include("graph.jl")
 
 # Core implementation
 include("core/getvprop.jl")
+include("core/geteprop.jl")
+include("core/setvprop.jl")
+include("core/seteprop.jl")
 
 # Querying
 include("query.jl")

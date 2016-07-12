@@ -15,8 +15,8 @@ a default value is returned.
 getvprop(g::Graph, v::VertexID) -> Dictionary containing vertex v's properties.
 """
 function getvprop(g::Graph, v::VertexID)
-   validate_vertex(g, vs)
-   getvprop(propmod(g), vs)
+   validate_vertex(g, v)
+   getvprop(propmod(g), v)
 end
 
 
@@ -25,12 +25,12 @@ end
 ###
 function getvprop(x::LinearPM{Any,Any}, v::VertexID)
    data = vdata(x)[v]
-   [get(data, prop, zero(typ)) for (prop,typ) in vprops(x)]
+   [prop => get(data, prop, zero(typ)) for (prop,typ) in vprops(x)]
 end
 
-function getvprop(x::LinearPM, v::VertexID)
+function getvprop{V,E}(x::LinearPM{V,E}, v::VertexID)
    data = vdata(x)[v]
-   [getfield(data, field) for field in keys(vprops(x))]
+   [string(field) => getfield(data, field) for field in fieldnames(V)]
 end
 
 
@@ -50,13 +50,13 @@ end
 ###
 # LINEARPM
 ###
-getvprop(x::LinearPM, vlist::AbstractVector{VertexID}) = [getvprop(x, v) for v in vlist]
+getvprop(x::LinearPM, vs::AbstractVector{VertexID}) = [getvprop(x, v) for v in vs]
 
 
 ###
 # VECTORPM
 ###
-getvprop(x::VectorPM, vlist::AbstractVector{VertexID}) = [getvprop(x, v) for v in vlist]
+getvprop(x::VectorPM, vs::AbstractVector{VertexID}) = [getvprop(x, v) for v in vs]
 
 ################################################# ALL DICT ##################################################################
 
@@ -68,9 +68,9 @@ getvprop(g::Graph, ::Colon) = getvprop(propmod(g), vertices(g))
 
 """ getvprop(g::Graph, v::VertexID, property) -> Fetch the value of a property for vertex v (or its default value) """
 function getvprop(g::Graph, v::VertexID, propname)
-   validate_vertex(g, vs)
-   validate_vertex_property(g, prop)
-   getvprop(propmod(g), vs, prop)
+   validate_vertex(g, v)
+   validate_vertex_property(g, propname)
+   getvprop(propmod(g), v, propname)
 end
 
 
@@ -78,7 +78,7 @@ end
 # LINEARPM
 ###
 getvprop(x::LinearPM{Any,Any}, v::VertexID, propname) = get(vdata(x)[v], propname, vprops(x)[propname] |> zero)
-getvprop(x::LinearPM, v::VertexID, propname) = getfield(vdata(x)[v], Symbol(propname))
+getvprop(x::LinearPM, v::VertexID, propname) = getfield(vdata(x)[v], symbol(propname))
 
 
 ###
@@ -92,8 +92,8 @@ getvprop(x::VectorPM, v::VertexID, propname) = vdata(x)[propname][v]
 """ getvprop(g::Graph, vs::AbstractVector{VertexID}, property) -> Fetch the value of a property for v in vs """
 function getvprop(g::Graph, vs::AbstractVector{VertexID}, propname)
    validate_vertex(g, vs)
-   validate_vertex_property(g, prop)
-   getvprop(propmod(g), vs, prop)
+   validate_vertex_property(g, propname)
+   getvprop(propmod(g), vs, propname)
 end
 
 
@@ -103,7 +103,7 @@ end
 getvprop(x::LinearPM{Any,Any}, vs::AbstractVector{VertexID}, propname) = [getvprop(x, v, propname) for v in vs]
 
 function getvprop(x::LinearPM, vs::AbstractVector{VertexID}, propname)
-   sym = Symbol(propame)
+   sym = symbol(propname)
    [getvprop(x, v, sym) for v in vs]
 end
 
@@ -111,9 +111,9 @@ end
 ###
 # VECTORPM
 ###
-getvprop(x::VectorPM, vs::AbstractVector{VertexID}, propname) = vdata(x)[property][vs]
+getvprop(x::VectorPM, vs::AbstractVector{VertexID}, propname) = vdata(x)[propname][vs]
 
 ################################################# All SINGLE ##################################################################
 
 """ getvprop(g::Graph, ::Colon, property) -> Fetch the value of a property for v in vertices(g) """
-getvprop(g::Graph, ::Colon, propname) = getvprop(propmod(g), :, propname)
+getvprop(g::Graph, ::Colon, propname) = getvprop(propmod(g), vertices(g), propname)

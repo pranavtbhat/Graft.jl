@@ -28,12 +28,12 @@ geteprop(g::Graph, e::EdgeID) = geteprop(g, e...)
 ###
 function geteprop(x::LinearPM{Any,Any}, u::VertexID, v::VertexID)
    data = edata(x)[v,u]
-   [get(data, prop, zero(typ)) for (prop,typ) in eprops(x)]
+   [prop => get(data, prop, zero(typ)) for (prop,typ) in eprops(x)]
 end
 
-function geteprop(x::LinearPM, u::VertexID, v::VertexID)
+function geteprop{V,E}(x::LinearPM{V,E}, u::VertexID, v::VertexID)
    data = edata(x)[v,u]
-   [getfield(data, field) for field in keys(eprops(x))]
+   [string(field) => getfield(data, field) for field in fieldnames(E)]
 end
 
 geteprop(x::LinearPM, e::EdgeID) = geteprop(x, e...)
@@ -85,19 +85,19 @@ geteprop(g::Graph, ::Colon) = geteprop(propmod(g), collect(edges(g)))
 function geteprop(g::Graph, u::VertexID, v::VertexID, property)
    validate_edge(g, u, v)
    validate_edge_property(g, property)
-   geteprop(propmod(g), u, v)
+   geteprop(propmod(g), u, v, property)
 end
 
 """ geteprop(g::Graph, e::EdgeID, property) -> Fetch the value of a property for edge e """
-geteprop(g::Graph, e::EdgeID) = geteprop(g, e...)
+geteprop(g::Graph, e::EdgeID, property) = geteprop(g, e..., property)
 
 
 ###
 # LINEARPM
 ###
-geteprop(x::LinearPM{Anu,Any}, u::VertexID, v::VertexID, propname) = get(edata(x)[v,u], propname, eprops(x)[propname] |> zero)
-geteprop(x::LinearPM, u::VertexID, v::VertexID, propname) = getfield(edata(x)[v,u], Symbol(propname))
-geteprop(x::LinearPM, e::EdgeID) = geteprop(x, e...)
+geteprop(x::LinearPM{Any,Any}, u::VertexID, v::VertexID, propname) = get(edata(x)[v,u], propname, eprops(x)[propname] |> zero)
+geteprop(x::LinearPM, u::VertexID, v::VertexID, propname) = getfield(edata(x)[v,u], symbol(propname))
+geteprop(x::LinearPM, e::EdgeID, propname) = geteprop(x, e..., propname)
 
 
 ###
@@ -111,17 +111,17 @@ geteprop(x::VectorPM, u::VertexID, v::VertexID, propname) = edata(x)[propname][v
 function geteprop(g::Graph, es::AbstractVector{EdgeID}, property)
    validate_edge(g, es)
    validate_edge_property(g, property)
-   geteprop(propmod(g), es)
+   geteprop(propmod(g), es, property)
 end
 
 
 ###
 # LINEARPM
 ###
-geteprop(x::LinearPM{Any,Any}, es::AbstractVector{EdgeID}, propname) = [geteprop(x, v, propname) for e in es]
+geteprop(x::LinearPM{Any,Any}, es::AbstractVector{EdgeID}, propname) = [geteprop(x, e, propname) for e in es]
 
 function geteprop(x::LinearPM, es::AbstractVector{EdgeID}, propname)
-   sym = Symbol(propame)
+   sym = Symbol(propname)
    [geteprop(x, e, sym) for e in es]
 end
 
@@ -130,7 +130,6 @@ end
 # VECTORPM
 ###
 function geteprop(x::VectorPM, elist::AbstractVector{EdgeID}, propname)
-   check_eprop(x, propname)
    sv = edata(x)[propname]
    [sv[v,u] for (u,v) in elist]
 end
@@ -139,6 +138,6 @@ end
 
 """ geteprop(g::Graph, ::Colon, property) -> Fetch the value of a property for e in edges(g) """
 function geteprop(g::Graph, ::Colon, propname)
-   validate_edge_property(g, property)
+   validate_edge_property(g, propname)
    geteprop(propmod(g), collect(edges(g)), propname)
 end

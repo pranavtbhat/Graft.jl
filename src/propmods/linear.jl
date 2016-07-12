@@ -113,12 +113,12 @@ end
 
 ################################################# PROPERTIES ##############################################################
 
-hasvprop(x::LinearPM, prop) = in(prop, vprops(x))
-haseprop(x::LinearPM, prop) = in(prop, eprops(x))
+hasvprop(x::LinearPM, prop) = haskey(vprops(x), prop)
+haseprop(x::LinearPM, prop) = haskey(eprops(x), prop)
 
 
-listvprops(x::LinearPM{Any,Any}) = collect(vprops(x))
-listeprops(x::LinearPM{Any,Any}) = collect(eprops(x))
+listvprops(x::LinearPM{Any,Any}) = vprops(x) |> keys |> collect
+listeprops(x::LinearPM{Any,Any}) = eprops(x) |> keys |> collect
 
 
 listvprops{V,E}(x::LinearPM{V,E}) = map(string, fieldnames(V))
@@ -127,226 +127,40 @@ listeprops{V,E}(x::LinearPM{V,E}) = map(string, fieldnames(E))
 
 ################################################# VALIDATION ###############################################################
 
+###
+# VERTEX PROPERTY VALIDATION
+###
 function propmote_vertex_type!{T}(x::LinearPM{Any,Any}, ::Type{T}, propname)
    vprops(x)[propname] = typejoin(get!(vprops(x), propname, T), T)
    nothing
 end
 
 function propmote_vertex_type!{T}(x::LinearPM, ::Type{T}, propname)
-   haskey(vprops(x), propname) || error("Illegal property name $propname")
-   !(T <: vprops(x)[propname]) || error("Illegal data type $T for property $propname")
+   validate_vertex_property(x, propname)
+   (T <: vprops(x)[propname]) || error("Illegal data type $T for property $propname")
    nothing
 end
 
-propmote_vertex_type(x::LinearPM, val, propname) = propmote_vertex_type(x, typeof(val), propname)
-propmote_vertex_type(x::LinearPM, vals::AbstractVector, propname) = propmote_vertex_type(x, eltype(vals), propname)
+propmote_vertex_type!(x::LinearPM, val, propname) = propmote_vertex_type!(x, typeof(val), propname)
+propmote_vertex_type!(x::LinearPM, vals::AbstractVector, propname) = propmote_vertex_type!(x, eltype(vals), propname)
 
-################################################# SETVPROP #################################################################
 
-# Set all properties for a vertex
-@inline _setvprop!(x::LinearPM{Any,Any}, v::VertexID, d::Dict) = merge!(vdata(x)[v], d)
-
-function _setvprop!(x::LinearPM, v::VertexID, d::Dict)
-   for (key,val) in d
-      setvprop!(x, v, val, key)
-   end
-end
-
-function setvprop!(x::LinearPM{Any,Any}, v::VertexID, d::Dict)
-   push!(vprops(x), keys(d)...)
-   _setvprop!(x, v, d)
+###
+# EDGE PROPERTY VALIDATION
+###
+function propmote_edge_type!{T}(x::LinearPM{Any,Any}, ::Type{T}, propname)
+   eprops(x)[propname] = typejoin(get!(eprops(x), propname, T), T)
    nothing
 end
 
-function setvprop!(x::LinearPM, v::VertexID, d::Dict)
-   for prop in keys(d)
-      check_eprop(x, prop)
-   end
-   _setvprop!(x, v, d)
+function propmote_edge_type!{T}(x::LinearPM, ::Type{T}, propname)
+   validate_edge_property(x, propname)
+   (T <: eprops(x)[propname]) || error("Illegal data type $T for property $propname")
    nothing
 end
 
-
-# Set all properties for a list of vertices.
-function setvprop!(x::LinearPM, vlist::AbstractVector{VertexID}, dlist::Vector)
-   for (v,d) in zip(vlist,dlist)
-      setvprop!(x, v, d)
-   end
-end
-
-
-# Set a property of a single vertex.
-@inline _setvprop!(x::LinearPM, v::VertexID, val, propname) = setfield!(vdata(x)[v], propname, val)
-@inline _setvprop!(x::LinearPM{Any,Any}, v::VertexID, val, propname) = setindex!(vdata(x)[v], val, propname)
-
-function setvprop!(x::LinearPM{Any,Any}, v::VertexID, val, propname)
-   push!(vprops(x), propname)
-   _setvprop!(x, v, val, propname)
-end
-
-function setvprop!(x::LinearPM, v::VertexID, val, propname)
-   check_vprop(x, propname)
-   _setvprop!(x, v, val, Symbol(propname))
-   nothing
-end
-
-
-# Set a property for a list of vertices
-function _setvprop!(x::LinearPM, vlist::AbstractVector{VertexID}, vals::Vector, propname)
-   for (v,val) in zip(vlist,vals)
-      _setvprop!(x, v, val, propname)
-   end
-end
-
-function setvprop!(x::LinearPM{Any,Any}, vlist::AbstractVector{VertexID}, vals::Vector, propname)
-   push!(vprops(x), propname)
-   _setvprop!(x, vlist, vals, propname)
-end
-
-function setvprop!(x::LinearPM, vlist::AbstractVector{VertexID}, vals::Vector, propname)
-   check_vprop(x, propname)
-   propsym = Symbol(propname)
-   _setvprop!(x, vlist, vals, propsym)
-end
-
-
-# Map onto a property for a list of vertices
-function _setvprop!(x::LinearPM, vlist::AbstractVector{VertexID}, f::Function, propname)
-   for v in vlist
-      _setvprop!(x, v, f(v), propname)
-   end
-end
-
-function setvprop!(x::LinearPM{Any,Any}, vlist::AbstractVector{VertexID}, f::Function, propname)
-   push!(vprops(x), propname)
-   _setvprop!(x, vlist, f, propname)
-end
-
-function setvprop!(x::LinearPM, vlist::AbstractVector{VertexID}, f::Function, propname)
-   check_vprop(x, propname)
-   propsym  = Symbol(propname)
-   _setvprop!(x, vlist, f, propsym)
-end
-
-
-# Set a property for all vertices
-function setvprop!(x::LinearPM, ::Colon, vals::Vector, propname)
-   setvprop!(x, 1 : length(vdata(x)), vals, propname)
-end
-
-
-# Map onto a property for all vertices
-function setvprop!(x::LinearPM, ::Colon, f::Function, propname)
-   setvprop!(x, 1 : length(vdata(x)), f, propname)
-end
-
-
-################################################# SETVPROP #################################################################
-
-# Set all properties for an edge
-function _seteprop!(x::LinearPM{Any,Any}, u::VertexID, v::VertexID, d::Dict)
-   setindex!(edata(x), merge!(edata(x)[v,u], d), v, u)
-   nothing
-end
-
-function _seteprop!(x::LinearPM, u::VertexID, v::VertexID, d::Dict)
-   E = edata(x)[v,u]
-   for (key,val) in d
-      setfield!(E, Symbol(key), val)
-   end
-   edata(x)[v,u] = E
-   nothing
-end
-
-function seteprop!(x::LinearPM{Any,Any}, u::VertexID, v::VertexID, d::Dict)
-   push!(vprops(x), keys(d)...)
-   _seteprop!(x, u, v, d)
-end
-
-function seteprop!(x::LinearPM, u::VertexID, v::VertexID, d::Dict)
-   for prop in keys(d)
-      check_eprop(x, prop)
-   end
-   _seteprop!(x, u, v, d)
-end
-@inline seteprop!(x::LinearPM, e::EdgeID, d::Dict) = seteprop!(x, e..., d)
-
-
-# Set all properties for a list of edges
-function seteprop!(x::LinearPM, elist::AbstractVector{EdgeID}, dlist::Vector)
-   for (e,d) in zip(elist,dlist)
-      seteprop!(x, e, d)
-   end
-end
-
-
-# Set a proprty for an edge
-function _seteprop!(x::LinearPM{Any,Any}, u::VertexID, v::VertexID, val, propname)
-   d = edata(x)[v,u]
-   d[propname] = val
-   edata(x)[v,u] = d
-   nothing
-end
-
-function _seteprop!(x::LinearPM, u::VertexID, v::VertexID, val, propname)
-   E = edata(x)[v,u]
-   setfield!(E, propname, val)
-   edata(x)[v,u] = E
-   nothing
-end
-
-@inline _seteprop!(x::LinearPM, e::EdgeID, val, propname) = _seteprop!(x, e..., val, propname)
-
-function seteprop!(x::LinearPM{Any,Any}, u::VertexID, v::VertexID, val, propname)
-   push!(eprops(x), propname)
-   _seteprop!(x, u, v, val, propname)
-end
-
-function seteprop!(x::LinearPM, u::VertexID, v::VertexID, val, propname)
-   check_eprop(x, propname)
-   _seteprop!(x, u, v, val, Symbol(propname))
-end
-@inline seteprop!(x::LinearPM, e::EdgeID, val, propname) = seteprop!(x, e..., val, propname)
-
-
-# Set a property for a list of edges
-function _seteprop!(x::LinearPM{Any,Any}, elist::AbstractVector{EdgeID}, vals::Vector, propname)
-   push!(eprops(x), propname)
-   for (e,val) in zip(elist,vals)
-      _seteprop!(x, e, val, propname)
-   end
-end
-
-function _seteprop!(x::LinearPM, elist::AbstractVector{EdgeID}, vals::Vector, propname)
-   check_eprop(x, propname)
-   propsym = Symbol(propname)
-   for (e,val) in zip(elist,vals)
-      _seteprop!(x, e, val, propsym)
-   end
-end
-
-seteprop!(x::LinearPM, elist::AbstractVector{EdgeID}, vals::Vector, propname) = _seteprop!(x, elist, vals, propname)
-seteprop!(x::LinearPM, es::EdgeIter, vals::Vector, propname) = _seteprop!(x, collect(es), vals, propname)
-
-
-# Map onto a property for a list of edges
-function _seteprop!(x::LinearPM{Any,Any}, elist::AbstractVector{EdgeID}, f::Function, propname)
-   push!(eprops(x), propname)
-   for e in elist
-      _seteprop!(x, e, f(e...), propname)
-   end
-end
-
-function _seteprop!(x::LinearPM, elist::AbstractVector{EdgeID}, f::Function, propname)
-   check_eprop(x, propname)
-   propsym = Symbol(propname)
-   for e in elist
-      _seteprop!(x, e, f(e...), propsym)
-   end
-end
-
-seteprop!(x::LinearPM, elist::AbstractVector{EdgeID}, f::Function, propname) = _seteprop!(x, elist, f, propname)
-seteprop!(x::LinearPM, es::EdgeIter, f::Function, propname) = seteprop!(x, collect(es), f, propname)
+propmote_edge_type!(x::LinearPM, val, propname) = propmote_edge_type!(x, typeof(val), propname)
+propmote_edge_type!(x::LinearPM, vals::AbstractVector, propname) = propmote_edge_type!(x, eltype(vals), propname)
 
 ################################################# SUBGRAPH #################################################################
 

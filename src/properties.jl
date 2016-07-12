@@ -88,8 +88,6 @@ end
 @interface geteprop{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID}, propname)
 
 
-@interface setvprop!{V,E}(x::PropertyModule{V,E}, v::VertexID, d::Dict)
-@interface setvprop!{V,E}(x::PropertyModule{V,E}, vlist::AbstractVector{VertexID}, dlist::Vector)
 @interface setvprop!{V,E}(x::PropertyModule{V,E}, v::VertexID, val, propname)
 @interface setvprop!{V,E}(x::PropertyModule{V,E}, vlist::AbstractVector{VertexID}, vals::Vector, propname)
 @interface setvprop!{V,E}(x::PropertyModule{V,E}, vlist::AbstractVector{VertexID}, f::Function, propname)
@@ -98,8 +96,6 @@ end
 
 
 @interface seteprop!{V,E}(x::PropertyModule{V,E}, u::VertexID, v::VertexID, d::Dict)
-@interface seteprop!{V,E}(x::PropertyModule{V,E}, e::EdgeID, d::Dict)
-@interface seteprop!{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID}, dlist::Vector)
 @interface seteprop!{V,E}(x::PropertyModule{V,E}, u::VertexID, v::VertexID, val, propname)
 @interface seteprop!{V,E}(x::PropertyModule{V,E}, e::EdgeID, val, propname)
 @interface seteprop!{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID}, vals::Vector, propname)
