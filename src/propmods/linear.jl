@@ -170,10 +170,11 @@ end
 
 # Slow af. But to be fair, this module isn't expected to do this..
 function subgraph(x::LinearPM, vlist::AbstractVector{VertexID}, vproplist::AbstractVector)
-   y = LinearPM{Any,Any}(Set{Any}(vproplist), copy(eprops(x)), [Dict() for v in vlist], edata(x)[vlist,vlist])
+   vpd = [prop => vprops(x)[prop] for prop in vproplist]
+   y = LinearPM{Any,Any}(vpd, copy(eprops(x)), [Dict() for v in vlist], edata(x)[vlist,vlist])
    for prop in vproplist
       vals = getvprop(x, vlist, prop)
-      setvprop!(y, vlist, vals, prop)
+      setvprop!(y, :, vals, prop)
    end
    y
 end
@@ -187,7 +188,8 @@ end
 # Slow af. But to be fair, this module isn't expected to do this..
 function subgraph(x::LinearPM, elist::AbstractVector{EdgeID}, eproplist::AbstractVector)
    nv = length(vdata(x))
-   y = LinearPM{Any,Any}(copy(vprops(x)), Set{Any}(eproplist), deepcopy(vdata(x)), spzeros(Dict, nv, nv))
+   epd = [prop => eprops(x)[prop] for prop in eproplist]
+   y = LinearPM{Any,Any}(copy(vprops(x)), epd, deepcopy(vdata(x)), spzeros(Dict, nv, nv))
    for prop in eproplist
       vals = geteprop(x, elist, prop)
       seteprop!(y, elist, vals, prop)
@@ -228,7 +230,8 @@ function subgraph(
    elist = sizehint!(Vector{EdgeID}(), nnz(sv))
    nzval = sizehint!(Vector{Dict}(), nnz(sv))
 
-   for u in vlist
+
+   for u in 1 : length(vlist)
       for v in sv.rowval[nzrange(sv, u)]
          d = Dict()
          for prop in eproplist
@@ -239,5 +242,7 @@ function subgraph(
       end
    end
    ED = init_spmx(nv, elist, nzval)
-   LinearPM{Any,Any}(Set{Any}(vproplist), Set{Any}(eproplist), VD, ED)
+   vpd = [prop => vprops(x)[prop] for prop in vproplist]
+   epd = [prop => eprops(x)[prop] for prop in eproplist]
+   LinearPM{Any,Any}(vpd, epd, VD, ED)
 end

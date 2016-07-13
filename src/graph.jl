@@ -43,7 +43,7 @@ type Graph{AM,PM}
 end
 
 function Graph{AM,PM}(am::AM, pm::PM, lm=NullModule())
-   Graph{AM,PM}(am, pm)
+   Graph{AM,PM}(am, pm, lm)
 end
 
 @inline adjmod(g::Graph) = g.adjmod
@@ -229,27 +229,27 @@ subgraph(g::Graph) = deepcopy(g)
 
 # Vertex only
 function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID})
-   Graph{AM,PM}(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist), subgraph(labelmod(g), vlist))
+   Graph(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist), subgraph(labelmod(g), vlist))
 end
 
 function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID}, vproplist::AbstractVector)
    validate_vertex_property(g, vproplist)
-   Graph{AM,PM}(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist, vproplist), subgraph(labelmod(g), vlist))
+   Graph(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist, vproplist), subgraph(labelmod(g), vlist))
 end
 
 # Edge only
 function subgraph{AM,PM}(g::Graph{AM,PM}, elist::AbstractVector{EdgeID})
-   Graph{AM,PM}(subgraph(adjmod(g), elist), subgraph(propmod(g), elist), deepcopy(labelmod(g)))
+   Graph(subgraph(adjmod(g), elist), subgraph(propmod(g), elist), deepcopy(labelmod(g)))
 end
 
 function subgraph{AM,PM}(g::Graph{AM,PM}, elist::AbstractVector{EdgeID}, eproplist::AbstractVector)
    validate_edge_property(g, eproplist)
-   Graph{AM,PM}(subgraph(adjmod(g), elist), subgraph(propmod(g), elist, eproplist), deepcopy(labelmod(g)))
+   Graph(subgraph(adjmod(g), elist), subgraph(propmod(g), elist, eproplist), deepcopy(labelmod(g)))
 end
 
 # Vertex and Edge
 function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
-   Graph{AM,PM}(subgraph(adjmod(g), vlist, elist), subgraph(propmod(g), vlist, elist), subgraph(labelmod(g), vlist))
+   Graph(subgraph(adjmod(g), vlist, elist), subgraph(propmod(g), vlist, elist), subgraph(labelmod(g), vlist))
 end
 
 function subgraph{AM,PM}(
@@ -259,7 +259,7 @@ function subgraph{AM,PM}(
    vproplist::AbstractVector,
    eproplist::AbstractVector
    )
-   Graph{AM,PM}(
+   Graph(
       subgraph(adjmod(g), vlist, elist),
       subgraph(propmod(g), vlist, elist, vproplist, eproplist),
       subgraph(labelmod(g), vlist)

@@ -79,7 +79,7 @@ function init_spmx{Tv}(nv::Int, elist::Vector{EdgeID}, vals::Vector{Tv})
    end
 
    colptr = Array{Int}(nv+1)
-   i = 1
+   i = 0
    colptr[1] = 1
 
    for c in 2 : nv
