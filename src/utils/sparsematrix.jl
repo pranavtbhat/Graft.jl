@@ -38,8 +38,8 @@ function delete_entry!{Tv,Ti}(x::SparseMatrixCSC{Tv,Ti}, i::Int, ::Colon)
 
    if r1 <= r2
       r = r1 : r2
-      deletat!(rowval, r)
-      deletat!(nzval, r)
+      deleteat!(rowval, r)
+      deleteat!(nzval, r)
       @simd for k = (i+1):(x.n+1)
          @inbounds colptr[k] -= length(r)
       end
