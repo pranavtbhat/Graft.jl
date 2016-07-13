@@ -4,13 +4,13 @@
 # contained in the graph. The Adjacency module uses Integer indices to refer to vertices, in order to keep accesses fast.
 
 ################################################# IMPORT/EXPORT ############################################################
-import Base: size
 export
 # Types
 AdjacencyModule,
 # AdjacencyModule Interface
 nv, ne, vertices, edges, hasvertex, hasedge, fadj, badj, outdegree, indegree, addvertex!, rmvertex!, addedge!, rmedge!
 
+""" Stores edge data """
 abstract AdjacencyModule
 
 ################################################# INTERFACE ################################################################
@@ -49,7 +49,6 @@ abstract AdjacencyModule
 @interface rmedge!(x::AdjacencyModule, e::EdgeID)
 @interface rmedge!(x::AdjacencyModule, e::AbstractVector{EdgeID})
 
-import Base: ==
 (==)(x::AdjacencyModule, y::AdjacencyModule) = vertices(x) == vertices(y) && collect(edges(x)) == collect(edges(y))
 
 ################################################# SUBGRAPH ################################################################

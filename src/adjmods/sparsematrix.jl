@@ -62,7 +62,7 @@ Base.length(x::EdgeIterCSC) = x.m
 Base.deepcopy(x::EdgeIterCSC) = x
 Base.issorted(x::EdgeIterCSC) = true
 
-Base.start(x::EdgeIterCSC) = EdgeIterState(1, 1, true)
+Base.start(x::EdgeIterCSC) = EdgeIterState(1, 1, false)
 
 # Hacky af
 Base.endof(x::EdgeIterCSC) = length(x)
@@ -82,7 +82,7 @@ function Base.next(x::EdgeIterCSC, state)
    state.i0 += 1
 
    if state.i0 > m
-      state = start(x)
+      state = EdgeIterState(1, 1, true)
    else
       state.done = false
    end

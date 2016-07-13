@@ -7,9 +7,9 @@
 ################################################# IMPORT/EXPORT ############################################################
 export
 # Types
-PropertyModule, StronglyTypedPM, WeaklyTypedPM,
+PropertyModule,
 # Properties Interface
-listvprops, listeprops, getvprop, geteprop, setvprop!, seteprop!
+listvprops, listeprops
 
 abstract PropertyModule{V,E}
 

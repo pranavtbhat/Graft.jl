@@ -1,4 +1,5 @@
 ################################################# FILE DESCRIPTION ##########################################################
+
 # This file contains methods designed to adapt the SparseMatrixCSC datasturcture to graphs.
 
 ################################################# IMPORT/EXPORT ############################################################
@@ -6,7 +7,7 @@
 
 ################################################# DELETION ##################################################################
 
-# Delete an entry(s) from a sparsematrix. Based on setindex from Julia's SparseMatrixCSC
+""" Delete an entry(s) from a sparsematrix. Based on setindex from Julia's SparseMatrixCSC """
 function delete_entry!{Tv,Ti}(x::SparseMatrixCSC{Tv,Ti}, i::Int, j::Int)
    rowval = x.rowval
    nzval = x.nzval
@@ -46,7 +47,7 @@ function delete_entry!{Tv,Ti}(x::SparseMatrixCSC{Tv,Ti}, i::Int, ::Colon)
 end
 
 
-# Remove columns from a sparsematrix
+""" Remove entire columns from a sparsematrix (return everything but those columns) """
 function remove_cols{Tv,Ti}(x::SparseMatrixCSC{Tv,Ti}, vs::Union{Int,AbstractVector{Int}})
    vlist = collect(1 : x.m)
    deleteat!(vlist, vs)
@@ -55,14 +56,15 @@ end
 
 ################################################# EXPANSION ##################################################################
 
-# Grow a sparsematrix along the diagonal
+""" Grow a sparsematrix along the diagonal """
 function grow{Tv,Ti}(x::SparseMatrixCSC{Tv,Ti}, sz::Int)
    colptr = x.colptr
    SparseMatrixCSC{Tv,Ti}(x.m+sz, x.n+sz, append!(colptr, fill(colptr[end], sz)), x.rowval, x.nzval)
 end
 
 ################################################# GENERATION #################################################################
-# Construct a sparsematrix using a list of edges.
+
+""" Construct a sparsematrix using a list of edges """
 function init_spmx{Tv}(nv::Int, elist::Vector{EdgeID}, vals::Vector{Tv})
    nzval = vals
    m = length(elist)
@@ -92,8 +94,8 @@ end
 
 init_spmx(nv::Int, eit::AbstractVector{EdgeID}, vals::Vector) = init_spmx(nv, collect(eit), vals)
 ################################################# SPLICING ###################################################################
-# Pair-vector getindex for SparseMatrixCSC
 
+""" Pair-vector getindex for SparseMatrixCSC """
 function splice_matrix{Tv,Ti}(x::SparseMatrixCSC{Tv,Ti}, elist::AbstractVector{EdgeID})
    m = length(elist)
    vals = Array{Tv}(m)
@@ -107,7 +109,7 @@ end
 
 ################################################# SIZEHINT ###################################################################
 
-# Sizehint to help sparsematrix grow quickly
+""" Sizehint to help sparsematrix grow quickly """
 function Base.sizehint!(x::SparseMatrixCSC, ne::Int)
    sizehint!(x.rowval, ne)
    sizehint!(x.nzval, ne)

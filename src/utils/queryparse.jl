@@ -1,5 +1,7 @@
 ################################################# FILE DESCRIPTION ############################################################
+
 # This file contains methods to parse query strings
+
 ################################################# IMPORT/EXPORT ###############################################################
 
 export parse_vertex_query, parse_edge_query
@@ -21,9 +23,7 @@ cvf(op::Symbol, x::Function, y::Function) = (g,v) -> eval(Expr(op, x(g,v), y(g,v
 cvf(op::Symbol, x::Function, y) = (g,v) -> eval(Expr(op, x(g,v), y))
 cvf(op::Symbol, x, y) = rcvf(op, y, x)
 
-function parse_vertex_query(x)
-   x
-end
+parse_vertex_query(x) = x
 
 function parse_vertex_query(x::Expr)
    if x.head == :.
@@ -79,9 +79,7 @@ cef(op::Symbol, x::Function, y::Function) = (g,u,v) -> eval(Expr(op, x(g,u,v), y
 cef(op::Symbol, x::Function, y) = (g,u,v) -> eval(Expr(op, x(g,u,v), y))
 cef(op::Symbol, x, y) = rcef(op, y, x)
 
-function parse_edge_query(x)
-   x
-end
+parse_edge_query(x) = x
 
 function parse_edge_query(x::Expr)
    if x.head == :.
