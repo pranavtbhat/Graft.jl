@@ -36,7 +36,7 @@ end
 
 function Base.getindex(g::Graph, v)
    v = resolve(g, v)
-   getindex(g, v)
+   encode(g, getindex(g, v))
 end
 
 

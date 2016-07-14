@@ -28,14 +28,14 @@ ParallelGraphs has the following `AdjacencyModule`s implemented:
 ## PropertyModule
 The `PropertyModule` will be responsible for maintaining vertex and edge metadata. A Property Module is parameterized by two templates:
 
-- `V` : The vertex descriptor. 
+- `V` : The vertex descriptor.
 - `E` : The edge descriptor.
 
 If you know the field names and their types beforehand, you can pass them in as a User defined type and get better performance. However, if you cannot anticipate the number or types of the fields, pass in type `Any` to use a ditctionary instead.
 
 ParallelGraphs provides two separate implementations:
-- `LinearPM` : Based on the Array of Structures paradigm. 
-- `VectorPM` : Based on the Structure of Arrays paragigm. 
+- `LinearPM` : Based on the Array of Structures paradigm.
+- `VectorPM` : Based on the Structure of Arrays paragigm.
 
 ## Graph Types
 ParallelGraphs allows users to mix and match Adjacency and Property modules to create graph structures that suit their needs. A graph can be created using the parametric constructor.
@@ -43,11 +43,11 @@ ParallelGraphs allows users to mix and match Adjacency and Property modules to c
 ```julia
 
 # Create smaller graphs
-g = Graph{LightGraphsAM,VectorPM}()                   # Create an empty graph
-g = Graph{LightGraphsAM,VectorPM}(100)                # Create a graph with 100 vertices
+g = Graph{LightGraphsAM,LinearPM}()                   # Create an empty graph
+g = Graph{LightGraphsAM,LinearPM}(100)                # Create a graph with 100 vertices
 
 # Create Large Sparse Graphs
-g = Graph{SparseMatrixAM,LinearPM}(1000000, 10000000) # Create a graph with 1M vertices and 10M edges.
+g = Graph{SparseMatrixAM,Vector}(10^6, 10^8) # Create a graph with 1M vertices and 100M edges.
 ```
 
 For less picky users, ParallelGraphs provides two typealiases:
@@ -55,57 +55,129 @@ For less picky users, ParallelGraphs provides two typealiases:
 - `SparseGraph` : Graph type that use sparse datastructures, and is targetted at larger graphs.
 
 ## Queries
-Most adjacency/property operations will be supported through indexing. Additionally, SQL like queries such as filter are also provided. 
+Most adjacency/property operations will be supported through indexing. Additionally, SQL like queries such as filter are also provided.
 
 ```julia
 using ParallelGraphs
 
 # Randomly generate a graph with 50 vertices and 500 edges.
+srand(101)
 g = SimpleGraph(50, 500)
 # Graph{ParallelGraphs.LightGraphsAM,ParallelGraphs.PureDictPM{ASCIIString,Any}} with 50 vertices and 500 edges
 
 # Generate properties and attach them to vertices.
-setvprop!(g, "name", v -> Faker.first_name())
-setvprop!(g, "age", v -> rand(1:80))
-setvprop!(g, "DOB", v -> Faker.date())
+setvprop!(g, :, v -> Faker.first_name(), "Name")
+setvprop!(g, :, v -> rand(1:80), "Age")
+setvprop!(g, :, v -> Faker.date(), "DoB")
 
 # Generate properties and attach them to edges.
-seteprop!(g, "weight", (u,v)->rand(1:10))
-seteprop!(g, "color", (u,v)->Faker.color_name())
+seteprop!(g, :, (u,v)->rand(1:10), "Weight")
+seteprop!(g, :, (u,v)->Faker.color_name(), "Color")
 
 # Instruct ParallelGraphs to use every Vertex's name property as its label
-setlabel!(g, "name")
+setlabel!(g, "Name")
 
-# Fetch all the properties assigned to vertex Cynthia
-g["Cynthia"]
-# Dict{ASCIIString,Any} with 3 entries:
-#   "name" => "Cynthia"
-#   "age"  => 70
-#   "DOB"  => "1976-8-2"
+# Vertex and Edge descriptors for the graph
+V,E = g
+
+# Display a view of all vertices in the graph
+println(V)
+# Vertex Descriptor, with  50 Vertices and 3 Properties
+#
+# ┌────────────────────┬────────────────────┬────────────────────┬────────────────────┐
+# │Vertex Label        │Age                 │DoB                 │Name                │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │Reina               │23                  │2015-3-7            │Reina               │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │Andrés              │30                  │1976-12-8           │Andrés              │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │Mónica              │53                  │2002-9-13           │Mónica              │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │Aldonza             │11                  │2005-4-18           │Aldonza             │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │Norma               │77                  │2020-4-12           │Norma               │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │                    │                    │                    │                    │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │Pedro               │23                  │1988-1-7            │Pedro               │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │Liliana             │50                  │1975-1-22           │Liliana             │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │Armando             │32                  │2005-9-6            │Armando             │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │Elvia               │4                   │1976-9-1            │Elvia               │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │Alicia              │27                  │1978-2-28           │Alicia              │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │Socorro             │8                   │2007-2-19           │Socorro             │
+# └────────────────────┴────────────────────┴────────────────────┴────────────────────┘
+
+# Display a view of all edges in the graph
+println(E)
+# Edge Descriptor with 500 edges and 2 properties
+#
+# ┌────────────────────┬────────────────────┬────────────────────┐
+# │Edge Label          │Color               │Weight              │
+# ├────────────────────┼────────────────────┼────────────────────┤
+# │Reina,Norma         │LightGoldenRodY...  │4                   │
+# ├────────────────────┼────────────────────┼────────────────────┤
+# │Reina,Ana           │DarkSalmon          │1                   │
+# ├────────────────────┼────────────────────┼────────────────────┤
+# │Reina,Helena        │FireBrick           │10                  │
+# ├────────────────────┼────────────────────┼────────────────────┤
+# │Reina,Minerva       │Moccasin            │3                   │
+# ├────────────────────┼────────────────────┼────────────────────┤
+# │Reina,Sergio        │LawnGreen           │2                   │
+# ├────────────────────┼────────────────────┼────────────────────┤
+# │                    │                    │                    │
+# ├────────────────────┼────────────────────┼────────────────────┤
+# │Socorro,Gerónim     │PaleGreen           │6                   │
+# ├────────────────────┼────────────────────┼────────────────────┤
+# │Socorro,María d     │MediumVioletRed     │2                   │
+# ├────────────────────┼────────────────────┼────────────────────┤
+# │Socorro,Octavio     │Wheat               │4                   │
+# ├────────────────────┼────────────────────┼────────────────────┤
+# │Socorro,Wendolin    │LawnGreen           │3                   │
+# ├────────────────────┼────────────────────┼────────────────────┤
+# │Socorro,Manuel      │MistyRose           │7                   │
+# ├────────────────────┼────────────────────┼────────────────────┤
+# │Socorro,Armando     │DarkGoldenRod       │4                   │
+# └────────────────────┴────────────────────┴────────────────────┘
+
+# Fetch all the properties assigned to vertex Silvano
+V["Silvano"]
+Vertex Descriptor, with  1 Vertices and 3 Properties
+
+# ┌────────────────────┬────────────────────┬────────────────────┬────────────────────┐
+# │Vertex Label        │Age                 │DoB                 │Name                │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │Silvano             │31                  │2007-11-16          │Silvano             │
+# └────────────────────┴────────────────────┴────────────────────┴────────────────────┘
 
 # Fetch all the properties assigned to association "Cynthia" => "Alfonso"
-g["Cynthia" => "Alfonso"]
-# Dict{ASCIIString,Any} with 2 entries:
-#   "weight" => 8
-#   "color"  => "LemonChiffon"
+g["Sara" => "Carolina"]
+# Edge Descriptor with 1 edges and 2 properties
+#
+# ┌────────────────────┬────────────────────┬────────────────────┐
+# │Edge Label          │Color               │Weight              │
+# ├────────────────────┼────────────────────┼────────────────────┤
+# │Sara,Carolina       │DarkMagenta         │2                   │
+# └────────────────────┴────────────────────┴────────────────────┘
 
-# Fetch associations from Cynthia
-g["Cynthia", :]'
-# 1x11 Array{AbstractString,2}:
-#  "Zacarías"  "Alfonso"  "Patricio"  …  "Isabel"  "Indira"  "Zeferino"
-
-# Fetch associations to Cynthia
-g[:, "Cynthia"]'
-# 1x13 Array{AbstractString,2}:
-#  "Cristobal"  "Patricia"  "Abigail"  …  "Araceli"  "Isabel"  "Natalia"
+# Fetch associations from Silvano
+g["Silvano"]'
+# 1x8 Array{AbstractString,2}:
+ # "Alejandro"  "Trinidad"  "Verónica"  "Minerva"  "Liliana"  "María Eugenia"  "Manuel"  "Alicia"
 
 # Get a subgraph with vertices of age less than 65
-filter(g, "v.age < 65")
-# Graph{ParallelGraphs.LightGraphsAM,ParallelGraphs.PureDictPM{K,V}} with 45 vertices and 402 edges
+vs = filter(V, "v.Age < 65")
 
 # Get a subgraph with edges of weight less than 7
-filter(g, "e.weight < 7")
-# Graph{ParallelGraphs.LightGraphsAM,ParallelGraphs.PureDictPM{K,V}} with 50 vertices and 305 edges
+es = filter(g, "e.Weight < 7")
+
+# Get a subgraph with vertices of age less than 65 and edges of weight less than 7
+Graph(vs, es)
+# Graph{ParallelGraphs.LightGraphsAM,ParallelGraphs.VectorPM{Any,Any}} with 40 vertices and 188 edges
 
 ```
 

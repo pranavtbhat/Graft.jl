@@ -1,10 +1,10 @@
 ######
 ##
 ## This file demonstrates the Graph API for generating graph data. Here we generate a sort of social network
-## of 2500 people, with each person begin assigned a name, age and weight. An edge in this social network
+## of 1000 people, with each person begin assigned a name, age and weight. An edge in this social network
 ## denotes a like-friendship. So we can calculate the number of people a person likes, as well as the number
-## of people that like him. We can also find the number of mutual friends in a relationship, and color the edges
-## accordingly
+## of people that like him. We can also find the number of mutual friends in a relationship, and therefore
+## the strength of the relationship, and color the edges accordingly.
 ##
 ######
 using ParallelGraphs

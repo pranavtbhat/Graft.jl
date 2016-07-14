@@ -40,7 +40,7 @@ type LinearPM{V,E} <: PropertyModule{V,E}
    end
 
    function LinearPM(nv::Int, ne::Int)
-      self = LinearPM(nv)
+      self = LinearPM{V,E}(nv)
       sizehint!(self.edata, ne)
       self
    end
@@ -50,7 +50,7 @@ function LinearPM(nv::Int=0)
    LinearPM{Any,Any}(nv)
 end
 
-function LinearPM(ne::Int=0)
+function LinearPM(nv::Int, ne::Int=0)
    LinearPM{Any,Any}(nv,ne)
 end
 
