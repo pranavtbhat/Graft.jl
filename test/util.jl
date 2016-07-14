@@ -63,8 +63,9 @@ for AM in subtypes(AdjacencyModule)
             setlabel!(V.g, "f3")
 
             # Drawing
-            println(V)
-            println(E)
+            ss = IOBuffer()
+            println(ss, V)
+            println(ss, E)
          end
       end
    end

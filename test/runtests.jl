@@ -26,12 +26,14 @@ include("adjacency.jl")
 
 include("properties.jl")
 
+include("labelling.jl")
+
 include("subgraph.jl")
 
 include("query.jl")
 
 include("filter.jl")
 
-include("algorithms.jl")
+include("parse.jl")
 
-include("labelling.jl")
+include("algorithms.jl")

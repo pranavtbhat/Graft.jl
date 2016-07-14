@@ -27,6 +27,19 @@ function Base.next(g::Graph, i)
    return nothing, 3
 end
 
+################################################# ADJACENCY QUERIES #########################################################
+
+function Base.getindex(g::Graph, v::VertexID)
+   validate_vertex(g, v)
+   copy(fadj(g, v))
+end
+
+function Base.getindex(g::Graph, v)
+   v = resolve(g, v)
+   getindex(g, v)
+end
+
+
 ################################################# VERTEX SUBSETS ############################################################
 
 @inline vertex_subset(g::Graph, vs) = vertex_subset(vertices(g), vs)
