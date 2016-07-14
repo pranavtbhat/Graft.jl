@@ -30,7 +30,7 @@ VertexDescriptor(x::VertexDescriptor, vs, props) = VertexDescriptor(x.g, copy(x.
 ################################################# MISC #######################################################################
 
 # Assume same graph for now
-(==)(x::VertexDescriptor, y::VertexDescriptor) = x.vs == y.vs && x.props == y.props
+(==)(x::VertexDescriptor, y::VertexDescriptor) = all(x.vs .== y.vs) && sort(x.props) == sort(y.props)
 
 # Orphan node in query tree
 Base.copy(x::VertexDescriptor) = VertexDescriptor(x.g, copy(x.vs), copy(x.props), nothing)

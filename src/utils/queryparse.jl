@@ -23,7 +23,12 @@ cvf(op::Symbol, x::Function, y::Function) = (g,v) -> eval(Expr(op, x(g,v), y(g,v
 cvf(op::Symbol, x::Function, y) = (g,v) -> eval(Expr(op, x(g,v), y))
 cvf(op::Symbol, x, y) = rcvf(op, y, x)
 
-parse_vertex_query(x) = x
+parse_vertex_query(x::Int) = x
+parse_vertex_query(x::Float64) = x
+parse_vertex_query(x::AbstractString) = x
+parse_vertex_query(x::Char) = x
+parse_vertex_query(x) = string(x)
+
 
 function parse_vertex_query(x::Expr)
    if x.head == :.
@@ -79,7 +84,11 @@ cef(op::Symbol, x::Function, y::Function) = (g,u,v) -> eval(Expr(op, x(g,u,v), y
 cef(op::Symbol, x::Function, y) = (g,u,v) -> eval(Expr(op, x(g,u,v), y))
 cef(op::Symbol, x, y) = rcef(op, y, x)
 
-parse_edge_query(x) = x
+parse_edge_query(x::Int) = x
+parse_edge_query(x::Float64) = x
+parse_edge_query(x::AbstractString) = x
+parse_edge_query(x::Char) = x
+parse_edge_query(x) = string(x)
 
 function parse_edge_query(x::Expr)
    if x.head == :.

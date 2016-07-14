@@ -149,7 +149,7 @@ function Base.filter(x::EdgeDescriptor, conditions::ASCIIString...)
       fn = parse_edge_query(condition)
       es = filter(e->fn(x.g, e...), es)
    end
-   EdgeDescriptor(x.g, es, property_subset(x, :))
+   EdgeDescriptor(x.g, es, property_subset(x, :), nothing)
 end
 
 function Base.filter!(x::EdgeDescriptor, conditions::ASCIIString...)
