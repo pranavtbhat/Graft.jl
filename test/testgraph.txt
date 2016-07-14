@@ -1,41 +1,41 @@
-10 28
+10,28
 
-1 name Abel age 32
-2 name Bharath age 35
-3 name Camila age 21
-4 name Dalia age 59
-5 name Eduardo age 24
-6 name Fabiola age 13
-7 name Gaurav age 46
-8 name Hector age 11
-9 name Ignacio age 81
-10 name Janardan age 5
+1,name,Abel,age,32
+2,name,Bharath,age,35
+3,name,Camila,age,21
+4,name,Dalia,age,59
+5,name,Eduardo,age,24
+6,name,Fabiola,age,13
+7,name,Gaurav,age,46
+8,name,Hector,age,11
+9,name,Ignacio,age,81
+10,name,Janardan,age,5
 
-1 2 relationship father
-2 1 relationship son
-1 3 relationship friend
-3 1 relationship friend
-2 3 relationship familyfriend
-3 2 relationship familyfriend
-3 4 relationship wife
-4 3 relationship husband
-4 5 relationship friend
-5 4 relationship friend
-4 6 relationship neighbor
-6 4 relationship neighbor
-4 7 relationship teacher
-7 4 relationship student
-4 8 relationship father
-8 4 relationship son
-4 9 relationship daughter
-9 4 relationship mother
-4 10 relationship aunt
-10 4 relationship nephew
-5 6 relationship friend
-6 5 relationship friend
-6 7 relationship friend
-7 6 relationship friend
-8 9 relationship granddaughter
-9 8 relationship grandmother
-9 10 relationship sister
-10 9 relationship sister
+1,2,relationship,father
+2,1,relationship,son
+1,3,relationship,friend
+3,1,relationship,friend
+2,3,relationship,familyfriend
+3,2,relationship,familyfriend
+3,4,relationship,wife
+4,3,relationship,husband
+4,5,relationship,friend
+5,4,relationship,friend
+4,6,relationship,neighbor
+6,4,relationship,neighbor
+4,7,relationship,teacher
+7,4,relationship,student
+4,8,relationship,father
+8,4,relationship,son
+4,9,relationship,daughter
+9,4,relationship,mother
+4,10,relationship,aunt
+10,4,relationship,nephew
+5,6,relationship,friend
+6,5,relationship,friend
+6,7,relationship,friend
+7,6,relationship,friend
+8,9,relationship,granddaughter
+9,8,relationship,grandmother
+9,10,relationship,sister
+10,9,relationship,sister

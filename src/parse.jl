@@ -1,18 +1,17 @@
 ################################################# FILE DESCRIPTION #########################################################
 
 # ParallelGraphs will eventually support several file formats for reading and writing graphs.
-# However currently, only a modified version of the Trivial Graph Format is supported. The TGF
-# is described below:
+# However currently, only a type of CSV supported. The format is described below
 #
 # The input file should contain data in the following format:
-# <num_vertices> <num_edges>
+# <num_vertices>,<num_edges>
 #
-# <vertex_label> <vertex_prop1> <val_1> <vertex_prop2> <val_2> ...
+# <vertex_label>,<vertex_prop1>,<val_1>,<vertex_prop2>,<val_2> ...
 # .
 # .
 # .
 #
-# <from_vertex_label> <to_vertex_label> <edge_property_1> <val_1> <edge_property_2> <val_2> ...
+# <from_vertex_label>,<to_vertex_label>,<edge_property_1>,<val_1>,<edge_property_2>,<val_2> ...
 # .
 # .
 # .
@@ -47,7 +46,8 @@ parseval(x) = error("Didn't know what to do with -> $x")
 parse_spec(args::Vector) = (parseval(args[1]), parseval(args[2]))
 
 # Fetch, strip and split the next line from stream
-next_line(io::IO) = split(strip(readline(io), '\n'), " ")
+next_line(io::IO) = split(strip(readline(io), '\n'), ",")
+
 
 # Parse a line describing a vertex -> <vertex_id> <vertex_prop_1> <val_1> <vertex_prop_2> <val_2> ...
 function parsevertex(g::Graph, v::VertexID, args::Vector)
@@ -112,14 +112,14 @@ prepval(x::Void) = ""
 
 """ Write a graph to file """
 function storegraph(g::Graph, io::IO)
-   println(io, "$(nv(g)) $(ne(g))")
+   println(io, "$(nv(g)),$(ne(g))")
 
    println(io)
 
    for v in vertices(g)
-      print(io, encode(g, v))
+      print(io, prepval(encode(g, v)))
       for (prop,val) in getvprop(g, v)
-         print(io, " ",prepval(prop), " ", prepval(val))
+         print(io, ",",prepval(prop), ",", prepval(val))
       end
       println(io)
    end
@@ -129,9 +129,9 @@ function storegraph(g::Graph, io::IO)
    for e in edges(g)
       v1 = prepval(encode(g, e.first))
       v2 = prepval(encode(g, e.second))
-      print(io, v1, " ", v2)
+      print(io, v1, ",", v2)
       for (prop,val) in geteprop(g, e)
-         print(io, " ", prepval(prop), " ", prepval(val))
+         print(io, ",", prepval(prop), ",", prepval(val))
       end
       println(io)
    end

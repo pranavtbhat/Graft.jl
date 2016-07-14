@@ -103,11 +103,16 @@ Base.deepcopy{AM,PM}(g::Graph{AM,PM}) = Graph{AM,PM}(deepcopy(adjmod(g)), deepco
 @inline hasedge(g::Graph, u::VertexID, v::VertexID) = hasedge(adjmod(g), u, v)
 @inline hasedge(g::Graph, es) = hasedge(adjmod(g), es)
 
-""" Vertex v's out-neighbors in the graph """
+""" Vertex v's out-neighbors in the graph (consistency and concurrency unsafe) """
 @inline fadj(g::Graph, v::VertexID) = fadj(adjmod(g), v)
-
-""" Vertex v's in-neighbors in the graph """
+""" Vertex v's in-neighbors in the graph (consistency and concurrency unsafe) """
 @inline badj(g::Graph, v::VertexID) = badj(adjmod(g), v)
+
+""" Vertex v's out-neighbors in the graph (safe) """
+@inline out_neighbors(g::Graph, v::VertexID) = out_neighbors(adjmod(g), v)
+
+""" Vertex v's in-neighbors in the graph (safe) """
+@inline in_neighbors(g::Graph, v::VertexID) = in_neighbors(adjmod(g), v)
 
 """ Get the outdegree of a vertex """
 @inline outdegree(g::Graph, v::VertexID) = outdegree(adjmod(g), v)

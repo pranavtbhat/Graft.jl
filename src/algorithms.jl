@@ -1,7 +1,7 @@
 ################################################# FILE DESCRIPTION #########################################################
 
 # This file contains graph algorithms.
- 
+
 ################################################# IMPORT/EXPORT ############################################################
 export
 # Traversals
@@ -57,17 +57,11 @@ end
 bfs(g::Graph, seed::AbstractVector) = bfs(g, collect(seed))
 bfs(g::Graph, seed::Int) = bfs(g, Int[seed])
 
-function bfs_subgraph{AM,PM}(g::Graph{AM,PM}, seed)
+function bfs_subgraph(g::Graph, seed)
    parvec = bfs(g, seed)
    vlist = find(x->x>0, parvec)
-
-   h = Graph{AM,PM}(nv(g))
-
-   for i in vlist
-      addedge!(h, parvec[i], i)
-   end
-
-   h
+   elist = EdgeID[parvec[v] => v for v in vlist]
+   subgraph(g, elist)
 end
 
 function dfs(g::Graph, root)
@@ -104,14 +98,8 @@ end
 function dfs_subgraph{AM,PM}(g::Graph{AM,PM}, root)
    parvec, = dfs(g, root)
    vlist = find(x->x>0, parvec)
-
-   h = Graph{AM,PM}(nv(g))
-
-   for i in vlist
-      addedge!(h, parvec[i], i)
-   end
-
-   h
+   elist = EdgeID[parvec[v] => v for v in vlist]
+   subgraph(g, elist)
 end
 
 ################################################# Connectivity ########################################################

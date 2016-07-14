@@ -8,7 +8,8 @@ export
 # Types
 AdjacencyModule,
 # AdjacencyModule Interface
-nv, ne, vertices, edges, hasvertex, hasedge, fadj, badj, outdegree, indegree, addvertex!, rmvertex!, addedge!, rmedge!
+nv, ne, vertices, edges, hasvertex, hasedge, fadj, badj, out_neighbors, in_neighbors, outdegree, indegree, addvertex!,
+rmvertex!, addedge!, rmedge!
 
 """ Stores edge data """
 abstract AdjacencyModule
@@ -33,6 +34,9 @@ abstract AdjacencyModule
 
 @interface fadj(x::AdjacencyModule, v::VertexID)
 @interface badj(x::AdjacencyModule, v::VertexID)
+
+out_neighbors(x::AdjacencyModule, v::VertexID) = copy(fadj(x, v))
+in_neighbors(x::AdjacencyModule, v::VertexID) = copy(badj(x, v))
 
 @interface outdegree(x::AdjacencyModule, v::VertexID)
 @interface indegree(x::AdjacencyModule, v::VertexID)
