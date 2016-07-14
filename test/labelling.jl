@@ -1,7 +1,7 @@
 ################################################# FILE DESCRIPTION #########################################################
 
 # This file contains tests for LabelModule
- 
+
 ############################################################################################################################
 
 
@@ -10,10 +10,6 @@
 
    labels = ["$i" for i in 1:10]
    @test setlabel!(g, labels) == nothing
-   @test g[:] == labels
-   
-   h = subgraph(g, 1:5)
-   @test h[:] == labels[1:5]
 
    @test rmvertex!(g, 5) == nothing
    @test resolve(g, "6") == 5
@@ -26,7 +22,7 @@
 
    # Disable labelling
    setlabel!(g) == nothing
-   @test resolve(g, 1) == 1 
+   @test resolve(g, 1) == 1
 
    # Enable labelling
    setlabel!(g, labels)
@@ -40,5 +36,3 @@
    @test resolve(g, "v1"=>"v2") == (1=>2)
    @test encode(g, 1=>2) == ("v1"=>"v2")
 end
-
-

@@ -1,124 +1,94 @@
 ################################################# FILE DESCRIPTION #########################################################
 
-# This file contains methods, macros and operators aimed at providing the user a convenient UI to the graph datastructures 
+# This file contains methods, macros and operators aimed at providing the user a convenient UI to the graph datastructures
 # over the REPL.
- 
+
 ################################################# IMPORT/EXPORT ############################################################
 
-export 
+export
 # Filtering
 vertex_filter, edge_filter
 ################################################# BASICS ###################################################################
 
-# Getindex for vertex display
-Base.getindex(g::Graph, ::Colon) = encode(g, vertices(g))
+# Vertex descriptor and queries
+include("query/vertex.jl")
 
-# Getindex for vertex properties
-Base.getindex(g::Graph, label) = getvprop(g, resolve(g, label))
-Base.getindex(g::Graph, ::Colon, propname) = getvprop(g, :, propname)
-Base.getindex(g::Graph, ::Colon, ::Colon) = getvprop(g, :)
+# Edge descriptor and queries
+include("query/edge.jl")
 
-# Getindex for edge display
-Base.getindex(g::Graph, ::Type{Pair}) = encode(g, collect(edges(g)))
 
-# Getindex of edge properties
-Base.getindex(g::Graph, e::Pair) = geteprop(g, resolve(g, e))
-Base.getindex(g::Graph, e::Pair, propname) = geteprop(g, resolve(g, e), propname)
-Base.getindex(g::Graph, ::Type{Pair}, propname) = geteprop(g, :, propname)
-Base.getindex(g::Graph, ::Type{Pair}, ::Colon) = geteprop(g, :)
+# Make the graph type iterable
+Base.start(g::Graph) = 1
+Base.done(g::Graph, i) = i == 3
 
-# Getindex for adjacencies
-Base.getindex{T}(g::Graph, e::Pair{T,Colon}) = encode(g, fadj(g, resolve(g, e.first)))
-
-# Setindex for vertex properties
-Base.setindex!(g::Graph, val, label, propname) = setvprop!(g, resolve(g, label), val, propname)
-Base.setindex!(g::Graph, d::Dict, label) = setvprop!(g, resolve(g, label), d)
-Base.setindex!(g::Graph, vals::Vector, ::Colon, propname) = setvprop!(g, :, vals, propname)
-Base.setindex!(g::Graph, dlist::Vector, ::Colon, ::Colon) = setvprop!(g, :, dlist)
-
-# Setindex for edge properties
-Base.setindex!(g::Graph, val, e::Pair, propname) = seteprop!(g, resolve(g, e)..., val, propname)
-Base.setindex!(g::Graph, d::Dict, e::Pair) = seteprop!(g, resolve(g, e), d)
-Base.setindex!(g::Graph, vals::Vector, ::Type{Pair}, propname) = seteprop!(g, :, vals, propname)
-Base.setindex!(g::Graph, dlist::Vector, ::Type{Pair}, ::Colon) = seteprop!(g, :, dlist)
-
-################################################# FILTERING #################################################################
-
-function Base.filter(g::Graph, vts::ASCIIString...)
-   vlist = vertices(g)
-   elist = collect(edges(g))
-
-   for ts in vts
-      if ismatch(r"v[.](\w+)", ts)
-         # Vertex filter query
-         vlist = vertex_filter(g, ts, vlist)
-      elseif ismatch(r"e[.](\w+)", ts)
-         # Edge filter query
-         elist = edge_filter(g, ts, elist)
-      else
-         error("The input string couldn't be parsed. Please consult documentation")
-      end
-   end
-
-   if(length(elist) == ne(g))
-      return subgraph(g, vlist)
-   elseif(length(vlist) == nv(g))
-      return subgraph(g, elist)
-   else
-      return subgraph(subgraph(g, elist), vlist)
-   end
+function Base.next(g::Graph, i)
+   i == 1 && return VertexDescriptor(g), 2
+   i == 2 && return EdgeDescriptor(g), 3
+   return nothing, 3
 end
 
-function vertex_filter(g::Graph, ts::ASCIIString, vlist=vertices(g))
-   fn = parse_vertex_query(ts)
-   filter(v->fn(g, v), vlist)
+################################################# ADJACENCY QUERIES #########################################################
+
+function Base.getindex(g::Graph, v::VertexID)
+   validate_vertex(g, v)
+   copy(fadj(g, v))
 end
 
-function edge_filter(g::Graph, ts::ASCIIString, elist=collect(edges(g)))
-   fn = parse_edge_query(ts)
-   filter(e->fn(g, e...), elist)
-end
-
-# VertexFilter Query parsing
-function parse_vertex_query(ts::ASCIIString)
-   ts = strip(ts)
-
-   # Relational filtering on vertex property
-   rvpf = r"^v[.](\w+)\s*(<|>|<=|>=|!=|==)\s*(\w+)$"
-   ismatch(rvpf, ts) && return rvpf_filter(match(rvpf, ts))
-
-   error("The input string couldn't be parsed. Please consult documentation")
-end
-
-function rvpf_filter(m)
-   prop = join(m[1])
-   op = parse(m[2])
-   val = isnumber(m[3]) ? parse(m[3]) : join(m[3])
-
-   return (g,v) -> begin
-      cmp = getvprop(g, v, prop)
-      return cmp == nothing ? false : eval(op)(cmp, val)
-   end
+function Base.getindex(g::Graph, v)
+   v = resolve(g, v)
+   encode(g, getindex(g, v))
 end
 
 
-# EdgeFilter Query parsing
-function parse_edge_query(ts::ASCIIString)
-   ts = strip(ts)
-   # Relational filtering on edge property
-   repf = r"^e[.](\w+)\s*(<|>|<=|>=|!=|==)\s*(\w+)$"
-   ismatch(repf, ts) && return repf_filter(match(repf, ts))
+################################################# VERTEX SUBSETS ############################################################
 
-   error("The input string couldn't be parsed. Please consult documentation")
-end
+@inline vertex_subset(g::Graph, vs) = vertex_subset(vertices(g), vs)
+@inline vertex_subset(x::VertexDescriptor, vs) = vertex_subset(x.g, vertex_subset(x.vs, vs))
 
-function repf_filter(m)
-   prop = join(m[1])
-   op = parse(m[2])
-   val = isnumber(m[3]) ? parse(m[3]) : join(m[3])
+@inline vertex_subset(vs::AbstractVector{VertexID}, ::Colon) = copy(vs)
+@inline vertex_subset(vs::AbstractVector{VertexID}, v::VertexID) = in(v, vs) ? [v] : error("Invalid vertex indexing: $vs <- $v")
+@inline vertex_subset(vs1::AbstractVector{VertexID}, vs2::AbstractVector{VertexID}) = issubset(vs2, vs1) ? vs2 : error("Invalid vertex indexing: $vs2 <- $vs1")
 
-   return (g, u, v) -> begin
-      cmp = geteprop(g, u, v, prop)
-      return cmp == nothing ? false : eval(op)(cmp, val)
-   end
+
+################################################# EDGE SUBSETS ##############################################################
+
+@inline edge_subset(g::Graph, is) = edge_subset(edges(g), is)
+@inline edge_subset(x::EdgeDescriptor, is) = edge_subset(x.es, is)
+
+@inline edge_subset(es::AbstractVector{EdgeID}, ::Colon) = copy(es)
+@inline edge_subset(es::AbstractVector{EdgeID}, i::Int) = try [es[i]] catch error("Invalid edge indexing: $es <- $i") end
+@inline edge_subset(es::AbstractVector{EdgeID}, is) = try es[is] catch error("Invalid edge indexing: $es <- $is") end
+
+@inline edge_subset(es::AbstractVector{EdgeID}, e::EdgeID) = e in es ? [e] : error("Invalid edge indexing: $es <- $e")
+@inline edge_subset(es1::AbstractVector{EdgeID}, es2::AbstractVector{EdgeID}) = issubset(es2, es1) ? es2 : error("Invalid edge indexing: $es1 <- $es2")
+
+################################################# PROPERTY SUBSETS ##########################################################
+
+@inline property_subset(g::Graph, props) = property_subset(listvprops(g), props)
+@inline property_subset(x::VertexDescriptor, props) = property_subset(x.props, props)
+@inline property_subset(x::EdgeDescriptor, props) = property_subset(x.props, props)
+
+@inline property_subset(props::AbstractVector, prop) = in(prop, props) ? [prop] : error("Invalid property indexing $props <- $prop")
+@inline property_subset(props1::AbstractVector, props2::AbstractVector) = issubset(props2, props1) ? props2 : error("Invalid property indexing $props1 <- $props2")
+@inline property_subset(props::AbstractVector, ::Colon) = copy(props)
+
+################################################# SUBGRAPHING ################################################################
+
+Graph(x::VertexDescriptor) = subgraph(x.g, x.vs, x.props)
+
+Graph(x::EdgeDescriptor) = subgraph(x.g, x.es, x.props)
+
+# Pray that they were derived from the same graphs :P
+function Graph(V::VertexDescriptor, E::EdgeDescriptor)
+   g = V.g
+   vlist = V.vs
+   elist = E.es
+   vproplist = V.props
+   eproplist = E.props
+
+   am = subgraph(adjmod(g), vlist, elist)
+   pm = subgraph(propmod(g), vlist, elist, vproplist, eproplist)
+   lm = subgraph(labelmod(g), vlist)
+
+   Graph(am, pm, lm)
 end

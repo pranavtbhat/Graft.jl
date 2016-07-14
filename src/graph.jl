@@ -42,6 +42,10 @@ type Graph{AM,PM}
    end
 end
 
+function Graph{AM,PM}(am::AM, pm::PM, lm=NullModule())
+   Graph{AM,PM}(am, pm, lm)
+end
+
 @inline adjmod(g::Graph) = g.adjmod
 @inline propmod(g::Graph) = g.propmod
 @inline labelmod(g::Graph) = g.labelmod
@@ -52,58 +56,31 @@ end
 
 typealias SparseGraph Graph{SparseMatrixAM, VectorPM}
 
-################################################# HELPERS ##############################################################
+################################################# VALIDATION ################################################################
 
-function validate_vertex(g::Graph, v::VertexID)
-   hasvertex(g, v) || error("Vertex $v isn't in the graph")
-   nothing
-end
+# Vertex validation
+validate_vertex(g::Graph, vs) = validate_vertex(adjmod(g), vs)
 
-function validate_vertex(g::Graph, vlist::AbstractVector{VertexID})
-   for v in vlist
-      validate_vertex(g, v)
-   end
-   nothing
-end
+# Edge checking
+can_add_edge(g::Graph, u::VertexID, v::VertexID) = can_add_edge(adjmod(g), u, v)
+can_add_edge(g::Graph, es) = can_add_edge(adjmod(g), es)
 
-function can_add_edge(g::Graph, u::VertexID, v::VertexID)
-   validate_vertex(g, u)
-   validate_vertex(g, v)
-   nothing
-end
+# Edge validation
+validate_edge(g::Graph, u::VertexID, v::VertexID) = validate_edge(adjmod(g), u, v)
+validate_edge(g::Graph, es) = validate_edge(adjmod(g), es)
 
-@inline can_add_edge(g::Graph, e::EdgeID) = can_add_edge(g, e...)
+# Property Validation
+validate_vertex_property(g::Graph, props) = validate_vertex_property(propmod(g), props)
+validate_edge_property(g::Graph, props) = validate_edge_property(propmod(g), props)
 
-function can_add_edge(g::Graph, elist::AbstractVector{EdgeID})
-   for (u,v) in elist
-      can_add_edge(g, u, v)
-   end
-end
-
-function validate_edge(g::Graph, u::VertexID, v::VertexID)
-   hasedge(g, u, v) || error("Edge $u=>$v isn't in the graph")
-   nothing
-end
-
-function validate_edge(g::Graph, e::EdgeID)
-   hasedge(g, e) || error("Edge $(e.first)=>$(e.second) isn't in the graph")
-   nothing
-end
-
-function validate_edge(g::Graph, elist::AbstractVector{EdgeID})
-   for e in elist
-      validate_edge(g, e)
-   end
-   nothing
-end
-################################################# GRAPH API ############################################################
+################################################# MISC #####################################################################
 
 # Deepcopy
 Base.deepcopy{AM,PM}(g::Graph{AM,PM}) = Graph{AM,PM}(deepcopy(adjmod(g)), deepcopy(propmod(g)), deepcopy(labelmod(g)))
 
 
+################################################# ADJACENCY ################################################################
 
-# Adjacency
 """ The number of vertices in the graph """
 @inline nv(g::Graph) = nv(adjmod(g))
 
@@ -124,13 +101,18 @@ Base.deepcopy{AM,PM}(g::Graph{AM,PM}) = Graph{AM,PM}(deepcopy(adjmod(g)), deepco
 
 """ Check if u=>v is in the graph """
 @inline hasedge(g::Graph, u::VertexID, v::VertexID) = hasedge(adjmod(g), u, v)
-@inline hasedge(g::Graph, e::EdgeID) = hasedge(adjmod(g), e)
+@inline hasedge(g::Graph, es) = hasedge(adjmod(g), es)
 
-""" Vertex v's out-neighbors in the graph """
+""" Vertex v's out-neighbors in the graph (consistency and concurrency unsafe) """
 @inline fadj(g::Graph, v::VertexID) = fadj(adjmod(g), v)
-
-""" Vertex v's in-neighbors in the graph """
+""" Vertex v's in-neighbors in the graph (consistency and concurrency unsafe) """
 @inline badj(g::Graph, v::VertexID) = badj(adjmod(g), v)
+
+""" Vertex v's out-neighbors in the graph (safe) """
+@inline out_neighbors(g::Graph, v::VertexID) = out_neighbors(adjmod(g), v)
+
+""" Vertex v's in-neighbors in the graph (safe) """
+@inline in_neighbors(g::Graph, v::VertexID) = in_neighbors(adjmod(g), v)
 
 """ Get the outdegree of a vertex """
 @inline outdegree(g::Graph, v::VertexID) = outdegree(adjmod(g), v)
@@ -138,13 +120,14 @@ Base.deepcopy{AM,PM}(g::Graph{AM,PM}) = Graph{AM,PM}(deepcopy(adjmod(g)), deepco
 """ Get the indegree of a vertex """
 @inline indegree(g::Graph, v::VertexID) = indegree(adjmod(g), v)
 
-
+################################################# MUTATION ################################################################
 """ Add a vertex to the graph """
 function addvertex!(g::Graph, num::Int=1)
    addvertex!(adjmod(g), num)
    addvertex!(propmod(g), num)
    addvertex!(labelmod(g), num)
 end
+
 
 """ Remove a vertex from the graph """
 function rmvertex!(g::Graph, vs::Union{VertexID,AbstractVector{VertexID}})
@@ -153,6 +136,7 @@ function rmvertex!(g::Graph, vs::Union{VertexID,AbstractVector{VertexID}})
    rmvertex!(propmod(g), vs)
    rmvertex!(labelmod(g), vs)
 end
+
 
 """ Add an edge u->v to the graph """
 function addedge!(g::Graph, u::VertexID, v::VertexID)
@@ -167,6 +151,7 @@ function addedge!(g::Graph, es::Union{EdgeID,AbstractVector{EdgeID}})
    addedge!(propmod(g), es)
 end
 
+
 """ Remove edge u->v from the graph """
 function rmedge!(g::Graph, u::VertexID, v::VertexID)
    validate_edge(g, u, v)
@@ -180,8 +165,14 @@ function rmedge!(g::Graph, es::Union{EdgeID,AbstractVector{EdgeID}})
    rmedge!(propmod(g), es)
 end
 
+################################################# LIST PROPS ##############################################################
 
-# Properties
+""" Check if a graph has a vertex field """
+@inline hasvprop(g::Graph, prop) = hasvprop(propmod(g), prop)
+
+""" Check if a graph has an edge field """
+@inline haseprop(g::Graph, prop) = haseprop(propmod(g), prop)
+
 """ List the vertex properties contained in the graph """
 @inline listvprops(g::Graph) = listvprops(propmod(g))
 
@@ -189,120 +180,8 @@ end
 @inline listeprops(g::Graph) = listeprops(propmod(g))
 
 
+################################################# LABELLING ################################################################
 
-""" Return the properties of a particular vertex(s) in the graph """
-function getvprop(g::Graph, vs::Union{VertexID,AbstractVector{VertexID}})
-   validate_vertex(g, vs)
-   getvprop(propmod(g), vs)
-end
-getvprop(g::Graph, ::Colon) = getvprop(propmod(g), vertices(g))
-
-function getvprop(g::Graph, vs::Union{VertexID,AbstractVector{VertexID}}, propname)
-   validate_vertex(g, vs)
-   getvprop(propmod(g), vs, propname)
-end
-getvprop(g::Graph, ::Colon, propname) = getvprop(propmod(g), vertices(g), propname)
-
-""" Return the properties of a particular edge in the graph """
-function geteprop(g::Graph, u::VertexID, v::VertexID)
-   validate_edge(g, u, v)
-   geteprop(propmod(g), u, v)
-end
-
-function geteprop(g::Graph, es::Union{EdgeID,AbstractVector{EdgeID}})
-   validate_edge(g, es)
-   geteprop(propmod(g), es)
-end
-geteprop(g::Graph, ::Colon) = geteprop(propmod(g), collect(edges(g)))
-
-function geteprop(g::Graph, u::VertexID, v::VertexID, prop)
-   validate_edge(g, u, v)
-   geteprop(propmod(g), u, v, prop)
-end
-
-function geteprop(g::Graph, es::Union{EdgeID,AbstractVector{EdgeID}}, propname)
-   validate_edge(g, es)
-   geteprop(propmod(g), es, propname)
-end
-geteprop(g::Graph, ::Colon, propname) = geteprop(propmod(g), collect(edges(g)), propname)
-
-
-""" Set the value for a vertex property """
-function setvprop!(g::Graph, vlist::Union{VertexID,AbstractVector{VertexID}}, dlist::Union{Dict,Vector})
-   validate_vertex(g, vlist)
-   setvprop!(propmod(g), vlist, dlist)
-end
-@inline setvprop!(g::Graph, ::Colon, dlist::Vector) = setvprop!(propmod(g), vertices(g), dlist)
-
-function setvprop!(g::Graph, vs::Union{VertexID,AbstractVector{VertexID}}, val, propname)
-   validate_vertex(g, vs)
-   setvprop!(propmod(g), vs, val, propname)
-end
-
-function setvprop!(g::Graph, vlist::AbstractVector{VertexID}, f::Function, propname)
-   validate_vertex(g, vlist)
-   setvprop!(propmod(g), vlist, f, propname)
-end
-
-function setvprop!(g::Graph, ::Colon, vals::Vector, propname)
-   setvprop!(propmod(g), :, vals, propname)
-end
-
-function setvprop!(g::Graph, ::Colon, f::Function, propname)
-   setvprop!(propmod(g), :, f, propname)
-end
-
-
-""" Set the value for an edge property """
-function seteprop!(g::Graph, u::VertexID, v::VertexID, d::Dict)
-   validate_edge(g, u, v)
-   seteprop!(propmod(g), u, v, d)
-end
-
-function seteprop!(g::Graph, es::EdgeID, ds::Dict)
-   validate_edge(g, es)
-   seteprop!(propmod(g), es, ds)
-end
-
-function seteprop!(g::Graph, es::AbstractVector{EdgeID}, ds::Vector)
-   validate_edge(g, es)
-   length(es) == length(ds) || error("Number of edges doesn't equal number of values")
-   seteprop!(propmod(g), es, ds)
-end
-@inline seteprop!(g::Graph, ::Colon, ds::Vector) = seteprop!(propmod(g), collect(edges(g)), ds)
-
-function seteprop!(g::Graph, u::VertexID, v::VertexID, val, propname)
-   validate_edge(g, u, v)
-   seteprop!(propmod(g), u, v, val, propname)
-end
-
-function seteprop!(g::Graph, e::EdgeID, val, propname)
-   validate_edge(g, e)
-   seteprop!(propmod(g), e, val, propname)
-end
-
-function seteprop!(g::Graph, es::AbstractVector{EdgeID}, val, propname)
-   validate_edge(g, es)
-   length(es) == length(val) || error("Number of edges doesn't equal number of values")
-   seteprop!(propmod(g), es, val, propname)
-end
-
-function seteprop!(g::Graph, elist::AbstractVector{EdgeID}, f::Function, propname)
-   validate_edge(g, elist)
-   seteprop!(propmod(g), elist, f, propname)
-end
-
-function seteprop!(g::Graph, ::Colon, vals::Vector, propname)
-   ne(g) == length(vals) || error("Number of edges doesn't equal number of values")
-   seteprop!(propmod(g), :, collect(edges(g)), vals, propname)
-end
-
-function seteprop!(g::Graph, ::Colon, f::Function, propname)
-   seteprop!(propmod(g), :, collect(edges(g)), f, propname)
-end
-
-
-# Labelling
 resolve(g::Graph, x) = resolve(labelmod(g), x)
 
 function encode(g::Graph, v::Union{VertexID,AbstractVector{VertexID}})
@@ -351,12 +230,43 @@ end
 
 ################################################# SUBGRAPHS ################################################################
 
-""" Construct an induced subgraph containing the vertices provided """
+subgraph(g::Graph) = deepcopy(g)
+
+# Vertex only
 function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID})
-   Graph{AM,PM}(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist), subgraph(labelmod(g), vlist))
+   Graph(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist), subgraph(labelmod(g), vlist))
 end
 
-""" Construct a subgraph from a list of edges """
+function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID}, vproplist::AbstractVector)
+   validate_vertex_property(g, vproplist)
+   Graph(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist, vproplist), subgraph(labelmod(g), vlist))
+end
+
+# Edge only
 function subgraph{AM,PM}(g::Graph{AM,PM}, elist::AbstractVector{EdgeID})
-   Graph{AM,PM}(subgraph(adjmod(g), elist), subgraph(propmod(g), elist), subgraph(labelmod(g), elist))
+   Graph(subgraph(adjmod(g), elist), subgraph(propmod(g), elist), deepcopy(labelmod(g)))
+end
+
+function subgraph{AM,PM}(g::Graph{AM,PM}, elist::AbstractVector{EdgeID}, eproplist::AbstractVector)
+   validate_edge_property(g, eproplist)
+   Graph(subgraph(adjmod(g), elist), subgraph(propmod(g), elist, eproplist), deepcopy(labelmod(g)))
+end
+
+# Vertex and Edge
+function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
+   Graph(subgraph(adjmod(g), vlist, elist), subgraph(propmod(g), vlist, elist), subgraph(labelmod(g), vlist))
+end
+
+function subgraph{AM,PM}(
+   g::Graph{AM,PM},
+   vlist::AbstractVector{VertexID},
+   elist::AbstractVector{EdgeID},
+   vproplist::AbstractVector,
+   eproplist::AbstractVector
+   )
+   Graph(
+      subgraph(adjmod(g), vlist, elist),
+      subgraph(propmod(g), vlist, elist, vproplist, eproplist),
+      subgraph(labelmod(g), vlist)
+   )
 end

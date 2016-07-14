@@ -4,51 +4,113 @@
 
 ############################################################################################################################
 
+# Tests for VertexDescriptor
 for PM in subtypes(PropertyModule)
    for typ in [Any,TestType]
-      @testset "Query tests for Graph{SparseMatrixAM,$PM}" begin
-         
-         g = Graph{SparseMatrixAM,PM{typ,typ}}(10,90)
+      propmod = PM{typ,typ}
+      @testset "VertexDescriptor tests for Graph{SparseMatrixAM,$PM}" begin
+         V, = Graph{SparseMatrixAM,propmod}(10,90)
 
-         labels = ["$i" for i in 1:10]
-         setlabel!(g, labels)
+         # Iteration
+         @test length(V) == 10
+         @test size(V) == (10,)
+         @test start(V) == false
+         @test endof(V) == 10
+         # @test next(V, 1) == ((1, Dict()), 2)
+         @test done(V, 11) == true
 
-         @test g[:] == labels
-         
-         @test length(g[=>]) == ne(g)
+         # Getindex
+         v1 = V[1]
+         @test isa(v1, VertexDescriptor)
+         @test length(v1) == 1
+         @test v1.props == V.props
 
-         @test g["1"=>:] == ["$i" for i in 2:10]
+         v38 = V[3:8]
+         @test isa(v38, VertexDescriptor)
+         @test length(v38) == 6
+         @test v38.props == V.props
 
-         # Vertex Properties
-         g["1", "f1"] = 1
-         g["1"] = Dict("f4"=>Colon(), "f5"=>'5')
-         g[:, "f2"] = fill(2.0, 10)
-         g[:,:] = [Dict("f3"=>"3") for i in 1:10]
+         @test V[:] == V
 
-         if typ == Any
-            @test g["1"] == Dict("f1"=>1, "f2"=>2.0, "f3"=>"3", "f4"=>Colon(), "f5"=>'5')
-         else
-            @test g["1"] == TestType(1, 2.0, "3", Colon(), '5')
-         end
+         # Setindex
+         V["f1"] = 1:10
+         V[1:5]["f4"] = true
+         V[5]["f3"] = "Middle"
 
-         @test g[:,"f2"] == fill(2.0, 10)
-         @test g[:,:] == getvprop(g, :)
+         # Get
+         @test all(get(V, "f1") .== 1:10)
+         @test get(V[1:5], "f4") == trues(5)
+         @test get(V[5], "f3") == "Middle"
 
-         # Edge Properties
-         g["1"=>"2", "f1"] = 1
-         g["1"=>"2"] = Dict("f2"=>2.0)
-         g[=>, "f3"] = fill("3", 90)
-         g[=>, :] = [Dict("f4"=>Colon(), "f5"=>'5') for i in 1:90]
+         # Map
+         map!(v->v, V, "f1")
+         map!(v->0.0, V[:], "f2")
+         map!(v->false, V[1:5], "f4")
+         map!(v->"Center", V[5], "f3")
 
-         if typ == Any
-            @test g["1"=>"2"] == Dict("f1"=>1, "f2"=>2.0, "f3"=>"3", "f4"=>Colon(), "f5"=>'5')
-         else
-            @test g["1"=>"2"] == TestType(1, 2.0, "3", Colon(), '5')
-         end
+         @test all(get(V, "f1") .== 1:10)
+         @test get(V[:], "f2") == zeros(10)
+         @test get(V[1:5], "f4") == falses(5)
+         @test get(V[5], "f3") == "Center"
 
-         @test g["1"=>"2", "f1"] == 1
-         @test g[=>, "f3"] == fill("3", 90)
-         @test g[=>, :] == geteprop(g, :)
+         # Select
+         @test select(V, "f1", "f2", "f3").props == ["f1", "f2", "f3"]
+         cV = V[:]
+         select!(cV, "f1", "f2")
+         @test cV.props == ["f1", "f2"]
+      end
+   end
+end
+
+for PM in subtypes(PropertyModule)
+   for typ in [Any,TestType]
+      propmod = PM{typ,typ}
+      @testset "EdgeDescriptor tests for Graph{SparseMatrixAM,$PM}" begin
+         V,E = Graph{SparseMatrixAM,propmod}(10,90)
+
+         # Iteration
+         @test length(E) == 90
+         @test size(E) == (90,)
+
+         # Getindex
+         e1 = E[1]
+         @test isa(e1, EdgeDescriptor)
+         @test length(e1) == 1
+         @test e1.props == E.props
+
+         e3060 = E[30:60]
+         @test isa(e3060, EdgeDescriptor)
+         @test length(e3060) == 31
+         @test e3060.props == E.props
+
+         @test E[:] == E
+
+         # Setindex
+         E["f1"] = 1:90
+         E[1:45]["f4"] = true
+         E[45]["f3"] = "Middle"
+
+         # Get
+         @test all(get(E, "f1") .== 1:90)
+         @test get(E[1:45], "f4") == trues(45)
+         @test get(E[45], "f3") == "Middle"
+
+         # Map
+         map!((u,v)->1, E, "f1")
+         map!((u,v)->5.0, E[:], "f2")
+         map!((u,v)->true, E[1:45], "f4")
+         map!((u,v)->"Center", E[45], "f3")
+
+         @test get(E, "f1") == fill(1, 90)
+         @test get(E[:], "f2") == fill(5.0, 90)
+         @test get(E[1:45], "f4") == trues(45)
+         @test get(E[45], "f3") == "Center"
+
+         # Select
+         @test select(E, "f1", "f2", "f3").props == ["f1", "f2", "f3"]
+         cE = E[:]
+         select!(cE, "f1", "f2")
+         @test cE.props == ["f1", "f2"]
       end
    end
 end

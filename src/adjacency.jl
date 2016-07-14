@@ -1,16 +1,17 @@
 ################################################# FILE DESCRIPTION #########################################################
 
-# This file contains the AdjacencyModule interface. The AdjacencyModule is expted to store all the structural information 
+# This file contains the AdjacencyModule interface. The AdjacencyModule is expted to store all the structural information
 # contained in the graph. The Adjacency module uses Integer indices to refer to vertices, in order to keep accesses fast.
- 
+
 ################################################# IMPORT/EXPORT ############################################################
-import Base: size
-export 
+export
 # Types
 AdjacencyModule,
 # AdjacencyModule Interface
-nv, ne, vertices, edges, hasvertex, hasedge, fadj, badj, outdegree, indegree, addvertex!, rmvertex!, addedge!, rmedge!
+nv, ne, vertices, edges, hasvertex, hasedge, fadj, badj, out_neighbors, in_neighbors, outdegree, indegree, addvertex!,
+rmvertex!, addedge!, rmedge!
 
+""" Stores edge data """
 abstract AdjacencyModule
 
 ################################################# INTERFACE ################################################################
@@ -25,10 +26,18 @@ abstract AdjacencyModule
 @interface edges(x::AdjacencyModule)
 
 @interface hasvertex(x::AdjacencyModule, v::VertexID)
+@interface hasvertex(x::AdjacencyModule, vs)
+
 @interface hasedge(x::AdjacencyModule, u::VertexID, v::VertexID)
-@interface hadedge(x::AdjacencyModule, e::EdgeID)
+@interface hasedge(x::AdjacencyModule, e::EdgeID)
+@interface hasedge(x::AdjacencyModule, es)
+
 @interface fadj(x::AdjacencyModule, v::VertexID)
 @interface badj(x::AdjacencyModule, v::VertexID)
+
+out_neighbors(x::AdjacencyModule, v::VertexID) = copy(fadj(x, v))
+in_neighbors(x::AdjacencyModule, v::VertexID) = copy(badj(x, v))
+
 @interface outdegree(x::AdjacencyModule, v::VertexID)
 @interface indegree(x::AdjacencyModule, v::VertexID)
 
@@ -44,7 +53,6 @@ abstract AdjacencyModule
 @interface rmedge!(x::AdjacencyModule, e::EdgeID)
 @interface rmedge!(x::AdjacencyModule, e::AbstractVector{EdgeID})
 
-import Base: ==
 (==)(x::AdjacencyModule, y::AdjacencyModule) = vertices(x) == vertices(y) && collect(edges(x)) == collect(edges(y))
 
 ################################################# SUBGRAPH ################################################################
@@ -53,6 +61,58 @@ import Base: ==
 
 @interface subgraph(x::AdjacencyModule, elist::AbstractVector{EdgeID})
 
+@interface subgraph(x::AdjacencyModule, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
+
+################################################# EDGE ITERATION ##########################################################
+
+abstract EdgeIter <: AbstractVector{EdgeID}
+
+################################################# VALIDATION ##############################################################
+
+###
+# VERTEX VALIDATION
+###
+function validate_vertex(x::AdjacencyModule, vs)
+   hasvertex(x, vs) || error("Invalid vertex(s) $vs")
+end
+
+
+###
+# EDGE CHECKING
+###
+function can_add_edge(x::AdjacencyModule, u::VertexID, v::VertexID)
+   validate_vertex(x, u)
+   validate_vertex(x, v)
+   nothing
+end
+
+can_add_edge(x::AdjacencyModule, e::EdgeID) = can_add_edge(x, e...)
+
+function can_add_edge(x::AdjacencyModule, es::AbstractVector{EdgeID})
+   for e in es
+      can_add_edge(x, e)
+   end
+end
+
+
+###
+# EDGE VALITION
+###
+
+function validate_edge(x::AdjacencyModule, u::VertexID, v::VertexID)
+   hasedge(x, u, v) || error("Edge $u=>$v isn't in the graph")
+   nothing
+end
+
+validate_edge(x::AdjacencyModule, e::EdgeID) = validate_edge(x, e...)
+
+function validate_edge(x::AdjacencyModule, elist::AbstractVector{EdgeID})
+   for e in elist
+      validate_edge(x, e)
+   end
+end
+
+
 ################################################# IMPLEMENTATIONS #########################################################
 
 if CAN_USE_LG
@@ -60,4 +120,3 @@ if CAN_USE_LG
 end
 
 include("adjmods/sparsematrix.jl")
-

@@ -1,7 +1,5 @@
 module ParallelGraphs
 
-using NDSparseData
-
 const CAN_USE_LG = begin
    try
       import LightGraphs
@@ -16,22 +14,28 @@ end
 
 using Faker
 
-import Base: deepcopy
+import Base: deepcopy, ==
 
 # Package Wide Utilities
 include("util.jl")
 
-# Property Modules
-include("properties.jl")
-
 # Adjacency Modules
 include("adjacency.jl")
+
+# Property Modules
+include("properties.jl")
 
 # Vertex Labelling
 include("labelmodule.jl")
 
 # Basic Graph Definition
 include("graph.jl")
+
+# Core implementation
+include("core/getvprop.jl")
+include("core/geteprop.jl")
+include("core/setvprop.jl")
+include("core/seteprop.jl")
 
 # Querying
 include("query.jl")

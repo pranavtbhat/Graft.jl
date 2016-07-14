@@ -1,7 +1,7 @@
 ################################################# FILE DESCRIPTION #########################################################
 
 # This file contains tests for PropertyModules
- 
+
 ############################################################################################################################
 
 
@@ -14,11 +14,11 @@ for PM in subtypes(PropertyModule)
          cmp = Array{Any}(10)
 
          setvprop!(g, 1, Dict("f1"=>1))
-         
+
          if typ == Any
             @test getvprop(g, 1) == Dict("f1"=>1)
          else
-            @test getvprop(g, 1) == TestType(1, 0.0, "", nothing, '\0')
+            @test getvprop(g, 1) == Dict("f1"=>1, "f2"=>0.0, "f3"=>"", "f4"=>nothing, "f5"=>'\0')
          end
 
          @test getvprop(g, 1, "f1") == 1
@@ -41,26 +41,21 @@ for PM in subtypes(PropertyModule)
          setvprop!(g, :, fill('0', 10), "f5")
          @test getvprop(g, :, "f5") == fill!(cmp, '0')
 
-         setvprop!(g, :, v->'5', "f5")
+         setvprop!(g, :, '5', "f5")
+         @test all(getvprop(g, :) .== Dict("f1"=>1, "f2"=>2.0, "f3"=>"3", "f4"=>Colon(), "f5"=>'5'))
 
-         if typ == Any
-            @test all(getvprop(g, :) .== Dict("f1"=>1, "f2"=>2.0, "f3"=>"3", "f4"=>Colon(), "f5"=>'5'))
-         else
-            @test all(getvprop(g, :) .== TestType(1, 2.0, "3", Colon(), '5'))
-         end
-         
          cmp = Array{Any}(10)
 
          elist = collect(edges(g))[11:20]
          dlist = [Dict("f1"=>1) for i in 1:10]
-         typlist = fill(TestType(1, 0.0, "", nothing, '\0'), 10)
+         str_dlist = fill(Dict("f1"=>1, "f2"=>0.0, "f3"=>"", "f4"=>nothing, "f5"=>'\0'), 10)
 
          seteprop!(g, 1, 2, Dict("f1"=>1))
 
          if typ == Any
             @test geteprop(g, 1, 2) == Dict("f1"=>1)
          else
-            @test geteprop(g, 1, 2) == TestType(1, 0.0, "", nothing, '\0')
+            @test geteprop(g, 1, 2) == Dict("f1"=>1, "f2"=>0.0, "f3"=>"", "f4"=>nothing, "f5"=>'\0')
          end
 
          seteprop!(g, 2=>3, Dict("f1"=>1))
@@ -68,7 +63,7 @@ for PM in subtypes(PropertyModule)
          if typ == Any
             @test geteprop(g, 2=>3) == Dict("f1"=>1)
          else
-            @test geteprop(g, 2=>3) == TestType(1, 0.0, "", nothing, '\0')
+            @test geteprop(g, 2=>3) == Dict("f1"=>1, "f2"=>0.0, "f3"=>"", "f4"=>nothing, "f5"=>'\0')
          end
 
          seteprop!(g, elist, dlist)
@@ -76,7 +71,7 @@ for PM in subtypes(PropertyModule)
          if typ == Any
             @test geteprop(g, elist) == dlist
          else
-            @test geteprop(g, elist) == typlist
+            @test geteprop(g, elist) == str_dlist
          end
 
          seteprop!(g, 3, 4, 2.0, "f2")
@@ -88,15 +83,15 @@ for PM in subtypes(PropertyModule)
          seteprop!(g, elist, fill(2.0, 10), "f2")
          @test all(geteprop(g, elist, "f2") .== 2.0)
 
-         seteprop!(g, elist, (u,v)->"3", "f3")
+         seteprop!(g, elist, "3", "f3")
          @test all(geteprop(g, elist, "f3") .== "3")
 
-         seteprop!(g, :, fill(Colon(), 90), "f4")
+         seteprop!(g, :, Colon(), "f4")
          @test all(geteprop(g, :, "f4") .== Colon())
 
-         seteprop!(g, :, (u,v)->'5', "f5")
+         seteprop!(g, :, '5', "f5")
          @test all(geteprop(g, :, "f5") .== '5')
-         
+
          # Adjacency Tests
          @test addvertex!(g) == nothing
          @test addvertex!(g, 2) == nothing

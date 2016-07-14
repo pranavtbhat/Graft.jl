@@ -1,15 +1,15 @@
 ################################################# FILE DESCRIPTION #########################################################
 
-# ParallelGraphs allows the assignment of properties (key-value pairs) the the edges and vertices in a graph. Property 
+# ParallelGraphs allows the assignment of properties (key-value pairs) the the edges and vertices in a graph. Property
 # modules are parameterized by a vertex template V and an edge template E. These templates must be types, where the fields
 # and their types describe properties.
 
 ################################################# IMPORT/EXPORT ############################################################
 export
 # Types
-PropertyModule, StronglyTypedPM, WeaklyTypedPM,
+PropertyModule,
 # Properties Interface
-listvprops, listeprops, getvprop, geteprop, setvprop!, seteprop!
+listvprops, listeprops
 
 abstract PropertyModule{V,E}
 
@@ -70,6 +70,8 @@ end
 @interface rmedge!{V,E}(x::PropertyModule{V,E}, e::EdgeID)
 @interface rmedge!{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID})
 
+@interface hasvprop{V,E}(x::PropertyModule{V,E}, prop)
+@interface haseprop{V,E}(x::PropertyModule{V,E}, prop)
 @interface listvprops{V,E}(x::PropertyModule{V,E})
 @interface listeprops{V,E}(x::PropertyModule{V,E})
 
@@ -86,8 +88,6 @@ end
 @interface geteprop{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID}, propname)
 
 
-@interface setvprop!{V,E}(x::PropertyModule{V,E}, v::VertexID, d::Dict)
-@interface setvprop!{V,E}(x::PropertyModule{V,E}, vlist::AbstractVector{VertexID}, dlist::Vector)
 @interface setvprop!{V,E}(x::PropertyModule{V,E}, v::VertexID, val, propname)
 @interface setvprop!{V,E}(x::PropertyModule{V,E}, vlist::AbstractVector{VertexID}, vals::Vector, propname)
 @interface setvprop!{V,E}(x::PropertyModule{V,E}, vlist::AbstractVector{VertexID}, f::Function, propname)
@@ -96,21 +96,57 @@ end
 
 
 @interface seteprop!{V,E}(x::PropertyModule{V,E}, u::VertexID, v::VertexID, d::Dict)
-@interface seteprop!{V,E}(x::PropertyModule{V,E}, e::EdgeID, d::Dict)
-@interface seteprop!{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID}, dlist::Vector)
 @interface seteprop!{V,E}(x::PropertyModule{V,E}, u::VertexID, v::VertexID, val, propname)
 @interface seteprop!{V,E}(x::PropertyModule{V,E}, e::EdgeID, val, propname)
 @interface seteprop!{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID}, vals::Vector, propname)
 @interface seteprop!{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID}, f::Function, propname)
-@interface seteprop!{V,E}(x::PropertyModule{V,E}, ::Colon, elist::AbstractVector{EdgeID}, vals::Vector, propname)
-@interface seteprop!{V,E}(x::PropertyModule{V,E}, ::Colon, elist::AbstractVector{EdgeID}, f::Function, propname)
 
 ################################################# SUBGRAPHING ##############################################################
 
 @interface subgraph{V,E}(x::PropertyModule{V,E}, vlist::AbstractVector{VertexID})
+@interface subgraph{V,E}(x::PropertyModule{V,E}, vlist::AbstractVector{VertexID}, vproplist::AbstractVector)
 
 @interface subgraph{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID})
+@interface subgraph{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID}, eproplist::AbstractVector)
 
+@interface subgraph{V,E}(x::PropertyModule{V,E}, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
+@interface subgraph{V,E}(
+   x::PropertyModule{V,E},
+   vlist::AbstractVector{VertexID},
+   elist::AbstractVector{EdgeID},
+   vproplist::AbstractVector,
+   eproplist::AbstractVector
+)
+
+################################################# VALIDATION ###############################################################
+
+function validate_vertex_property(x::PropertyModule, prop)
+   hasvprop(x, prop) || error("Vertex property $prop doesn't exist")
+   nothing
+end
+
+function validate_vertex_property(x::PropertyModule, props::AbstractVector)
+   for prop in props
+      validate_vertex_property(x, prop)
+   end
+end
+
+function validate_edge_property(x::PropertyModule, prop)
+   haseprop(x, prop) || error("Edge property $prop doesn't exist")
+   nothing
+end
+
+function validate_edge_property(x::PropertyModule, props::AbstractVector)
+   for prop in props
+      validate_edge_property(x, prop)
+   end
+end
+
+# Provision for new/existing vertex property
+@interface propmote_vertex_type!(x::PropertyModule, val, propname)
+
+# Provision for new/existing edge property
+@interface propmote_edge_type!(x::PropertyModule, val, propname)
 ################################################# IMPLEMENTATIONS ##########################################################
 
 # Array of Structures Implementations
