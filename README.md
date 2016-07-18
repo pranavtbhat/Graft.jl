@@ -4,8 +4,6 @@
 [![codecov.io](http://codecov.io/github/pranavtbhat/ParallelGraphs.jl/coverage.svg?branch=master)](http://codecov.io/github/pranavtbhat/ParallelGraphs.jl)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/pranavtbhat/ParallelGraphs.jl/master/LICENSE.md)
 
-*Presentation available [here](https://pranavtbhat.github.io/ParallelGraphs.jl/#/)*
-
 ParallelGraphs hopes to be a general purpose graph processing framework. Some of the use cases addressed are:
 - Storing and querying vertex or edge properties. ParallelGraphs allows the assignment of key-value pairs to vertices and edges, which can be used in various graph algorithms.
 - Vertex Labelling. ParallelGraphs allows users to refer to vertices using arbitrary Julia types.

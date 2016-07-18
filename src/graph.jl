@@ -183,6 +183,9 @@ end
 ################################################# LABELLING ################################################################
 
 resolve(g::Graph, x) = resolve(labelmod(g), x)
+resolve(g::Graph, x, y) = resolve(labelmod(g), x, y)
+
+haslabel(g::Graph, x) = haslabel(labelmod(g), x)
 
 function encode(g::Graph, v::Union{VertexID,AbstractVector{VertexID}})
    validate_vertex(g, v)

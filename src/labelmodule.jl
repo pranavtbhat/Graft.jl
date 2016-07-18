@@ -2,7 +2,7 @@
 
 # ParallelGraphs allows users to refer to vertices externally, through arbitrary Julia types. The LabelModule is responsible
 # for the resolution of these arbitrary objects into the internally used Integer indices. Both forward and reverse mappings
-# are stored in the same Dict. 
+# are stored in the same Dict.
 
 ################################################# IMPORT/EXPORT ############################################################
 export
@@ -49,10 +49,14 @@ function resolve(x::LabelModule, label)
 end
 @inline resolve(x::LabelModule, ls::AbstractVector) = map(l->resolve(x, l), ls)
 
-function resolve(x::LabelModule, e::Pair)
-   EdgeID(resolve(x, e.first), resolve(x, e.second))
+function resolve(x::LabelModule, ul, vl)
+   EdgeID(resolve(x, ul), resolve(x, vl))
 end
-@inline resolve(x::LabelModule, es::AbstractVector{Pair}) = map(e->resolve(x, e), es)
+@inline resolve(x::LabelModule, es::AbstractVector{Pair}) = map(e->resolve(x, e...), es)
+
+
+
+haslabel(x::LabelModule, y) = haskey(fmap(x), y)
 
 
 
@@ -89,7 +93,7 @@ function rmvertex!(x::LabelModule, vs)
       fmap(x)[rm[v]] = v
    end
 
-   
+
 
    x.nv -= length(vs)
    nothing

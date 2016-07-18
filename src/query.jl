@@ -39,6 +39,20 @@ function Base.getindex(g::Graph, v)
    encode(g, getindex(g, v))
 end
 
+function (+)(g::Graph, x)
+   if !haslabel(g, x)
+      addvertex!(g)
+      setlabel!(g, nv(g), x)
+      nv(g)
+   else
+      resolve(g, x)
+   end
+end
+
+function Base.setindex!(g::Graph, y, x)
+   addedge!(g, g + x, g + y)
+end
+
 
 ################################################# VERTEX SUBSETS ############################################################
 

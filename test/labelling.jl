@@ -33,6 +33,6 @@
    @test resolve(g, "v1") == 1
    @test encode(g, 1) == "v1"
 
-   @test resolve(g, "v1"=>"v2") == (1=>2)
+   @test resolve(g, "v1", "v2") == (1=>2)
    @test encode(g, 1=>2) == ("v1"=>"v2")
 end

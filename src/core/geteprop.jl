@@ -141,3 +141,11 @@ function geteprop(g::Graph, ::Colon, propname)
    validate_edge_property(g, propname)
    geteprop(propmod(g), collect(edges(g)), propname)
 end
+
+###
+# VECTORPM
+###
+function geteprop(x::VectorPM, es::EdgeIter, propname)
+   sv = edata(x)[propname]
+   sv.nzval
+end
