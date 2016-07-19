@@ -9,7 +9,10 @@ bfs, bfs_subgraph, dfs, dfs_subgraph,
 # Connectivity
 is_connected, is_strongly_connected, is_weakly_connected, strongly_connected_components, condensation,
 # Shortest Paths
-a_star, dijkstra_shortest_paths, bellman_ford_shortest_paths, sssp
+a_star, dijkstra_shortest_paths, bellman_ford_shortest_paths, sssp,
+# Centrality
+betweenness_centrality, degree_centrality, indegree_centrality, outdegree_centrality,
+closeness_centrality, katz_centrality, pagerank
 
 ################################################# INTERNALS ################################################################
 
@@ -102,7 +105,7 @@ function dfs_subgraph{AM,PM}(g::Graph{AM,PM}, root)
    subgraph(g, elist)
 end
 
-################################################# Connectivity ########################################################
+################################################# CONNECTIVITY ########################################################
 
 if CAN_USE_LG
    is_connected(g::Graph{LightGraphsAM}) = LightGraphs.is_connected(data(adjmod(g)))
@@ -112,7 +115,7 @@ if CAN_USE_LG
    condensation(g::Graph{LightGraphsAM})= LightGraphsAM(LightGraphs.condensation(data(adjmod(g))))
 end
 
-################################################# Shortest Paths ######################################################
+################################################# SHORTEST PATHS ######################################################
 
 if CAN_USE_LG
    a_star(g::Graph{LightGraphsAM}, s::Int64, t::Int64) = LightGraphs.a_star(data(adjmod(g)), s, t)
@@ -125,4 +128,16 @@ if CAN_USE_LG
 
    sssp(g::Graph{LightGraphsAM}, s::Int) = dijkstra_shortest_paths(g, s).dists
    sssp(g::Graph{LightGraphsAM}, s::Int, propname) = dijkstra_shortest_paths(g, s, propname).dists
+end
+
+################################################# BETWEENNESS CENTRALITY ###############################################
+
+if CAN_USE_LG
+   betweenness_centrality(g::Graph{LightGraphsAM}) = LightGraphs.betweenness_centrality(data(adjmod(g)))
+   degree_centrality(g::Graph{LightGraphsAM}) = LightGraphs.degree_centrality(data(adjmod(g)))
+   indegree_centrality(g::Graph{LightGraphsAM}) = LightGraphs.indegree_centrality(data(adjmod(g)))
+   outdegree_centrality(g::Graph{LightGraphsAM}) = LightGraphs.outdegree_centrality(data(adjmod(g)))
+   closeness_centrality(g::Graph{LightGraphsAM}) = LightGraphs.closeness_centrality(data(adjmod(g)))
+   katz_centrality(g::Graph{LightGraphsAM}) = LightGraphs.katz_centrality(data(adjmod(g)))
+   pagerank(g::Graph{LightGraphsAM}) = LightGraphs.pagerank(data(adjmod(g)))
 end

@@ -47,7 +47,7 @@ function parse_vertex_query(x::Expr)
       return cvf(op, lhs, rhs)
    end
 
-   if x.head in [:call, :|, :&]
+   if x.head in [:call, :|, :&, +, -, *, /, ^]
       op = eval((x.args[1]))
       a1 = parse_vertex_query(x.args[2])
       a2 = parse_vertex_query(x.args[3])
@@ -64,7 +64,8 @@ function parse_vertex_query(x::Expr)
 end
 
 function parse_vertex_query(s::ASCIIString)
-   parse_vertex_query(parse(s))
+   res = parse_vertex_query(parse(s))
+   !isa(res, Function) ? (g,v) -> res : res
 end
 
 ################################################# EDGE QUERY ##################################################################
@@ -97,7 +98,11 @@ function parse_edge_query(x::Expr)
       if isa(word, Symbol) && !isdefined(word)
          word = string(word)
       end
-      return (g,u,v) -> geteprop(g, u, v, word)
+
+      x.args[1] == :u && return (g, u, v) -> getvprop(g, u, word)
+      x.args[1] == :v && return (g, u, v) -> getvprop(g, v, word)
+      x.args[1] == :e && return (g, u, v) -> geteprop(g, u, v, word)
+      error("Couldn't parse (sub)expression $x")
    end
 
    if x.head == :comparison
@@ -107,7 +112,7 @@ function parse_edge_query(x::Expr)
       return cef(op, lhs, rhs)
    end
 
-   if x.head in [:call, :|, :&]
+   if x.head in [:call, :|, :&, +, -, *, /, ^]
       op = eval((x.args[1]))
       a1 = parse_edge_query(x.args[2])
       a2 = parse_edge_query(x.args[3])
@@ -124,5 +129,6 @@ function parse_edge_query(x::Expr)
 end
 
 function parse_edge_query(s::ASCIIString)
-   parse_edge_query(parse(s))
+   res = parse_edge_query(parse(s))
+   !isa(res, Function) ? (g,u,v) -> res : res
 end

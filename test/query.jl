@@ -42,16 +42,22 @@ for PM in subtypes(PropertyModule)
          @test get(V[1:5], "f4") == trues(5)
          @test get(V[5], "f3") == "Middle"
 
-         # Map
+         # Map! Function based
          map!(v->v, V, "f1")
-         map!(v->0.0, V[:], "f2")
-         map!(v->false, V[1:5], "f4")
-         map!(v->"Center", V[5], "f3")
-
          @test all(get(V, "f1") .== 1:10)
+
+         map!(v->0.0, V[:], "f2")
          @test get(V[:], "f2") == zeros(10)
-         @test get(V[1:5], "f4") == falses(5)
-         @test get(V[5], "f3") == "Center"
+
+         # Map! query based
+         map!("v.f2 < v.f1", V[1:5], "f4")
+         @test get(V[1:5], "f4") == trues(5)
+
+         # Map function based
+         @test map(v->1, V) == fill(1, 10)
+
+         # Map query based
+         @test map("v.f1 + 5", V) == get(V, "f1") .+ 5
 
          # Select
          @test select(V, "f1", "f2", "f3").props == ["f1", "f2", "f3"]
@@ -95,16 +101,22 @@ for PM in subtypes(PropertyModule)
          @test get(E[1:45], "f4") == trues(45)
          @test get(E[45], "f3") == "Middle"
 
-         # Map
+         # Map! function based
          map!((u,v)->1, E, "f1")
-         map!((u,v)->5.0, E[:], "f2")
-         map!((u,v)->true, E[1:45], "f4")
-         map!((u,v)->"Center", E[45], "f3")
-
          @test get(E, "f1") == fill(1, 90)
+
+         map!((u,v)->5.0, E[:], "f2")
          @test get(E[:], "f2") == fill(5.0, 90)
-         @test get(E[1:45], "f4") == trues(45)
-         @test get(E[45], "f3") == "Center"
+
+
+         # Map! query based
+         map!("e.f1 < e.f2", E[:], "f4")
+         @test get(E, "f4") == trues(90)
+
+
+         # Map function based
+         @test map((u,v)->5, E) == fill(5, 90)
+         @test map("e.f1 + 1", E) == fill(2, 90)
 
          # Select
          @test select(E, "f1", "f2", "f3").props == ["f1", "f2", "f3"]

@@ -117,17 +117,36 @@ function Base.setindex!(x::VertexDescriptor, val, propname)
    setvprop!(x.g, x.vs, val, propname)
 end
 
-################################################# MAP #######################################################################
+################################################# GET #######################################################################
 
 function Base.get(x::VertexDescriptor, propname)
    property_subset(x, propname)
    length(x) == 1 ? getvprop(x.g, x.vs[1], propname) : getvprop(x.g, x.vs, propname)
 end
 
-################################################# MAP #######################################################################
+################################################# MAP ########################################################################
 
+# Function based
+Base.map(f::Function, x::VertexDescriptor) = [f(v) for v in x.vs]
+
+# Query based
+function Base.map(s::AbstractString, x::VertexDescriptor)
+   fn = parse_vertex_query(s)
+   [fn(x.g, v) for v in x.vs]
+end
+
+################################################# MAP! #######################################################################
+
+# Function based
 function Base.map!(f::Function, x::VertexDescriptor, propname)
    setvprop!(x.g, x.vs, f, propname)
+   property_propagate!(x, propname)
+end
+
+# Query based
+function Base.map!(s::AbstractString, x::VertexDescriptor, propname)
+   f = parse_vertex_query(s)
+   setvprop!(x.g, x.vs, [f(x.g, v) for v in x.vs], propname)
    property_propagate!(x, propname)
 end
 

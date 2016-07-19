@@ -29,16 +29,17 @@ end
 
 ################################################# ADJACENCY QUERIES #########################################################
 
-function Base.getindex(g::Graph, v::VertexID)
-   validate_vertex(g, v)
-   copy(fadj(g, v))
-end
-
+###
+# GETINDEX FOR ADJACENCY
+###
 function Base.getindex(g::Graph, v)
-   v = resolve(g, v)
-   encode(g, getindex(g, v))
+   encode(g, out_neighbors(g, resolve(g, v)))
 end
 
+
+###
+# + FOR ADDVERTEX
+###
 function (+)(g::Graph, x)
    if !haslabel(g, x)
       addvertex!(g)
@@ -49,10 +50,33 @@ function (+)(g::Graph, x)
    end
 end
 
+(+)(g::Graph, xs::Vector) = [g + x for x in xs]
+
+
+###
+# - for RMVERTEX
+###
+(-)(g::Graph, x) = rmvertex!(g, resolve(g, x))
+
+function (-)(g::Graph, sx::Vector)
+   for x in xs
+      g - x
+   end
+end
+
+
+###
+# SETINDEX FOR ADDEDGE
+###
 function Base.setindex!(g::Graph, y, x)
    addedge!(g, g + x, g + y)
 end
 
+function Base.setindex!(g::Graph, ys::Vector, x)
+   for y in ys
+      addedge!(g, g + x, g + y)
+   end
+end
 
 ################################################# VERTEX SUBSETS ############################################################
 

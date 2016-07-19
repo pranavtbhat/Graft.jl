@@ -68,4 +68,17 @@ if ParallelGraphs.CAN_USE_LG
       @test sssp(g, 1) == dless_arr
       @test sssp(g, 1, "weight") == d_arr
    end
+
+   # Centrality
+   @testset "LightGraphs Centrality" begin
+      g = SimpleGraph(10, 90)
+      h = g.adjmod.data
+      @test betweenness_centrality(g) == LightGraphs.betweenness_centrality(h)
+      @test degree_centrality(g) == LightGraphs.degree_centrality(h)
+      @test indegree_centrality(g) == LightGraphs.indegree_centrality(h)
+      @test outdegree_centrality(g) == LightGraphs.outdegree_centrality(h)
+      @test closeness_centrality(g) == LightGraphs.closeness_centrality(h)
+      @test katz_centrality(g) == LightGraphs.katz_centrality(h)
+      @test pagerank(g) == LightGraphs.pagerank(h)
+   end
 end

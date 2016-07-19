@@ -125,11 +125,30 @@ function Base.get(x::EdgeDescriptor, propname)
    end
 end
 
-################################################# MAP #######################################################################
+################################################# MAP ########################################################################
 
+# Function based
+Base.map(f::Function, x::EdgeDescriptor) = [f(u,v) for (u,v) in x.es]
+
+# Query based
+function Base.map(s::AbstractString, x::EdgeDescriptor)
+   f = parse_edge_query(s)
+   [f(x.g, u, v) for (u,v) in x.es]
+end
+
+################################################# MAP! #######################################################################
+
+# Function based
 function Base.map!(f::Function, x::EdgeDescriptor, propname)
-   property_propagate!(x, propname)
    seteprop!(x.g, x.es, f, propname)
+   property_propagate!(x, propname)
+end
+
+# Query based
+function Base.map!(s::AbstractString, x::EdgeDescriptor, propname)
+   f = parse_edge_query(s)
+   seteprop!(x.g, x.es, [f(x.g, u, v) for (u,v) in x.es], propname)
+   property_propagate!(x, propname)
 end
 
 ################################################# SELECT ####################################################################
