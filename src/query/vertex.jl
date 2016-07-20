@@ -4,19 +4,8 @@
 
 ################################################# IMPORT/EXPORT ############################################################
 
-export
-# Types
-VertexDescriptor
 
-################################################# INTERNAL IMPLEMENTATION ##################################################
-""" Describes a subset of vertices and their properties """
-type VertexDescriptor
-   g::Graph
-   vs::AbstractVector{VertexID}
-   props::Vector
-   parent::Union{Void,VertexDescriptor}
-end
-
+################################################# CONSTRUCTORS #############################################################
 
 # Constructor for Iterator
 VertexDescriptor(g::Graph) = VertexDescriptor(g, vertices(g), listvprops(g), nothing)
@@ -90,13 +79,14 @@ end
 
 Base.length(x::VertexDescriptor) = length(x.vs)
 Base.size(x::VertexDescriptor) = (length(x),)
+Base.eltype(x::VertexDescriptor) = eltype(x.g.labelmod)
 
-Base.start(x::VertexDescriptor) = x.vs == start(x.vs)
+Base.start(x::VertexDescriptor) = start(x.vs)
 Base.endof(x::VertexDescriptor) = endof(x.vs)
 
 function Base.next(x::VertexDescriptor, i)
    v, i = next(x.vs, i)
-   (encode(x.g, v), getvprop(x.g, v)), i
+   (encode(x.g, v), i)
 end
 
 Base.done(x::VertexDescriptor, i) = done(x.vs, i)
@@ -111,44 +101,29 @@ Base.getindex(x::VertexDescriptor, label) = VertexDescriptor(x, resolve(x.g, lab
 Base.getindex(x::VertexDescriptor, vs::AbstractVector{VertexID}) = VertexDescriptor(x, vs)
 Base.getindex(x::VertexDescriptor, ::Colon) = VertexDescriptor(x, :)
 
-# Setindex!
-function Base.setindex!(x::VertexDescriptor, val, propname)
-   property_propagate!(x, propname)
-   setvprop!(x.g, x.vs, val, propname)
-end
-
-################################################# GET #######################################################################
+################################################# GET and SET! ##############################################################
 
 function Base.get(x::VertexDescriptor, propname)
    property_subset(x, propname)
    length(x) == 1 ? getvprop(x.g, x.vs[1], propname) : getvprop(x.g, x.vs, propname)
 end
 
+###
+# TODO: Don't modify the graph, cache properties in the Descriptor.
+###
+function set!(x::VertexDescriptor, val, propname)
+   property_propagate!(x, propname)
+   setvprop!(x.g, x.vs, val, propname)
+end
+
 ################################################# MAP ########################################################################
 
-# Function based
-Base.map(f::Function, x::VertexDescriptor) = [f(v) for v in x.vs]
+Base.map(f::Function, x::VertexDescriptor) = [f(v) for v in x]
 
-# Query based
-function Base.map(s::AbstractString, x::VertexDescriptor)
-   fn = parse_vertex_query(s)
-   [fn(x.g, v) for v in x.vs]
-end
-
-################################################# MAP! #######################################################################
-
-# Function based
-function Base.map!(f::Function, x::VertexDescriptor, propname)
-   setvprop!(x.g, x.vs, f, propname)
-   property_propagate!(x, propname)
-end
-
-# Query based
-function Base.map!(s::AbstractString, x::VertexDescriptor, propname)
-   f = parse_vertex_query(s)
-   setvprop!(x.g, x.vs, [f(x.g, v) for v in x.vs], propname)
-   property_propagate!(x, propname)
-end
+###
+# TODO: Don't modify the graph, cache properties in the Descriptor.
+###
+Base.map!(f::Function, x::VertexDescriptor, propname) = set!(x, map(f, x), propname)
 
 ################################################# SELECT ####################################################################
 

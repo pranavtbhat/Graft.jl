@@ -26,6 +26,8 @@ end
 @inline fmap(x::LabelModule) = x.fmap
 @inline rmap(x::LabelModule) = x.rmap
 
+Base.eltype{T}(x::LabelModule{T}) = T
+
 ################################################# API ######################################################################
 
 function setlabel!(x::LabelModule, v::VertexID, label)

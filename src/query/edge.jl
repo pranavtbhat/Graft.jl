@@ -4,19 +4,8 @@
 
 ################################################# IMPORT/EXPORT ############################################################
 
-export
-# Types
-EdgeDescriptor
 
 ################################################# INTERNAL IMPLEMENTATION ##################################################
-""" Describes a subset of vertices and their properties """
-type EdgeDescriptor
-   g::Graph
-   es::AbstractVector{EdgeID}
-   props::Vector
-   parent::Union{Void,EdgeDescriptor}
-end
-
 
 # Constructor for Iterator
 EdgeDescriptor(g::Graph) = EdgeDescriptor(g, edges(g), listeprops(g), nothing)

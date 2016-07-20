@@ -62,6 +62,7 @@ setvprop!(x::NullModule, args...) = Void()
 seteprop!(x::NullModule, args...) = Void()
 
 # Labelling
+Base.eltype(x::NullModule) = Int
 setlabel!(x::NullModule, args...) = Void()
 resolve(x::NullModule, obj) = obj
 encode(x::NullModule, obj) = obj
