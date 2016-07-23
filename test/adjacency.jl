@@ -7,32 +7,34 @@
 
 for AM in subtypes(AdjacencyModule)
    @testset "AdjacencyModule interface for $AM" begin
-      g = Graph{AM,NullModule}(10, 90)
-      @test nv(g) == 10
-      @test ne(g) == 90
-      @test size(g) == (10,90)
-      @test vertices(g) == 1 : 10
+      x = AM(10, 90)
 
-      @test all(e->hasedge(g, e), edges(g))
+      @test nv(x) == 10
+      @test ne(x) == 90
+      @test size(x) == (10,90)
+      @test vertices(x) == 1 : 10
 
-      @test fadj(g, 1) == collect(2:10)
-      @test badj(g, 10) == collect(1:9)
+      @test all(e->hasedge(x, e), edges(x))
 
-      @test addvertex!(g, 2) == nothing
-      @test nv(g) == 12
+      @test fadj(x, 1) == collect(2:10)
+      @test badj(x, 10) == collect(1:9)
 
-      @test addedge!(g, 10, 11) == nothing
-      @test addedge!(g, [EdgeID(10, 12), EdgeID(11, 12)]) == nothing
-      @test ne(g) == 93
+      addvertex!(x)
+      addvertex!(x)
+      @test nv(x) == 12
 
-      @test rmedge!(g, 11, 12) == nothing
-      @test rmedge!(g, [EdgeID(10, 12), EdgeID(10, 11)]) == nothing
-      @test ne(g) == 90
+      @test addedge!(x, 10, 11) == nothing
+      @test addedge!(x, [EdgeID(10, 12), EdgeID(11, 12)]) == nothing
+      @test ne(x) == 93
 
-      @test rmvertex!(g, [11, 12]) == nothing
-      @test rmvertex!(g, 10) == nothing
-      @test nv(g) == 9
-      @test ne(g) == 72
+      @test rmedge!(x, 11, 12) == nothing
+      @test rmedge!(x, [EdgeID(10, 12), EdgeID(10, 11)]) == nothing
+      @test ne(x) == 90
+
+      @test rmvertex!(x, [11, 12]) == nothing
+      @test rmvertex!(x, 10) == nothing
+      @test nv(x) == 9
+      @test ne(x) == 72
    end
 end
 
@@ -40,11 +42,10 @@ end
 
 for AM in subtypes(AdjacencyModule)
    @testset "Edge iteration interface for $AM" begin
-      g = Graph{AM,NullModule}(10, 90)
-      eit = edges(g)
+      x = AM(10, 90)
+      eit = edges(x)
       es = collect(eit)
 
-      @test isa(eit, ParallelGraphs.EdgeIter)
       @test [e for e in eit] == es
 
       @test all(eit .== es)

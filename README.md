@@ -61,7 +61,7 @@ using ParallelGraphs
 # Randomly generate a graph with 50 vertices and 500 edges.
 srand(101)
 g = SimpleGraph(50, 500)
-# Graph{ParallelGraphs.LightGraphsAM,ParallelGraphs.PureDictPM{ASCIIString,Any}} with 50 vertices and 500 edges
+# Graph{ParallelGraphs.LightGraphsAM,ParallelGraphs.PureDictPM{String,Any}} with 50 vertices and 500 edges
 
 # Generate properties and attach them to vertices.
 setvprop!(g, :, v -> Faker.first_name(), "Name")
@@ -164,7 +164,7 @@ g["Sara" => "Carolina"]
 
 # Fetch associations from Silvano
 g["Silvano"]'
-# 1x8 Array{AbstractString,2}:
+# 1x8 Array{String,2}:
  # "Alejandro"  "Trinidad"  "Verónica"  "Minerva"  "Liliana"  "María Eugenia"  "Manuel"  "Alicia"
 
 # Get a subgraph with vertices of age less than 65

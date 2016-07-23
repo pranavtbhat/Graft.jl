@@ -162,32 +162,6 @@ end
 
 seteprop!(x::VectorPM, e::EdgeID, d::Dict) = seteprop!(x, e..., d)
 
-
-################################################# MULTI DICT #################################################################
-
-""" seteprop!(g::Graph, es::AbstractVector{EdgeID}, ds::Vector) -> Set all properties for e in es """
-function seteprop!(g::Graph, es::AbstractVector{EdgeID}, ds::Vector)
-   validate_edge(g, es)
-   length(es) == length(ds) || error("Number of edges doesn't equal number of values")
-   seteprop!(propmod(g), es, ds)
-end
-
-
-###
-# PROPERTY MODULE
-###
-function seteprop!(x::PropertyModule, elist::AbstractVector{EdgeID}, dlist::Vector)
-   for (e,d) in zip(elist,dlist)
-      seteprop!(x, e, d)
-   end
-end
-
-
-################################################# ALL DICT ###################################################################
-
-""" seteprop!(g::Graph, es::AbstractVector{EdgeID}, ds::Vector) -> Set all properties for e in edges(g) """
-seteprop!(g::Graph, ::Colon, ds::Vector) = seteprop!(propmod(g), collect(edges(g)), ds)
-
 ################################################# MULTI FUNCTION ##############################################################
 
 """ seteprop!(g::Graph, elist::AbstractVector{EdgeID}, f::Function, propname) -> Map onto a property for e in es """

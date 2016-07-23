@@ -98,7 +98,7 @@ function dfs(g::Graph, root)
    parvec, order
 end
 
-function dfs_subgraph{AM,PM}(g::Graph{AM,PM}, root)
+function dfs_subgraph(g::Graph, root)
    parvec, = dfs(g, root)
    vlist = find(x->x>0, parvec)
    elist = EdgeID[parvec[v] => v for v in vlist]

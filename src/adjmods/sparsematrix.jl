@@ -25,7 +25,7 @@ function SparseMatrixAM(nv=0)
 end
 
 function SparseMatrixAM(nv::Int, ne::Int)
-   m = sprandbool(nv, nv, ne/(nv*(nv-1)))
+   m = sprand(Bool, nv, nv, ne/(nv*(nv-1)))
    fdata = m - spdiagm(diag(m), 0)
    bdata = fdata'
    adjvec = zeros(VertexID, nv)
@@ -197,10 +197,10 @@ indegree(x::SparseMatrixAM, v::VertexID) = length(nzrange(bdata(x), v))
 
 
 
-function addvertex!(x::SparseMatrixAM, numv::Int = 1)
-   x.fdata = grow(fdata(x), numv)
-   x.bdata = grow(bdata(x), numv)
-   x.nv += numv
+function addvertex!(x::SparseMatrixAM)
+   x.fdata = grow(fdata(x), 1)
+   x.bdata = grow(bdata(x), 1)
+   x.nv += 1
    nothing
 end
 

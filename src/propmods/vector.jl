@@ -55,12 +55,12 @@ end
 
 # Initialize vprop array
 function init_vprop_dict(T::DataType, nv::Int)
-   [string(field) => default_vector(fieldtype(T, field), nv) for field in fieldnames(T)]
+   Dict(string(field) => default_vector(fieldtype(T, field), nv) for field in fieldnames(T))
 end
 
 # Initialize eprop array
 function init_eprop_dict(T::DataType, nv::Int)
-   [string(field) => default_matrix(fieldtype(T, field), nv) for field in fieldnames(T)]
+   Dict(string(field) => default_matrix(fieldtype(T, field), nv) for field in fieldnames(T))
 end
 
 ################################################# VALIDATION ###############################################################
@@ -191,34 +191,34 @@ listeprops{V,E}(x::VectorPM{V,E}) = map(string, fieldnames(E))
 ################################################# SUBGRAPH #################################################################
 
 function subgraph{V,E}(x::VectorPM{V,E}, vlist::AbstractVector{VertexID})
-   VD = [key=>arr[vlist] for (key,arr) in vdata(x)]
-   ED = [key=>arr[vlist,vlist] for (key,arr) in edata(x)]
+   VD = Dict(key=>arr[vlist] for (key,arr) in vdata(x))
+   ED = Dict(key=>arr[vlist,vlist] for (key,arr) in edata(x))
    VectorPM{V,E}(nv(x), VD, ED)
 end
 
 function subgraph(x::VectorPM, vlist::AbstractVector{VertexID}, vproplist::AbstractVector)
-   VD = [prop=>vdata(x)[prop][vlist] for prop in vproplist]
-   ED = [key=>arr[vlist,vlist] for (key,arr) in edata(x)]
+   VD = Dict(prop=>vdata(x)[prop][vlist] for prop in vproplist)
+   ED = Dict(key=>arr[vlist,vlist] for (key,arr) in edata(x))
    VectorPM{Any,Any}(nv(x), VD, ED)
 end
 
 
 function subgraph{V,E}(x::VectorPM{V,E}, elist::AbstractVector{EdgeID})
    VD = deepcopy(vdata(x))
-   ED = [key=>splice_matrix(arr, elist) for (key,arr) in edata(x)]
+   ED = Dict(key=>splice_matrix(arr, elist) for (key,arr) in edata(x))
    VectorPM{V,E}(nv(x), VD, ED)
 end
 
 function subgraph(x::VectorPM, elist::AbstractVector{EdgeID}, eproplist::AbstractVector)
    VD = deepcopy(vdata(x))
-   ED = [prop=>splice_matrix(edata(x)[prop], elist) for prop in eproplist]
+   ED = Dict(prop=>splice_matrix(edata(x)[prop], elist) for prop in eproplist)
    VectorPM{Any,Any}(nv(x), VD, ED)
 end
 
 
 function subgraph{V,E}(x::VectorPM{V,E}, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
-   VD = [key=>arr[vlist] for (key,arr) in vdata(x)]
-   ED = [key=>splice_matrix(arr, elist)[vlist,vlist] for (key,arr) in edata(x)]
+   VD = Dict(key=>arr[vlist] for (key,arr) in vdata(x))
+   ED = Dict(key=>splice_matrix(arr, elist)[vlist,vlist] for (key,arr) in edata(x))
    VectorPM{V,E}(length(vlist), VD, ED)
 end
 
@@ -229,7 +229,7 @@ function subgraph(
    vproplist::AbstractVector,
    eproplist::AbstractVector
    )
-   VD = [prop => vdata(x)[prop][vlist] for prop in vproplist]
-   ED = [prop => splice_matrix(edata(x)[prop], elist)[vlist,vlist] for prop in eproplist]
+   VD = Dict(prop => vdata(x)[prop][vlist] for prop in vproplist)
+   ED = Dict(prop => splice_matrix(edata(x)[prop], elist)[vlist,vlist] for prop in eproplist)
    VectorPM{Any,Any}(length(vlist), VD, ED)
 end

@@ -1,15 +1,16 @@
 module ParallelGraphs
 
-const CAN_USE_LG = begin
-   try
-      import LightGraphs
-      true
-   catch e
-      println(e)
-      println("Cannot load LightGraphs. LightGraphsAM will be disabled.")
-      false
-   end
-end
+const CAN_USE_LG = false
+# begin
+#    try
+#       import LightGraphs
+#       true
+#    catch e
+#       println(e)
+#       println("Cannot load LightGraphs. LightGraphsAM will be disabled.")
+#       false
+#    end
+# end
 
 
 using Faker
@@ -30,6 +31,9 @@ include("labelmodule.jl")
 
 # Basic Graph Definition
 include("graph.jl")
+
+# Graph Generators
+include("generator.jl")
 
 # Core implementation
 include("core/getvprop.jl")

@@ -23,6 +23,10 @@ function is_vertex_setfield(x::Expr)
    x.head == :(=) && is_vertex_getfield(x.args[1])
 end
 
+is_graph_getfield(x) = false
+function is_graph_getfield(x::Expr)
+   x == :(g[v])
+end
 
 fetch_getfield_property(x) = x
 fetch_getfield_property(x::Expr) = fetch_getfield_property(x.args[2])
@@ -34,7 +38,7 @@ fetch_setfield_property(x::Expr) = fetch_getfield_property(x.args[1])
 
 exec_query(x::Number, desc) = fill(x, length(desc))
 exec_query(x::Bool, desc) = fill(x, length(desc))
-exec_query(x::AbstractString, desc) = fill(x, length(desc))
+exec_query(x::String, desc) = fill(x, length(desc))
 exec_query(x::AbstractArray, desc) = fill(x, length(desc))
 
 # Convert unit operators into
@@ -54,8 +58,10 @@ const _sym_map = Dict{Symbol,Symbol}(
 function exec_query(x::Symbol, desc)
    if haskey(_sym_map, x)
       _sym_map[x]
+   elseif x == :v
+      encode(desc.g, :)
    elseif isdefined(x)
-      fill(eval(x), length(V))
+      fill(eval(x), length(desc))
    end
 end
 
@@ -70,6 +76,11 @@ function exec_query(x::Expr, V::VertexDescriptor)
    if is_vertex_setfield(x)
       prop = fetch_setfield_property(x)
       return set!(V, exec_query(x.args[2], V), prop)
+   end
+
+   # Getindex override for graph
+   if is_graph_getfield(x)
+      return [V.g[v] for v in V]
    end
 
    # Convert non-adherent query into either :comparison or :call types

@@ -39,7 +39,6 @@ function property_propagate!(x::EdgeDescriptor, propname)
    property_propagate!(x.parent, propname)
 end
 
-property_propagate!(x::Void, propname) = nothing
 
 ################################################# SHOW ######################################################################
 
@@ -120,7 +119,7 @@ end
 Base.map(f::Function, x::EdgeDescriptor) = [f(u,v) for (u,v) in x.es]
 
 # Query based
-function Base.map(s::AbstractString, x::EdgeDescriptor)
+function Base.map(s::String, x::EdgeDescriptor)
    f = parse_edge_query(s)
    [f(x.g, u, v) for (u,v) in x.es]
 end
@@ -134,7 +133,7 @@ function Base.map!(f::Function, x::EdgeDescriptor, propname)
 end
 
 # Query based
-function Base.map!(s::AbstractString, x::EdgeDescriptor, propname)
+function Base.map!(s::String, x::EdgeDescriptor, propname)
    f = parse_edge_query(s)
    seteprop!(x.g, x.es, [f(x.g, u, v) for (u,v) in x.es], propname)
    property_propagate!(x, propname)
@@ -151,7 +150,7 @@ end
 
 ################################################# FILTER ####################################################################
 
-function Base.filter(x::EdgeDescriptor, conditions::ASCIIString...)
+function Base.filter(x::EdgeDescriptor, conditions::String...)
    es = edge_subset(x, :)
    for condition in conditions
       fn = parse_edge_query(condition)
@@ -160,7 +159,7 @@ function Base.filter(x::EdgeDescriptor, conditions::ASCIIString...)
    EdgeDescriptor(x.g, es, property_subset(x, :), nothing)
 end
 
-function Base.filter!(x::EdgeDescriptor, conditions::ASCIIString...)
+function Base.filter!(x::EdgeDescriptor, conditions::String...)
    for condition in conditions
       fn = parse_edge_query(condition)
       x.es = filter(e->fn(x.g, e...), x.es)

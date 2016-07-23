@@ -14,47 +14,20 @@ subgraph
 type Graph{AM,PM}
    adjmod::AM
    propmod::PM
-   labelmod::Any
-
-
-   function Graph(am, pm=NullModule(), lm=NullModule())
-      self = new()
-      self.adjmod = am
-      self.propmod = pm
-      self.labelmod = lm
-      self
-   end
-
-   function Graph(nv::Int=0)
-      self = new()
-      self.adjmod = AM(nv)
-      self.propmod = PM(nv)
-      self.labelmod = NullModule()
-      self
-   end
-
-   function Graph(nv::Int, ne::Int)
-      self = new()
-      self.adjmod = AM(nv, ne)
-      self.propmod = PM(nv)
-      self.labelmod = NullModule()
-      self
-   end
+   labelmod::LabelModule
 end
 
-function Graph{AM,PM}(am::AM, pm::PM, lm=NullModule())
-   Graph{AM,PM}(am, pm, lm)
-end
+Graph(am, pm, lm=LabelModule(nv(am))) = Graph(am, pm, lm)
 
-@inline adjmod(g::Graph) = g.adjmod
-@inline propmod(g::Graph) = g.propmod
-@inline labelmod(g::Graph) = g.labelmod
+adjmod(g::Graph) = g.adjmod
+propmod(g::Graph) = g.propmod
+labelmod(g::Graph) = g.labelmod
 
 if CAN_USE_LG
    typealias SimpleGraph Graph{LightGraphsAM,VectorPM}
 end
 
-typealias SparseGraph Graph{SparseMatrixAM, VectorPM}
+typealias SparseGraph Graph{SparseMatrixAM,VectorPM}
 
 ################################################# VALIDATION ################################################################
 
@@ -76,7 +49,7 @@ validate_edge_property(g::Graph, props) = validate_edge_property(propmod(g), pro
 ################################################# MISC #####################################################################
 
 # Deepcopy
-Base.deepcopy{AM,PM}(g::Graph{AM,PM}) = Graph{AM,PM}(deepcopy(adjmod(g)), deepcopy(propmod(g)), deepcopy(labelmod(g)))
+Base.deepcopy(g::Graph) = Graph(deepcopy(adjmod(g)), deepcopy(propmod(g)), deepcopy(labelmod(g)))
 
 
 ################################################# ADJACENCY ################################################################
@@ -121,48 +94,45 @@ Base.deepcopy{AM,PM}(g::Graph{AM,PM}) = Graph{AM,PM}(deepcopy(adjmod(g)), deepco
 @inline indegree(g::Graph, v::VertexID) = indegree(adjmod(g), v)
 
 ################################################# MUTATION ################################################################
+
 """ Add a vertex to the graph """
-function addvertex!(g::Graph, num::Int=1)
-   addvertex!(adjmod(g), num)
-   addvertex!(propmod(g), num)
-   addvertex!(labelmod(g), num)
+function addvertex!(g::Graph)
+   addvertex!(adjmod(g)); addvertex!(propmod(g)); addvertex!(labelmod(g))
+end
+
+function addvertex!(g::Graph, l)
+   addvertex!(adjmod(g)); addvertex!(propmod(g)); addvertex!(labelmod(g), l)
 end
 
 
 """ Remove a vertex from the graph """
 function rmvertex!(g::Graph, vs::Union{VertexID,AbstractVector{VertexID}})
    validate_vertex(g, vs)
-   rmvertex!(adjmod(g), vs)
-   rmvertex!(propmod(g), vs)
-   rmvertex!(labelmod(g), vs)
+   rmvertex!(adjmod(g), vs); rmvertex!(propmod(g), vs); rmvertex!(labelmod(g), vs)
 end
 
 
 """ Add an edge u->v to the graph """
 function addedge!(g::Graph, u::VertexID, v::VertexID)
    can_add_edge(g, u, v)
-   addedge!(adjmod(g), u, v)
-   addedge!(propmod(g), u, v)
+   addedge!(adjmod(g), u, v); addedge!(propmod(g), u, v)
 end
 
 function addedge!(g::Graph, es::Union{EdgeID,AbstractVector{EdgeID}})
    can_add_edge(g, es)
-   addedge!(adjmod(g), es)
-   addedge!(propmod(g), es)
+   addedge!(adjmod(g), es); addedge!(propmod(g), es)
 end
 
 
 """ Remove edge u->v from the graph """
 function rmedge!(g::Graph, u::VertexID, v::VertexID)
    validate_edge(g, u, v)
-   rmedge!(adjmod(g), u, v)
-   rmedge!(propmod(g), u, v)
+   rmedge!(adjmod(g), u, v); rmedge!(propmod(g), u, v)
 end
 
 function rmedge!(g::Graph, es::Union{EdgeID,AbstractVector{EdgeID}})
    validate_edge(g, es)
-   rmedge!(adjmod(g), es)
-   rmedge!(propmod(g), es)
+   rmedge!(adjmod(g), es); rmedge!(propmod(g), es)
 end
 
 ################################################# LIST PROPS ##############################################################
@@ -187,44 +157,42 @@ resolve(g::Graph, x, y) = resolve(labelmod(g), x, y)
 
 haslabel(g::Graph, x) = haslabel(labelmod(g), x)
 
-function encode(g::Graph, v::Union{VertexID,AbstractVector{VertexID}})
-   validate_vertex(g, v)
-   encode(labelmod(g), v)
+function encode(g::Graph, vs::Union{VertexID,AbstractVector{VertexID}})
+   validate_vertex(g, vs)
+   encode(labelmod(g), vs)
 end
 
-function encode(g::Graph, elist::Union{EdgeID,AbstractVector{EdgeID}})
-   validate_edge(g, elist)
-   encode(labelmod(g), elist)
+function encode(g::Graph, es::Union{EdgeID,AbstractVector{EdgeID}})
+   validate_edge(g, es)
+   encode(labelmod(g), es)
 end
 
-function setlabel!{T}(g::Graph, labels::Vector{T})
-   length(labels) == nv(g) || error("Incorrect number of labels provided")
-   g.labelmod = LabelModule(nv(g), copy(labels))
-   nothing
-end
-
-function setlabel!(g::Graph, f::Function)
-   labels = [f(v) for v in vertices(g)]
-   g.labelmod = LabelModule(nv(g), labels)
+function setlabel!{T}(g::Graph, ls::Vector{T})
+   length(ls) == nv(g) || error("Incorrect number of ls provided")
+   g.labelmod = LabelModule(ls)
    nothing
 end
 
 function setlabel!(g::Graph, propname)
-   labels = [getvprop(g, v, propname) for v in vertices(g)]
-   g.labelmod = LabelModule(nv(g), labels)
+   ls = [getvprop(g, v, propname) for v in vertices(g)]
+   g.labelmod = LabelModule(ls)
    nothing
 end
 
 function setlabel!(g::Graph)
-   g.labelmod = NullModule()
+   g.labelmod = LabelModule(nv(g))
    nothing
 end
 
-function setlabel!(g::Graph, v::VertexID, label)
+function setlabel!(g::Graph, v::VertexID, l)
    validate_vertex(g, v)
-   setlabel!(labelmod(g), v, label)
+   setlabel!(labelmod(g), v, l)
 end
 
+function setlabel!(g::Graph, vs::AbstractVector{VertexID}, ls::AbstractVector)
+   validate_vertex(g, vs)
+   setlabel!(labelmod(g), vs, ls)
+end
 ################################################# DISPLAY ##################################################################
 
 function Base.show{AM,PM}(io::IO, g::Graph{AM,PM})
@@ -236,32 +204,32 @@ end
 subgraph(g::Graph) = deepcopy(g)
 
 # Vertex only
-function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID})
+function subgraph(g::Graph, vlist::AbstractVector{VertexID})
    Graph(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist), subgraph(labelmod(g), vlist))
 end
 
-function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID}, vproplist::AbstractVector)
+function subgraph(g::Graph, vlist::AbstractVector{VertexID}, vproplist::AbstractVector)
    validate_vertex_property(g, vproplist)
    Graph(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist, vproplist), subgraph(labelmod(g), vlist))
 end
 
 # Edge only
-function subgraph{AM,PM}(g::Graph{AM,PM}, elist::AbstractVector{EdgeID})
+function subgraph(g::Graph, elist::AbstractVector{EdgeID})
    Graph(subgraph(adjmod(g), elist), subgraph(propmod(g), elist), deepcopy(labelmod(g)))
 end
 
-function subgraph{AM,PM}(g::Graph{AM,PM}, elist::AbstractVector{EdgeID}, eproplist::AbstractVector)
+function subgraph(g::Graph, elist::AbstractVector{EdgeID}, eproplist::AbstractVector)
    validate_edge_property(g, eproplist)
    Graph(subgraph(adjmod(g), elist), subgraph(propmod(g), elist, eproplist), deepcopy(labelmod(g)))
 end
 
 # Vertex and Edge
-function subgraph{AM,PM}(g::Graph{AM,PM}, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
+function subgraph(g::Graph, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
    Graph(subgraph(adjmod(g), vlist, elist), subgraph(propmod(g), vlist, elist), subgraph(labelmod(g), vlist))
 end
 
-function subgraph{AM,PM}(
-   g::Graph{AM,PM},
+function subgraph(
+   g::Graph,
    vlist::AbstractVector{VertexID},
    elist::AbstractVector{EdgeID},
    vproplist::AbstractVector,

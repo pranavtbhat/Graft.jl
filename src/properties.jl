@@ -20,7 +20,7 @@ abstract PropertyModule{V,E}
 Base.zero(::Type{Char}) = Char(0)
 
 # String
-Base.zero{T<:AbstractString}(::Type{T}) = ""
+Base.zero{T<:String}(::Type{T}) = ""
 
 # Dict
 Base.zero(::Type{Dict}) = Dict()
@@ -76,7 +76,6 @@ end
 @interface listeprops{V,E}(x::PropertyModule{V,E})
 
 @interface getvprop{V,E}(x::PropertyModule{V,E}, v::VertexID)
-@interface getvprop{V,E}(x::PropertyModule{V,E}, vlist::AbstractVector{VertexID})
 @interface getvprop{V,E}(x::PropertyModule{V,E}, v::VertexID, propname)
 @interface getvprop{V,E}(x::PropertyModule{V,E}, vlist::AbstractVector{VertexID}, propname)
 
@@ -84,7 +83,6 @@ end
 @interface geteprop{V,E}(x::PropertyModule{V,E}, e::EdgeID)
 @interface geteprop{V,E}(x::PropertyModule{V,E}, u::VertexID, v::VertexID, propname)
 @interface geteprop{V,E}(x::PropertyModule{V,E}, e::EdgeID, propname)
-@interface geteprop{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID})
 @interface geteprop{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID}, propname)
 
 
@@ -95,7 +93,6 @@ end
 @interface setvprop!{V,E}(x::PropertyModule{V,E}, ::Colon, f::Function, propname)
 
 
-@interface seteprop!{V,E}(x::PropertyModule{V,E}, u::VertexID, v::VertexID, d::Dict)
 @interface seteprop!{V,E}(x::PropertyModule{V,E}, u::VertexID, v::VertexID, val, propname)
 @interface seteprop!{V,E}(x::PropertyModule{V,E}, e::EdgeID, val, propname)
 @interface seteprop!{V,E}(x::PropertyModule{V,E}, elist::AbstractVector{EdgeID}, vals::Vector, propname)

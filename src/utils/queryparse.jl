@@ -25,7 +25,6 @@ cvf(op::Symbol, x, y) = rcvf(op, y, x)
 
 parse_vertex_query(x::Int) = x
 parse_vertex_query(x::Float64) = x
-parse_vertex_query(x::AbstractString) = x
 parse_vertex_query(x::Char) = x
 parse_vertex_query(x) = string(x)
 
@@ -63,7 +62,7 @@ function parse_vertex_query(x::Expr)
    error("Couldn't parse (sub)expression $x")
 end
 
-function parse_vertex_query(s::ASCIIString)
+function parse_vertex_query(s::String)
    res = parse_vertex_query(parse(s))
    !isa(res, Function) ? (g,v) -> res : res
 end
@@ -87,7 +86,6 @@ cef(op::Symbol, x, y) = rcef(op, y, x)
 
 parse_edge_query(x::Int) = x
 parse_edge_query(x::Float64) = x
-parse_edge_query(x::AbstractString) = x
 parse_edge_query(x::Char) = x
 parse_edge_query(x) = string(x)
 
@@ -128,7 +126,7 @@ function parse_edge_query(x::Expr)
    error("Couldn't parse (sub)expression $x")
 end
 
-function parse_edge_query(s::ASCIIString)
+function parse_edge_query(s::String)
    res = parse_edge_query(parse(s))
    !isa(res, Function) ? (g,u,v) -> res : res
 end

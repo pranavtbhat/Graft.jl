@@ -28,12 +28,12 @@ geteprop(g::Graph, e::EdgeID) = geteprop(g, e...)
 ###
 function geteprop(x::LinearPM{Any,Any}, u::VertexID, v::VertexID)
    data = edata(x)[v,u]
-   [prop => get(data, prop, zero(typ)) for (prop,typ) in eprops(x)]
+   Dict(prop => get(data, prop, zero(typ)) for (prop,typ) in eprops(x))
 end
 
 function geteprop{V,E}(x::LinearPM{V,E}, u::VertexID, v::VertexID)
    data = edata(x)[v,u]
-   [string(field) => getfield(data, field) for field in fieldnames(E)]
+   Dict(string(field) => getfield(data, field) for field in fieldnames(E))
 end
 
 geteprop(x::LinearPM, e::EdgeID) = geteprop(x, e...)
@@ -42,42 +42,8 @@ geteprop(x::LinearPM, e::EdgeID) = geteprop(x, e...)
 ###
 # VECTORPM
 ###
-geteprop(x::VectorPM, u::VertexID, v::VertexID) = [prop => arr[v,u] for (prop,arr) in edata(x)]
+geteprop(x::VectorPM, u::VertexID, v::VertexID) = Dict(prop => arr[v,u] for (prop,arr) in edata(x))
 geteprop(x::VectorPM, e::EdgeID) = geteprop(x, e...)
-
-################################################# MUTLI DICT ################################################################
-
-""" geteprop(g::Graph, es::AbstractVector{EdgeID}) -> A list of dictionaries for e in es """
-function geteprop(g::Graph, es::AbstractVector{EdgeID})
-   validate_edge(g, es)
-   geteprop(propmod(g), es)
-end
-
-###
-# LINEARPM
-###
-geteprop(x::LinearPM, elist::AbstractVector{EdgeID}) = [geteprop(x, e) for e in elist]
-
-
-###
-# VECTORPM
-###
-function geteprop(x::VectorPM, elist::AbstractVector{EdgeID})
-   dlist = [Dict() for i in 1:length(elist)]
-   for (key,arr) in edata(x)
-      vals = geteprop(x, elist, key)
-      for (i,d) in enumerate(dlist)
-         d[key] = vals[i]
-      end
-   end
-   dlist
-end
-
-################################################# ALL DICT ##################################################################
-
-""" geteprop(g::Graph, ::Colon) -> A list of dictionaries for e in edges(g) """
-geteprop(g::Graph, ::Colon) = geteprop(propmod(g), collect(edges(g)))
-
 
 ################################################# UNIT SINGLE ###############################################################
 
@@ -121,7 +87,7 @@ end
 geteprop(x::LinearPM{Any,Any}, es::AbstractVector{EdgeID}, propname) = [geteprop(x, e, propname) for e in es]
 
 function geteprop(x::LinearPM, es::AbstractVector{EdgeID}, propname)
-   sym = Symbol(propname)
+   sym = symbol(propname)
    [geteprop(x, e, sym) for e in es]
 end
 

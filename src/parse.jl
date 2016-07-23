@@ -30,9 +30,9 @@ storegraph
 # Parse token
 parseval(x::SubString) = parseval(join(x))
 # Prevent infinte loop
-function parseval(x::AbstractString)
+function parseval(x::String)
    s = parse(x)
-   isa(s, AbstractString) ? s : parseval(s)
+   isa(s, String) ? s : parseval(s)
 end
 parseval(x::Int) = x
 parseval(x::Float64) = x
@@ -75,7 +75,7 @@ end
 
 function loadgraph(io::IO, graph_type=SparseGraph)
    nv, ne = parse_spec(next_line(io))
-   g = graph_type(nv)
+   g = emptygraph(graph_type, nv)
 
    # First blank line
    next_line(io)
@@ -94,7 +94,7 @@ function loadgraph(io::IO, graph_type=SparseGraph)
 end
 
 """ Parse a text file in the trivial graph format """
-function loadgraph(filename::AbstractString, graph_type=SparseGraph)
+function loadgraph(filename::String, graph_type=SparseGraph)
    file = open(filename)
    g = loadgraph(file, graph_type)
    close(file)
@@ -106,7 +106,7 @@ end
 prepval(x::Int) = string(x)
 prepval(x::Float64) = string(x)
 prepval(x::Char) = "\'$x\'"
-prepval(x::AbstractString) = "\"$x\""
+prepval(x::String) = "\"$x\""
 prepval(x::Bool) = string(x)
 prepval(x::Void) = ""
 
@@ -137,7 +137,7 @@ function storegraph(g::Graph, io::IO)
    end
 end
 
-function storegraph(g::Graph, filename::AbstractString)
+function storegraph(g::Graph, filename::String)
    file = open(filename, "w")
    storegraph(g, file)
    close(file)

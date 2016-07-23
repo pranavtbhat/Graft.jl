@@ -7,7 +7,7 @@ import BenchmarkTools: prettytime, prettymemory, prettydiff
 type TestType
    f1::Int
    f2::Float64
-   f3::ASCIIString
+   f3::String
    f4::Any
    f5::Char
 end

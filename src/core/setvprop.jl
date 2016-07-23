@@ -173,28 +173,3 @@ function setvprop!(x::PropertyModule, v::VertexID, d::Dict)
       setvprop!(x, v, val, key)
    end
 end
-
-################################################# MULTI DICT #################################################################
-
-""" setvprop!(g::Graph, vs::AbstractVector{VertexID}, ds::Vector{Dict}) -> Set all properties for v in vs """
-function setvprop!(g::Graph, vs::AbstractVector{VertexID}, ds::Vector)
-   length(vs) == length(ds) || error("Trying to assign $(length(ds)) values to $(length(vs)) vertices")
-   setvprop!(propmod(g), vs, ds)
-end
-
-###
-# PROPERTYMODULE
-###
-function setvprop!(x::PropertyModule, vlist::AbstractVector{VertexID}, dlist::Vector)
-   for (v,d) in zip(vlist,dlist)
-      setvprop!(x, v, d)
-   end
-end
-
-################################################# ALL DICT ###################################################################
-
-""" setvprop!(g::Graph, ::Colon, ds::AbstractVector{Dict}) -> Set all properties for v in vertices(g) """
-function setvprop!(g::Graph, ::Colon, ds::Vector)
-   nv(g) == length(ds) || error("Trying to assign $(length(vals)) values to $(nv(g)) vertices")
-   setvprop!(propmod(g), vertices(g), ds)
-end

@@ -136,7 +136,7 @@ end
 
 ################################################# FILTER ####################################################################
 
-function Base.filter(x::VertexDescriptor, conditions::ASCIIString...)
+function Base.filter(x::VertexDescriptor, conditions::String...)
    vs = vertex_subset(x, :)
    for condition in conditions
       fn = parse_vertex_query(condition)
@@ -145,7 +145,7 @@ function Base.filter(x::VertexDescriptor, conditions::ASCIIString...)
    VertexDescriptor(x, vs)
 end
 
-function Base.filter!(x::VertexDescriptor, conditions::ASCIIString...)
+function Base.filter!(x::VertexDescriptor, conditions::String...)
    for condition in conditions
       fn = parse_vertex_query(condition)
       x.vs = filter(v->fn(x.g, v), x.vs)

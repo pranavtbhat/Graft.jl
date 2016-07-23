@@ -24,7 +24,7 @@ type LinearPM{V,E} <: PropertyModule{V,E}
          self.vprops = Dict{Any,DataType}()
          self.vdata = [Dict() for i in 1:nv]
       else
-         self.vprops = Dict{Any,DataType}([string(field) => fieldtype(V, field) for field in fieldnames(V)]...)
+         self.vprops = Dict{Any,DataType}(string(field) => fieldtype(V, field) for field in fieldnames(V))
          self.vdata = [zero(V) for i in 1:nv]
       end
 
@@ -32,7 +32,7 @@ type LinearPM{V,E} <: PropertyModule{V,E}
          self.eprops = Dict{Any,DataType}()
          self.edata = spzeros(Dict, nv, nv)
       else
-         self.eprops = Dict{Any,DataType}([string(field) => fieldtype(E, field) for field in fieldnames(E)]...)
+         self.eprops = Dict{Any,DataType}(string(field) => fieldtype(E, field) for field in fieldnames(E))
          self.edata = spzeros(E, nv, nv)
       end
 
@@ -46,13 +46,8 @@ type LinearPM{V,E} <: PropertyModule{V,E}
    end
 end
 
-function LinearPM(nv::Int=0)
-   LinearPM{Any,Any}(nv)
-end
-
-function LinearPM(nv::Int, ne::Int=0)
-   LinearPM{Any,Any}(nv,ne)
-end
+LinearPM(nv::Int) = LinearPM{Any,Any}(nv)
+LinearPM(nv::Int, ne::Int) = LinearPM{Any,Any}(nv,ne)
 
 @inline vprops(x::LinearPM) = x.vprops
 @inline eprops(x::LinearPM) = x.eprops
@@ -170,7 +165,7 @@ end
 
 # Slow af. But to be fair, this module isn't expected to do this..
 function subgraph(x::LinearPM, vlist::AbstractVector{VertexID}, vproplist::AbstractVector)
-   vpd = [prop => vprops(x)[prop] for prop in vproplist]
+   vpd = Dict(prop => vprops(x)[prop] for prop in vproplist)
    y = LinearPM{Any,Any}(vpd, copy(eprops(x)), [Dict() for v in vlist], edata(x)[vlist,vlist])
    for prop in vproplist
       vals = getvprop(x, vlist, prop)
@@ -188,7 +183,7 @@ end
 # Slow af. But to be fair, this module isn't expected to do this..
 function subgraph(x::LinearPM, elist::AbstractVector{EdgeID}, eproplist::AbstractVector)
    nv = length(vdata(x))
-   epd = [prop => eprops(x)[prop] for prop in eproplist]
+   epd = Dict(prop => eprops(x)[prop] for prop in eproplist)
    y = LinearPM{Any,Any}(copy(vprops(x)), epd, deepcopy(vdata(x)), spzeros(Dict, nv, nv))
    for prop in eproplist
       vals = geteprop(x, elist, prop)
@@ -204,7 +199,7 @@ function subgraph{V,E}(x::LinearPM{V,E}, vlist::AbstractVector{VertexID}, elist:
 end
 
 _getfield(d::Dict, key) = d[key]
-_getfield(d, key) = getfield(d, Symbol(key))
+_getfield(d, key) = getfield(d, symbol(key))
 
 # PLEASE OPTIMIZE ME
 function subgraph(
@@ -242,7 +237,7 @@ function subgraph(
       end
    end
    ED = init_spmx(nv, elist, nzval)
-   vpd = [prop => vprops(x)[prop] for prop in vproplist]
-   epd = [prop => eprops(x)[prop] for prop in eproplist]
+   vpd = Dict(prop => vprops(x)[prop] for prop in vproplist)
+   epd = Dict(prop => eprops(x)[prop] for prop in eproplist)
    LinearPM{Any,Any}(vpd, epd, VD, ED)
 end

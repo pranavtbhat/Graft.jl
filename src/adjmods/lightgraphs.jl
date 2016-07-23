@@ -125,14 +125,7 @@ end
 @inline indegree(x::LightGraphsAM, v::VertexID) = LightGraphs.indegree(data(x), v)
 
 
-function addvertex!(x::LightGraphsAM, num::Int=1)
-   D = data(x)
-   for i in 1 : num
-      LightGraphs.add_vertex!(D)
-   end
-   nothing
-end
-
+addvertex!(x::LightGraphsAM) = LightGraphs.add_vertex!(data(x))
 
 
 function rmvertex!(x::LightGraphsAM, v::VertexID)

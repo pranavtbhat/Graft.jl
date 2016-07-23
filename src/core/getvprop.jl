@@ -25,44 +25,19 @@ end
 ###
 function getvprop(x::LinearPM{Any,Any}, v::VertexID)
    data = vdata(x)[v]
-   [prop => get(data, prop, zero(typ)) for (prop,typ) in vprops(x)]
+   Dict(prop => get(data, prop, zero(typ)) for (prop,typ) in vprops(x))
 end
 
 function getvprop{V,E}(x::LinearPM{V,E}, v::VertexID)
    data = vdata(x)[v]
-   [string(field) => getfield(data, field) for field in fieldnames(V)]
+   Dict(string(field) => getfield(data, field) for field in fieldnames(V))
 end
 
 
 ###
 # VECTORPM
 ###
-getvprop(x::VectorPM, v::VertexID) = [prop => arr[v] for (prop,arr) in vdata(x)]
-
-################################################# MUTLI DICT ################################################################
-
-""" getvprop(g::Graph, vs::AbstractVector{VertexID}) -> A list of dictionaries for v in vs """
-function getvprop(g::Graph, vs::AbstractVector{VertexID})
-   validate_vertex(g, vs)
-   getvprop(propmod(g), vs)
-end
-
-###
-# LINEARPM
-###
-getvprop(x::LinearPM, vs::AbstractVector{VertexID}) = [getvprop(x, v) for v in vs]
-
-
-###
-# VECTORPM
-###
-getvprop(x::VectorPM, vs::AbstractVector{VertexID}) = [getvprop(x, v) for v in vs]
-
-################################################# ALL DICT ##################################################################
-
-""" getvprop(g::Graph, ::Colon) -> A list of dictionaries for v in vertices(g) """
-getvprop(g::Graph, ::Colon) = getvprop(propmod(g), vertices(g))
-
+getvprop(x::VectorPM, v::VertexID) = Dict(prop => arr[v] for (prop,arr) in vdata(x))
 
 ################################################# UNIT SINGLE ###############################################################
 
