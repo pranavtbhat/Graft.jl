@@ -112,6 +112,8 @@ function validate_edge(x::AdjacencyModule, elist::AbstractVector{EdgeID})
    end
 end
 
+# Shortcut for iterators
+validate_edge(x::AdjacencyModule, elist::EdgeIter) = nothing
 
 ################################################# IMPLEMENTATIONS #########################################################
 

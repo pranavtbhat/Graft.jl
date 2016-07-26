@@ -15,7 +15,7 @@ const CAN_USE_LG = false
 
 using Faker
 
-import Base: deepcopy, ==, +, -
+import Base: deepcopy, ==, +, -, |>
 
 # Package Wide Utilities
 include("util.jl")

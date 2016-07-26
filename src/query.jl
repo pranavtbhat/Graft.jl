@@ -47,6 +47,10 @@ include("query/exec.jl")
 
 ################################################# @QUERY #####################################################################
 
+type QueryNode
+   expr
+end
+
 macro query(desc, x)
    x = Expr(:quote, x)
    quote
@@ -56,7 +60,17 @@ macro query(desc, x)
    end
 end
 
+macro query(x)
+   QueryNode(x)
+end
+
+|>(desc, x::QueryNode) = exec_query(x.expr, desc)
+
 ################################################# @FILTER #####################################################################
+
+type FilterNode
+   expr
+end
 
 macro filter(desc, x)
    x = Expr(:quote, x)
@@ -66,3 +80,9 @@ macro filter(desc, x)
       _filter(exec_query(Q, D), D)
    end
 end
+
+macro filter(x)
+   FilterNode(x)
+end
+
+|>(desc, x::FilterNode) = _filter(exec_query(x.expr, desc), desc)

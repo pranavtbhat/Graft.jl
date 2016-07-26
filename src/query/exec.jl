@@ -29,9 +29,19 @@ function match_adj(x::Expr, s)
 end
 
 fetch_getfield_property(x) = x
-fetch_getfield_property(x::Expr) = fetch_getfield_property(x.args[2])
 fetch_getfield_property(x::QuoteNode) = fetch_getfield_property(eval(x))
 fetch_getfield_property(x::Symbol) = isdefined(x) ? x : string(x)
+
+function fetch_getfield_property(x::Expr)
+   if x.head == :.
+      fetch_getfield_property(x.args[2])
+   elseif x.head == :quote
+      fetch_getfield_property(x.args[1])
+   else
+      cant_parse(x)
+   end
+end
+
 
 fetch_setfield_property(x::Expr) = fetch_getfield_property(x.args[1])
 ################################################# RECURSIVE EXECUTION ######################################################
@@ -76,7 +86,9 @@ function exec_query(x::Expr, V::VertexDescriptor)
    # Set field override
    if match_setfield(x, :v)
       prop = fetch_setfield_property(x)
-      return set!(V, exec_query(x.args[2], V), prop)
+      vals = exec_query(x.args[2], V)
+      set!(V, vals, prop)
+      return vals
    end
 
    # Getindex override for graph
@@ -154,7 +166,9 @@ function exec_query(x::Expr, E::EdgeDescriptor)
    if match_setfield(x, :u)
       us = map(x->x.first, E.es)
       prop = fetch_setfield_property(x)
-      return setvprop!(E.g, us, exec_query(x.args[2], E), prop)
+      vals = exec_query(x.args[2], E)
+      setvprop!(E.g, us, vals, prop)
+      return vals
    end
 
    # Get field override v
@@ -167,7 +181,9 @@ function exec_query(x::Expr, E::EdgeDescriptor)
    if match_setfield(x, :v)
       vs = map(x->x.second, E.es)
       prop = fetch_setfield_property(x)
-      return setvprop!(E.g, vs, exec_query(x.args[2], E), prop)
+      vals = exec_query(x.args[2], E)
+      setvprop!(E.g, vs, vals, prop)
+      return vals
    end
 
    # Get field override e
@@ -175,11 +191,12 @@ function exec_query(x::Expr, E::EdgeDescriptor)
       return get(E, fetch_getfield_property(x))
    end
 
-   # Set field override u
+   # Set field override e
    if match_setfield(x, :e)
       prop = fetch_setfield_property(x)
       vals = exec_query(x.args[2], E)
-      return set!(E, vals, prop)
+      set!(E, vals, prop)
+      return vals
    end
 
    # Getindex override for graph u
