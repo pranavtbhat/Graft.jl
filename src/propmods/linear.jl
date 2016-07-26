@@ -199,7 +199,7 @@ function subgraph{V,E}(x::LinearPM{V,E}, vlist::AbstractVector{VertexID}, elist:
 end
 
 _getfield(d::Dict, key) = d[key]
-_getfield(d, key) = getfield(d, symbol(key))
+_getfield(d, key) = getfield(d, Symbol(key))
 
 # PLEASE OPTIMIZE ME
 function subgraph(

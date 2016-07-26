@@ -27,13 +27,13 @@ end
 end
 
 @testset "Tests for init_spmx" begin
-   x = sprandbool(10, 10, 1.0)
+   x = sprand(Bool, 10, 10, 1.0)
    es = map(i->reverse(EdgeID(ind2sub(x, i)...)), 1:100)
    @test x == ParallelGraphs.init_spmx(10, es, x.nzval)
 end
 
 @testset "Tests for splice_matrix" begin
-   x = sprandbool(10, 10, 1.0)
+   x = sprand(Bool, 10, 10, 1.0)
    es = map(i->reverse(EdgeID(ind2sub(x, i)...)), 1:100)
    @test x == ParallelGraphs.splice_matrix(x, es)
 end

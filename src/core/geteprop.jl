@@ -62,7 +62,7 @@ geteprop(g::Graph, e::EdgeID, property) = geteprop(g, e..., property)
 # LINEARPM
 ###
 geteprop(x::LinearPM{Any,Any}, u::VertexID, v::VertexID, propname) = get(edata(x)[v,u], propname, eprops(x)[propname] |> zero)
-geteprop(x::LinearPM, u::VertexID, v::VertexID, propname) = getfield(edata(x)[v,u], symbol(propname))
+geteprop(x::LinearPM, u::VertexID, v::VertexID, propname) = getfield(edata(x)[v,u], Symbol(propname))
 geteprop(x::LinearPM, e::EdgeID, propname) = geteprop(x, e..., propname)
 
 
@@ -87,7 +87,7 @@ end
 geteprop(x::LinearPM{Any,Any}, es::AbstractVector{EdgeID}, propname) = [geteprop(x, e, propname) for e in es]
 
 function geteprop(x::LinearPM, es::AbstractVector{EdgeID}, propname)
-   sym = symbol(propname)
+   sym = Symbol(propname)
    [geteprop(x, e, sym) for e in es]
 end
 

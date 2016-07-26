@@ -49,7 +49,7 @@ end
 function DictLM{T}(labels::AbstractVector{T})
    nv = length(labels)
    fmap = Dict(l => i for (i,l) in enumerate(labels))
-   DictLM{T}(nv, fmap, labels)
+   DictLM{T}(nv, fmap, copy(labels))
 end
 
 # Convert from IdentityLM
@@ -84,6 +84,11 @@ Base.deepcopy(x::DictLM) = DictLM(nv(x), deepcopy(fmap(x)), deepcopy(rmap(x)))
 
 ################################################# SETLABEL SINGLE ######################################################
 
+function setlabel!(x::LabelModule)
+   x.lmap = IdentityLM(nv(x))
+   nothing
+end
+
 function setlabel!(x::LabelModule, v::VertexID, l)
    x.lmap = setlabel!(lmap(x), v, l)
    nothing
@@ -99,6 +104,11 @@ end
 setlabel!(x::DictLM, v::VertexID, l) =  setlabel!(type_promote(x, l), v, l)
 
 ################################################# SETLABEL MUTLI ######################################################
+
+function setlabel!(x::LabelModule, ls::AbstractVector)
+   x.lmap = DictLM(ls)
+   nothing
+end
 
 function setlabel!(x::LabelModule, vs::AbstractVector{VertexID}, ls::AbstractVector)
    x.lmap = setlabel!(lmap(x), vs, ls)
@@ -145,12 +155,6 @@ resolve(x::LabelModule, u, v) = resolve(lmap(x), u, v)
 resolve(x::IdentityLM, u::VertexID, v::VertexID) = EdgeID(u, v)
 resolve(x::DictLM, ul, vl) = EdgeID(resolve(x, ul), resolve(x, vl))
 
-################################################# RESOLVE EDGES #############################################################
-
-resolve(x::LabelModule, ls::AbstractVector{Pair}) = resolve(lmap(x), ls)
-resolve(x::IdentityLM, es::AbstractVector{EdgeID}) = es
-resolve(x::DictLM, ls::AbstractVector{Pair}) = broadcast(resolve, [x], ls)
-
 ################################################# ENCODE VERTEX ############################################################
 
 encode(x::LabelModule, v::VertexID) = encode(lmap(x), v)
@@ -159,7 +163,7 @@ encode(x::DictLM, v::VertexID) = getindex(rmap(x), v)
 
 ################################################# ENCODE VERTICES ##########################################################
 
-encode(x::LabelModule, vs::AbstractVector{VertexID}) = encode(lmap(x), ls)
+encode(x::LabelModule, vs::AbstractVector{VertexID}) = encode(lmap(x), vs)
 encode(x::IdentityLM, vs::AbstractVector{VertexID}) = vs
 encode(x::DictLM, vs::AbstractVector{VertexID}) = getindex(rmap(x), vs)
 
@@ -173,7 +177,10 @@ encode{T}(x::DictLM{T}, e::EdgeID) = Pair{T,T}(encode(x, e.first), encode(x, e.s
 
 encode(x::LabelModule, es::AbstractVector{EdgeID}) = encode(lmap(x), es)
 encode(x::IdentityLM, es::AbstractVector{EdgeID}) = es
-encode(x::DictLM, es::AbstractVector{EdgeID}) = broadcast(encode, [x], es)
+
+function encode(x::DictLM, es::AbstractVector{EdgeID})
+   [encode(x, e) for e in es]
+end
 
 ################################################# ADDVERTEX ################################################################
 
@@ -192,7 +199,7 @@ addvertex!(x::DictLM) = error("Please supply a label")
 # WITH LABEL
 ###
 function addvertex!(x::LabelModule, l)
-   x.map = addvertex!(lmap(x), l)
+   x.lmap = addvertex!(lmap(x), l)
    nothing
 end
 

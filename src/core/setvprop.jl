@@ -23,7 +23,7 @@ end
 ###
 function setvprop!(x::LinearPM, v::VertexID, val, propname)
    propmote_vertex_type!(x, val, propname)
-   setfield!(vdata(x)[v], symbol(propname), val)
+   setfield!(vdata(x)[v], Symbol(propname), val)
 end
 
 function setvprop!(x::LinearPM{Any,Any}, v::VertexID, val, propname)
@@ -70,7 +70,7 @@ end
 
 function setvprop!(x::LinearPM, vs::AbstractVector{VertexID}, vals::Vector, propname)
    propmote_vertex_type!(x, vals, propname)
-   sym = symbol(propname)
+   sym = Symbol(propname)
    for (v,val) in zip(vs, vals)
       setfield!(vdata(x)[v], sym, val)
    end

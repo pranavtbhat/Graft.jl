@@ -82,9 +82,7 @@ end
 # Reject invalid property names and types
 function propmote_vertex_type!{T}(x::VectorPM, ::Type{T}, propname)
    haskey(vdata(x), propname) || error("Illegal property name $propname")
-
-   # Disable this check till 0.5
-   # (T <: eltype(vdata(x)[propname])) || error("Illegal data type $T for property $propname")
+   (T <: eltype(vdata(x)[propname])) || error("Illegal data type $T for property $propname")
    nothing
 end
 

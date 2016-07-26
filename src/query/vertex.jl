@@ -45,7 +45,7 @@ property_propagate!(x::Void, propname) = nothing
 
 function display_vertex_list(io::IO, x::VertexDescriptor)
    vs = x.vs
-   props = sort(x.props)
+   props = sort(map(string, x.props))
    n = length(vs)
 
    println(io, "Vertex Descriptor, with  $n Vertices and $(length(props)) Properties")
@@ -92,7 +92,7 @@ end
 Base.done(x::VertexDescriptor, i) = done(x.vs, i)
 
 
-################################################# GETINDEX / SETINDEX #######################################################
+################################################# GETINDEX ##################################################################
 
 # Unit getindex to search for a single label
 Base.getindex(x::VertexDescriptor, label) = VertexDescriptor(x, resolve(x.g, label))
@@ -129,26 +129,9 @@ Base.map!(f::Function, x::VertexDescriptor, propname) = set!(x, map(f, x), propn
 
 Base.select(x::VertexDescriptor, props...) = VertexDescriptor(x, copy(x.vs), collect(props))
 
-function Base.select!(x::VertexDescriptor, props...)
-   x.props = property_subset(x.props, collect(props))
-   x
-end
-
 ################################################# FILTER ####################################################################
 
-function Base.filter(x::VertexDescriptor, conditions::String...)
-   vs = vertex_subset(x, :)
-   for condition in conditions
-      fn = parse_vertex_query(condition)
-      vs = filter(v->fn(x.g, v), vs)
-   end
-   VertexDescriptor(x, vs)
-end
-
-function Base.filter!(x::VertexDescriptor, conditions::String...)
-   for condition in conditions
-      fn = parse_vertex_query(condition)
-      x.vs = filter(v->fn(x.g, v), x.vs)
-   end
-   nothing
+function _filter(farr, V::VertexDescriptor)
+   nzind = find(farr)
+   VertexDescriptor(V, V.vs[nzind])
 end

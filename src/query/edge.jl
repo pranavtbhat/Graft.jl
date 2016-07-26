@@ -27,12 +27,12 @@ Base.deepcopy(x::EdgeDescriptor) = EdgeDescriptor(x.g, deepcopy(x.es), deepcopy(
 
 ################################################# PROPERTY UNION #############################################################
 
-@inline function property_union!(x::EdgeDescriptor, prop)
+function property_union!(x::EdgeDescriptor, prop)
    x.props = property_union(x.props, prop)
    nothing
 end
 
-@inline property_union(xprop::Vector, prop) = in(prop, xprop) ? xprop : vcat(xprop, prop)
+property_union(xprop::Vector, prop) = in(prop, xprop) ? xprop : vcat(xprop, prop)
 
 function property_propagate!(x::EdgeDescriptor, propname)
    property_union!(x, propname)
@@ -43,8 +43,8 @@ end
 ################################################# SHOW ######################################################################
 
 function display_edge_list(io::IO, x::EdgeDescriptor)
-   props = sort(x.props)
    es = x.es
+   props = sort(map(string, x.props))
    n = length(es)
 
    println(io, "Edge Descriptor with $n edges and $(length(props)) properties")
@@ -82,13 +82,14 @@ Base.start(x::EdgeDescriptor) = start(x.es)
 Base.endof(x::EdgeDescriptor) = endof(x.es)
 
 function Base.next(x::EdgeDescriptor, i0)
-   e,i = next(x.es, i0)
-   (encode(x.g, e), geteprop(x.g, e)), i
+   e, i0 = next(x.es, i0)
+   (_encode(x.g, e), i0)
 end
-@inline Base.done(x::EdgeDescriptor, i) = done(x.es, i)
+
+Base.done(x::EdgeDescriptor, i) = done(x.es, i)
 
 
-################################################# GETINDEX / SETINDEX #######################################################
+################################################# GETINDEX ##################################################################
 
 # Unit getindex to search for a single label
 Base.getindex(x::EdgeDescriptor, e::Pair) = EdgeDescriptor(x, resolve(x.g, e))
@@ -97,13 +98,7 @@ Base.getindex(x::EdgeDescriptor, label1, label2) = EdgeDescriptor(x, resolve(x.g
 # Vector getindex for subset EdgeDescriptors
 Base.getindex(x::EdgeDescriptor, is) = EdgeDescriptor(x, is)
 
-# Setindex!
-function Base.setindex!(x::EdgeDescriptor, val, propname)
-   property_propagate!(x, propname)
-   seteprop!(x.g, x.es, val, propname)
-end
-
-################################################# MAP #######################################################################
+################################################# GET/SET ###################################################################
 
 function Base.get(x::EdgeDescriptor, propname)
    if(length(x) == 1)
@@ -113,56 +108,28 @@ function Base.get(x::EdgeDescriptor, propname)
    end
 end
 
+###
+# TODO: Don't modify the graph, cache properties in the Descriptor.
+###
+function set!(x::EdgeDescriptor, val, propname)
+   property_propagate!(x, propname)
+   seteprop!(x.g, x.es, val, propname) # Bypass validation
+end
+
 ################################################# MAP ########################################################################
 
 # Function based
-Base.map(f::Function, x::EdgeDescriptor) = [f(u,v) for (u,v) in x.es]
+Base.map(f::Function, x::EdgeDescriptor) = [f(u,v) for (u,v) in x]
 
 # Query based
-function Base.map(s::String, x::EdgeDescriptor)
-   f = parse_edge_query(s)
-   [f(x.g, u, v) for (u,v) in x.es]
-end
-
-################################################# MAP! #######################################################################
-
-# Function based
-function Base.map!(f::Function, x::EdgeDescriptor, propname)
-   seteprop!(x.g, x.es, f, propname)
-   property_propagate!(x, propname)
-end
-
-# Query based
-function Base.map!(s::String, x::EdgeDescriptor, propname)
-   f = parse_edge_query(s)
-   seteprop!(x.g, x.es, [f(x.g, u, v) for (u,v) in x.es], propname)
-   property_propagate!(x, propname)
-end
+Base.map!(f::Function, x::EdgeDescriptor, propname) = set!(x, map(f, x), propname)
 
 ################################################# SELECT ####################################################################
 
 Base.select(x::EdgeDescriptor, props...) = EdgeDescriptor(x, x.es, collect(props))
 
-function Base.select!(x::EdgeDescriptor, props...)
-   x.props = property_subset(x, collect(props))
-   x
-end
-
 ################################################# FILTER ####################################################################
 
-function Base.filter(x::EdgeDescriptor, conditions::String...)
-   es = edge_subset(x, :)
-   for condition in conditions
-      fn = parse_edge_query(condition)
-      es = filter(e->fn(x.g, e...), es)
-   end
-   EdgeDescriptor(x.g, es, property_subset(x, :), nothing)
-end
-
-function Base.filter!(x::EdgeDescriptor, conditions::String...)
-   for condition in conditions
-      fn = parse_edge_query(condition)
-      x.es = filter(e->fn(x.g, e...), x.es)
-   end
-   nothing
+function _filter(farr, E::EdgeDescriptor)
+   EdgeDescriptor(E, find(farr))
 end

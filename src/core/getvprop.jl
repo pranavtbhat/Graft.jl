@@ -53,7 +53,7 @@ end
 # LINEARPM
 ###
 getvprop(x::LinearPM{Any,Any}, v::VertexID, propname) = get(vdata(x)[v], propname, vprops(x)[propname] |> zero)
-getvprop(x::LinearPM, v::VertexID, propname) = getfield(vdata(x)[v], symbol(propname))
+getvprop(x::LinearPM, v::VertexID, propname) = getfield(vdata(x)[v], Symbol(propname))
 
 
 ###
@@ -78,7 +78,7 @@ end
 getvprop(x::LinearPM{Any,Any}, vs::AbstractVector{VertexID}, propname) = [getvprop(x, v, propname) for v in vs]
 
 function getvprop(x::LinearPM, vs::AbstractVector{VertexID}, propname)
-   sym = symbol(propname)
+   sym = Symbol(propname)
    [getvprop(x, v, sym) for v in vs]
 end
 

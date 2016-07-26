@@ -27,9 +27,15 @@ for AM in subtypes(AdjacencyModule)
 
             h = loadgraph("tmp.txt", gtype)
 
-            @test getvprop(g, :) == getvprop(h, :)
+            @test getvprop(g, :, "f1") == getvprop(h, :, "f1")
+            @test getvprop(g, :, "f2") == getvprop(h, :, "f2")
+            @test getvprop(g, :, "f3") == getvprop(h, :, "f3")
+            @test getvprop(g, :, "f5") == getvprop(h, :, "f5")
 
-            @test geteprop(g, :) == geteprop(h, :)
+            @test geteprop(g, :, "f1") == geteprop(h, :, "f1")
+            @test geteprop(g, :, "f2") == geteprop(h, :, "f2")
+            @test geteprop(g, :, "f3") == geteprop(h, :, "f3")
+            @test geteprop(g, :, "f5") == geteprop(h, :, "f5")
 
             rm("tmp.txt")
          end

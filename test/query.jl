@@ -7,20 +7,27 @@
 # Tests for VertexDescriptor
 for PM in subtypes(PropertyModule)
    for typ in [Any,TestType]
-      propmod = PM{typ,typ}
-      @testset "VertexDescriptor tests for Graph{SparseMatrixAM,$PM}" begin
-         V, = Graph{SparseMatrixAM,propmod}(10,90)
+      gtype = Graph{SparseMatrixAM,PM{typ,typ}}
+      @testset "VertexDescriptor tests for $gtype" begin
+         g = complete_graph(gtype, 10)
+         ls = map(string, 1:10)
+         setlabel!(g, ls)
+
+         V, = g
 
          # Iteration
          @test length(V) == 10
          @test size(V) == (10,)
-         @test start(V) == false
+
+         @test start(V) == 1
          @test endof(V) == 10
-         # @test next(V, 1) == ((1, Dict()), 2)
          @test done(V, 11) == true
 
+         @test [v for v in V] == ls
+
+
          # Getindex
-         v1 = V[1]
+         v1 = V["1"]
          @test isa(v1, VertexDescriptor)
          @test length(v1) == 1
          @test v1.props == V.props
@@ -32,51 +39,67 @@ for PM in subtypes(PropertyModule)
 
          @test V[:] == V
 
-         # Setindex
-         V["f1"] = 1:10
-         V[1:5]["f4"] = true
-         V[5]["f3"] = "Middle"
+         # Get/Set
+         val = rand(Int, 10)
+         set!(V, val, "f1")
+         @test get(V, "f1") == val
 
-         # Get
-         @test all(get(V, "f1") .== 1:10)
-         @test get(V[1:5], "f4") == trues(5)
-         @test get(V[5], "f3") == "Middle"
+         val = rand(5)
+         set!(V[1:5], val, "f2")
+         @test get(V[1:5], "f2") == val
 
-         # Map! Function based
-         map!(v->v, V, "f1")
-         @test all(get(V, "f1") .== 1:10)
+         val = randstring()
+         set!(V["5"], val, "f3")
+         @test get(V["5"], "f3") == val
 
-         map!(v->0.0, V[:], "f2")
-         @test get(V[:], "f2") == zeros(10)
 
-         # Map! query based
-         map!("v.f2 < v.f1", V[1:5], "f4")
-         @test get(V[1:5], "f4") == trues(5)
+         # Map
+         @test map(v->v, V) == ls
 
-         # Map function based
-         @test map(v->1, V) == fill(1, 10)
-
-         # Map query based
-         @test map("v.f1 + 5", V) == get(V, "f1") .+ 5
+         # Map!
+         map!(v->false, V, "f4")
+         @test all(get(V, "f4") .== false)
 
          # Select
          @test select(V, "f1", "f2", "f3").props == ["f1", "f2", "f3"]
-         cV = V[:]
-         select!(cV, "f1", "f2")
-         @test cV.props == ["f1", "f2"]
+      end
+
+      @testset "Query tests for $gtype" begin
+         g = complete_graph(gtype, 10)
+         V, = g
+
+         # Label substitution
+         @test (@query V v) == 1:10
+
+         # getfield/setfield
+         @query V v.f1 = 1
+         @test all(@query V v.f1 == 1)
+
+         # Adjacency substitution
+         @test (@query V[5] g[v]) == [V.g[5]]
+
+         # Function substitution
+         @query V v.f1 = zero(Int)
+         @test (@query V v.f1) == zeros(Int, 10)
       end
    end
 end
 
 for PM in subtypes(PropertyModule)
    for typ in [Any,TestType]
-      propmod = PM{typ,typ}
-      @testset "EdgeDescriptor tests for Graph{SparseMatrixAM,$PM}" begin
-         V,E = Graph{SparseMatrixAM,propmod}(10,90)
+      gtype = Graph{SparseMatrixAM,PM{typ,typ}}
+      @testset "EdgeDescriptor tests for $gtype" begin
+         g = complete_graph(gtype, 10)
+         ls = map(string, 1:10)
+         setlabel!(g, ls)
+
+         _,E = g
 
          # Iteration
          @test length(E) == 90
          @test size(E) == (90,)
+
+         @test [e for e in E] == encode(g, edges(g))
 
          # Getindex
          e1 = E[1]
@@ -91,38 +114,54 @@ for PM in subtypes(PropertyModule)
 
          @test E[:] == E
 
-         # Setindex
-         E["f1"] = 1:90
-         E[1:45]["f4"] = true
-         E[45]["f3"] = "Middle"
+         # Get/Set
+         val = collect(1:90)
+         set!(E, val, "f1")
+         get(E, "f1") == val
 
-         # Get
-         @test all(get(E, "f1") .== 1:90)
-         @test get(E[1:45], "f4") == trues(45)
-         @test get(E[45], "f3") == "Middle"
+         val = rand(45)
+         set!(E[1:45], val, "f2")
+         @test get(E[1:45], "f2") == val
 
-         # Map! function based
-         map!((u,v)->1, E, "f1")
-         @test get(E, "f1") == fill(1, 90)
+         val = randstring()
+         set!(E[45], val, "f3")
+         @test get(E[45], "f3") == val
 
-         map!((u,v)->5.0, E[:], "f2")
-         @test get(E[:], "f2") == fill(5.0, 90)
+         # Map
+         @test all(map((u,v)->false, E) .== false)
 
-
-         # Map! query based
-         map!("e.f1 < e.f2", E[:], "f4")
-         @test get(E, "f4") == trues(90)
-
-
-         # Map function based
-         @test map((u,v)->5, E) == fill(5, 90)
-         @test map("e.f1 + 1", E) == fill(2, 90)
+         # Map!
+         map!((u,v)->true, E[:], "f4")
+         @test all(get(E[:], "f4") .== true)
 
          # Select
          @test select(E, "f1", "f2", "f3").props == ["f1", "f2", "f3"]
-         cE = E[:]
-         select!(cE, "f1", "f2")
-         @test cE.props == ["f1", "f2"]
+      end
+
+      @testset "Query tests for $gtype" begin
+         g = complete_graph(gtype, 10)
+         V,E = g
+
+         # Label substitution
+         (@query E[1:10] u) == ones(Int, 10)
+         (@query E[1:10] v) == collect(1:10)
+
+         # getfield/setfield
+         @query E e.f1 = 1
+         @test all(@query(E, e.f1 == 1))
+
+         @query E u.f1 = 1
+         @test all(@query E u.f1 == 1)
+
+         @query E v.f2 = 1.0
+         @test all(@query(E, v.f2 == 1.0))
+
+         @query E e.f2 = u.f1 + v.f2
+         @test all(@query E e.f2 == 2.0)
+
+         # Function substitution
+         @query E e.f1 = zero(Int)
+         @test all(@query E e.f1 == 0)
       end
    end
 end

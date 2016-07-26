@@ -7,94 +7,76 @@
 
 for PM in subtypes(PropertyModule)
    for typ in [Any,TestType]
-      @testset "Properties Interface for $(PM{typ,typ})" begin
+      pmtype = PM{typ,typ}
+      @testset "Properties Interface for $pmtype" begin
+         x = complete_graph(Graph{SparseMatrixAM,pmtype}, 10)
+         d = Dict("f1"=>1, "f2"=>0.0, "f3"=>"3", "f4"=>nothing, "f5"=>'5')
+         es = collect(edges(x))
 
-         x = PM{typ,typ}(10,90)
-
-         cmp = Array{Any}(10)
-
-         setvprop!(x, 1, Dict("f1"=>1))
-
-         if typ == Any
-            @test getvprop(x, 1) == Dict("f1"=>1)
-         else
-            @test getvprop(x, 1) == Dict("f1"=>1, "f2"=>0.0, "f3"=>"", "f4"=>nothinx, "f5"=>'\0')
-         end
-
+         ###
+         # VERTEX TESTS
+         ###
+         # Unit Single
+         setvprop!(x, 1, 1, "f1")
          @test getvprop(x, 1, "f1") == 1
 
-         setvprop!(x, 1:10, [Dict("f1"=>1) for i in 1:10])
-         @test getvprop(x, 1:10, "f1") == getvprop(x, :, "f1") == fill!(cmp, 1)
+         # Multi Single
+         arr = rand(4)
+         setvprop!(x, 3:6, arr, "f2")
+         @test getvprop(x, 3:6, "f2") == arr
 
-         setvprop!(x, :, [Dict("f2"=>2.0) for i in 1:10])
-         @test getvprop(x, :, "f2") == fill!(cmp, 2.0)
+         # All Single
+         arr = broadcast(randstring, fill(5, 10))
+         setvprop!(x, 1:10, arr, "f3")
+         @test getvprop(x, :, "f3") == arr
 
-         setvprop!(x, 2, "3", "f3")
-         @test getvprop(x, 2, "f3") == "3"
+         # Multi Function
+         arr = map(Symbol, 2:7)
+         setvprop!(x, 2:7, x->Symbol(x), "f4")
+         @test getvprop(x, 2:7, "f4") == arr
 
-         setvprop!(x, 1:10, fill("3", 10), "f3")
-         @test getvprop(x, 1:10, "f3") == fill!(cmp, "3")
+         # All Function
+         arr = map(Char, 1:10)
+         setvprop!(x, :, x->Char(x), "f5")
+         @test getvprop(x, :, "f5") == arr
 
-         setvprop!(x, 1:10, v->Colon(), "f4")
-         @test getvprop(x, 1:10, "f4")  == fill!(cmp, Colon())
+         # Unit Dict
+         setvprop!(x, 1, d)
+         @test getvprop(x, 1) == d
 
-         setvprop!(x, :, fill('0', 10), "f5")
-         @test getvprop(x, :, "f5") == fill!(cmp, '0')
+         ###
+         # EDGE TESTS
+         ###
+         # Unit Single
+         seteprop!(x, es[1], 1, "f1")
+         @test geteprop(x, es[1], "f1") == 1
 
-         setvprop!(x, :, '5', "f5")
-         @test all(getvprop(x, :) .== Dict("f1"=>1, "f2"=>2.0, "f3"=>"3", "f4"=>Colon(), "f5"=>'5'))
+         # Multi Single
+         arr = rand(47)
+         seteprop!(x, es[17:63], arr, "f2")
+         @test geteprop(x, es[17:63], "f2") == arr
 
-         cmp = Array{Any}(10)
+         # All Single
+         arr = broadcast(randstring, fill(2, 90))
+         seteprop!(x, :, arr, "f3")
+         @test geteprop(x, :, "f3") == arr
 
-         elist = collect(edges(x))[11:20]
-         dlist = [Dict("f1"=>1) for i in 1:10]
-         str_dlist = fill(Dict("f1"=>1, "f2"=>0.0, "f3"=>"", "f4"=>nothinx, "f5"=>'\0'), 10)
+         # Multi Function
+         arr = broadcast(Symbol, 63:88)
+         i = 62
+         seteprop!(x, es[63:88], (u,v)->Symbol(i+=1), "f4")
+         @test geteprop(x, es[63:88], "f4") == arr
 
-         seteprop!(x, 1, 2, Dict("f1"=>1))
-
-         if typ == Any
-            @test geteprop(x, 1, 2) == Dict("f1"=>1)
-         else
-            @test geteprop(x, 1, 2) == Dict("f1"=>1, "f2"=>0.0, "f3"=>"", "f4"=>nothinx, "f5"=>'\0')
-         end
-
-         seteprop!(x, 2=>3, Dict("f1"=>1))
-
-         if typ == Any
-            @test geteprop(x, 2=>3) == Dict("f1"=>1)
-         else
-            @test geteprop(x, 2=>3) == Dict("f1"=>1, "f2"=>0.0, "f3"=>"", "f4"=>nothinx, "f5"=>'\0')
-         end
-
-         seteprop!(x, elist, dlist)
-
-         if typ == Any
-            @test geteprop(x, elist) == dlist
-         else
-            @test geteprop(x, elist) == str_dlist
-         end
-
-         seteprop!(x, 3, 4, 2.0, "f2")
-         @test geteprop(x, 3, 4, "f2") == 2.0
-
-         seteprop!(x, 5=>6, 2.0, "f2")
-         @test geteprop(x, 5=>6, "f2") == 2.0
-
-         seteprop!(x, elist, fill(2.0, 10), "f2")
-         @test all(geteprop(x, elist, "f2") .== 2.0)
-
-         seteprop!(x, elist, "3", "f3")
-         @test all(geteprop(x, elist, "f3") .== "3")
-
-         seteprop!(x, :, Colon(), "f4")
-         @test all(geteprop(x, :, "f4") .== Colon())
-
-         seteprop!(x, :, '5', "f5")
-         @test all(geteprop(x, :, "f5") .== '5')
+         # All Function
+         arr = map(Char, 1:90)
+         i = 0
+         seteprop!(x, :, (u,v)->Char(i+=1), "f5")
+         @test geteprop(x, :, "f5") == arr
 
          # Adjacency Tests
-         @test addvertex!(x) == nothing
-         @test addvertex!(x, 2) == nothing
+         addvertex!(x)
+         addvertex!(x)
+         addvertex!(x)
          @test addedge!(x, 11, 12) == nothing
          @test addedge!(x, EdgeID[12=>13, 11=>13]) == nothing
 

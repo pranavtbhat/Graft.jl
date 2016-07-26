@@ -35,7 +35,7 @@ end
 function seteprop!(x::LinearPM, u::VertexID, v::VertexID, val, propname)
    propmote_edge_type!(x, val, propname)
    t = edata(x)[v,u]
-   setfield!(t, symbol(propname), val)
+   setfield!(t, Symbol(propname), val)
    edata(x)[v,u] = t
    nothing
 end
@@ -111,7 +111,6 @@ seteprop!(x::LinearPM, es::EdgeIter, vals::Vector, propname) = seteprop!(x, coll
 # VECTORPM
 ###
 function seteprop!(x::VectorPM, es::EdgeIter, vals::Vector, propname)
-   propmote_edge_type!(x, vals, propname)
    edata(x)[propname] = init_spmx(nv(x), collect(es), vals)
    nothing
 end
@@ -142,7 +141,7 @@ function seteprop!(x::LinearPM, u::VertexID, v::VertexID, d::Dict)
    t = edata(x)[v,u]
    for (prop,val) in d
       propmote_edge_type!(x, val, prop)
-      setfield!(t, symbol(prop), val)
+      setfield!(t, Symbol(prop), val)
    end
    edata(x)[v,u] = t
    nothing

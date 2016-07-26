@@ -13,19 +13,19 @@ exec_query
 
 cant_parse(x::Expr) = error("Couldn't parse (sub)expression $x")
 
-is_vertex_getfield(x) = false
-function is_vertex_getfield(x::Expr)
-   x.head == :. && x.args[1] == :v
+match_getfield(x, s) = false
+function match_getfield(x::Expr, s)
+   x.head == :. && x.args[1] == s
 end
 
-is_vertex_setfield(x) = false
-function is_vertex_setfield(x::Expr)
-   x.head == :(=) && is_vertex_getfield(x.args[1])
+match_setfield(x, s) = false
+function match_setfield(x::Expr, s)
+   (x.head == :(=) || x.head ==:kw) && match_getfield(x.args[1], s) # KEYWORD ARG CONFLICT!!!
 end
 
-is_graph_getfield(x) = false
-function is_graph_getfield(x::Expr)
-   x == :(g[v])
+match_adj(x, s) = false
+function match_adj(x::Expr, s)
+   x.head == :ref && x.args[1] == :g && x.args[2] == s
 end
 
 fetch_getfield_property(x) = x
@@ -55,41 +55,40 @@ const _sym_map = Dict{Symbol,Symbol}(
    :>= => :>=,
 )
 
-function exec_query(x::Symbol, desc)
+################################################# VERTEX QUERIES ############################################################
+
+function exec_query(x::Symbol, V::VertexDescriptor)
    if haskey(_sym_map, x)
       _sym_map[x]
    elseif x == :v
-      encode(desc.g, :)
-   elseif isdefined(x)
-      fill(eval(x), length(desc))
+      encode(V.g, V.vs)
+   else
+      fill(eval(x), length(V))
    end
 end
 
 function exec_query(x::Expr, V::VertexDescriptor)
-
    # Get field override
-   if is_vertex_getfield(x)
+   if match_getfield(x, :v)
       return get(V, fetch_getfield_property(x))
    end
 
    # Set field override
-   if is_vertex_setfield(x)
+   if match_setfield(x, :v)
       prop = fetch_setfield_property(x)
       return set!(V, exec_query(x.args[2], V), prop)
    end
 
    # Getindex override for graph
-   if is_graph_getfield(x)
+   if match_adj(x, :v)
       return [V.g[v] for v in V]
    end
 
    # Convert non-adherent query into either :comparison or :call types
    if x.head == :||
-      x.head = :comparison
-      x.args = vcat(:|, args...)
+      x = Expr(:call, :|, x.args...)
    elseif x.head == :&&
-      x.head == comparison
-      x.args = vcat(:&, args...)
+      x = Expr(:call, :&, x.args...)
    end
 
    # Substitute into adherent query type
@@ -117,6 +116,116 @@ function exec_query(x::Expr, V::VertexDescriptor)
       # We don't understand this query. Try an exec
       try
          return exec_query(eval(x), V)
+      catch
+         cant_parse(x)
+      end
+   end
+
+   # Evaluate the processed query
+   eval(x)
+end
+
+################################################# EDGE QUERIES ##########################################################
+
+function exec_query(x::Symbol, E::EdgeDescriptor)
+   if haskey(_sym_map, x)
+      _sym_map[x]
+   elseif x == :u
+      encode(E.g, map(x->x.first, E.es))
+   elseif x == :v
+      encode(E.g, map(x->x.second, E.es))
+   elseif x == :e
+      _encode(E.g, E.es)
+   elseif isdefined(x)
+      fill(eval(x), length(E))
+   else
+      fill(eval(x), length(E))
+   end
+end
+
+function exec_query(x::Expr, E::EdgeDescriptor)
+   # Get field override u
+   if match_getfield(x, :u)
+      us = map(x->x.first, E.es)
+      return getvprop(E.g, us, fetch_getfield_property(x))
+   end
+
+   # Set field override u
+   if match_setfield(x, :u)
+      us = map(x->x.first, E.es)
+      prop = fetch_setfield_property(x)
+      return setvprop!(E.g, us, exec_query(x.args[2], E), prop)
+   end
+
+   # Get field override v
+   if match_getfield(x, :v)
+      vs = map(x->x.second, E.es)
+      return getvprop(E.g, vs, fetch_getfield_property(x))
+   end
+
+   # Set field override v
+   if match_setfield(x, :v)
+      vs = map(x->x.second, E.es)
+      prop = fetch_setfield_property(x)
+      return setvprop!(E.g, vs, exec_query(x.args[2], E), prop)
+   end
+
+   # Get field override e
+   if match_getfield(x, :e)
+      return get(E, fetch_getfield_property(x))
+   end
+
+   # Set field override u
+   if match_setfield(x, :e)
+      prop = fetch_setfield_property(x)
+      vals = exec_query(x.args[2], E)
+      return set!(E, vals, prop)
+   end
+
+   # Getindex override for graph u
+   if match_adj(x, :u)
+      us = map(x->x.first, E.es)
+      return [E.g[u] for u in us]
+   end
+
+   # Getindex override for graph v
+   if match_adj(x, :v)
+      vs = map(x->x.second, E.es)
+      return [E.g[v] for v in vs]
+   end
+
+   # Convert non-adherent query into either :comparison or :call types
+   if x.head == :||
+      x = Expr(:call, :|, x.args...)
+   elseif x.head == :&&
+      x = Expr(:call, :&, x.args...)
+   end
+
+   # Substitute into adherent query type
+   if x.head == :comparison
+      # Only substitution required
+      x.args[2:end] = map(y->exec_query(y, E), x.args[2:end])
+
+   elseif x.head == :call
+      if haskey(_sym_map, x.args[1])
+         # Only substitution required
+         map!(y->exec_query(y, E), x.args, x.args)
+
+      else
+         # Substition and broadcast required
+         fargs = Any[exec_query(y, E) for y in x.args[2:end]]
+
+         if length(fargs) == 0
+            # Unary function
+            x = Expr(:comprehension, Expr(:call, x.args[1]), Expr(:(=), :i, E.es))
+         else
+            x.args = vcat(:map, x.args[1], fargs)
+         end
+      end
+   else
+      # We don't understand this query. Try an exec
+      try
+         return exec_query(eval(x), E)
       catch
          cant_parse(x)
       end

@@ -8,7 +8,9 @@ export
 # Types
 VertexDescriptor, EdgeDescriptor,
 # Macros
-@query
+@query, @filter,
+# Methods
+set!
 ################################################# BASICS ###################################################################
 
 """ Describes a subset of vertices and their properties """
@@ -46,10 +48,21 @@ include("query/exec.jl")
 ################################################# @QUERY #####################################################################
 
 macro query(desc, x)
-   quer = Expr(:quote, x)
+   x = Expr(:quote, x)
    quote
-      local V = $(esc(desc))
-      local Q = $(esc(quer))
-      exec_query(Q, V)
+      local Q = $(esc(x))
+      local D = $(esc(desc))
+      exec_query(Q, D)
+   end
+end
+
+################################################# @FILTER #####################################################################
+
+macro filter(desc, x)
+   x = Expr(:quote, x)
+   quote
+      local Q = $(esc(x))
+      local D = $(esc(desc))
+      _filter(exec_query(Q, D), D)
    end
 end

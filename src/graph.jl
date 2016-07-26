@@ -152,35 +152,55 @@ end
 
 ################################################# LABELLING ################################################################
 
+###
+# RESOLVE
+###
 resolve(g::Graph, x) = resolve(labelmod(g), x)
 resolve(g::Graph, x, y) = resolve(labelmod(g), x, y)
 
+
+###
+# HALABEL
+###
 haslabel(g::Graph, x) = haslabel(labelmod(g), x)
 
-function encode(g::Graph, vs::Union{VertexID,AbstractVector{VertexID}})
-   validate_vertex(g, vs)
-   encode(labelmod(g), vs)
+
+###
+# ENCODE
+###
+encode(g::Graph, v::VertexID) = (validate_vertex(g, v); encode(labelmod(g), v))
+encode(g::Graph, vs::AbstractVector{VertexID}) = (validate_vertex(g, vs); encode(labelmod(g), vs))
+
+_encode(g::Graph, e::EdgeID) = encode(labelmod(g), e)
+_encode(g::Graph, es::AbstractVector{EdgeID}) = encode(labelmod(g), es)
+
+function encode(g::Graph, e::EdgeID)
+   validate_edge(g, e)
+   _encode(g, e)
 end
 
-function encode(g::Graph, es::Union{EdgeID,AbstractVector{EdgeID}})
+function encode(g::Graph, es::AbstractVector{EdgeID})
    validate_edge(g, es)
-   encode(labelmod(g), es)
+   _encode(g, es)
 end
 
+###
+# SETLABEL
+###
 function setlabel!{T}(g::Graph, ls::Vector{T})
    length(ls) == nv(g) || error("Incorrect number of ls provided")
-   g.labelmod = LabelModule(ls)
+   setlabel!(labelmod(g), ls)
    nothing
 end
 
 function setlabel!(g::Graph, propname)
    ls = [getvprop(g, v, propname) for v in vertices(g)]
-   g.labelmod = LabelModule(ls)
+   setlabel!(labelmod(g), ls)
    nothing
 end
 
 function setlabel!(g::Graph)
-   g.labelmod = LabelModule(nv(g))
+   setlabel!(labelmod(g))
    nothing
 end
 
