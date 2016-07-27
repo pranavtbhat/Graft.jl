@@ -44,6 +44,10 @@ include("core/seteprop.jl")
 # Graph Algortithms
 include("algorithms.jl")
 
+# Conversions
+include("conv/conversion.jl")
+include("conv/condensation.jl")
+
 # Querying
 include("query.jl")
 

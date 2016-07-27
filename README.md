@@ -9,7 +9,7 @@ vertex and edge metadata, vertex labelling and SQL-like queries.
 
 Two separate views of a graph are presented:
 
-# Graph Datastructure
+## Graph Datastructure
 ParallelGraphs provides a generic graph interface that can have multiple implementations:
 ```julia
 # Create a (10,90) directed graph with a LightGraphs backend. Use this interface if you want to
@@ -45,7 +45,7 @@ g["v1"]
 By default vertices have the internally assigned integer indices. Labels can be when adding new vertices,
 or by calling the `setlabel!` method.
 
-# Vertex and Edge Descriptors
+## Vertex and Edge Descriptors
 Descriptors behave like table-views of graphs:
 
 ```julia

@@ -242,7 +242,7 @@ end
 subgraph(x::LabelModule, vlist::AbstractVector{VertexID}) = LabelModule(subgraph(lmap(x), vlist))
 subgraph(x::LabelModule, elist::AbstractVector{EdgeID}) = x
 
-subgraph(x::IdentityLM, vlist::AbstractVector{VertexID}) = LabelModule(length(vlist))
+subgraph(x::IdentityLM, vlist::AbstractVector{VertexID}) = IdentityLM(length(vlist))
 
 function subgraph(x::DictLM, vlist::AbstractVector{VertexID})
    DictLM(rmap(x)[vlist])
