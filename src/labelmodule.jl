@@ -53,7 +53,7 @@ function DictLM{T}(labels::AbstractVector{T})
 end
 
 # Convert from IdentityLM
-DictLM(x::IdentityLM) = DictLM{Int}([i for i in 1 : nv(x)])
+DictLM(x::IdentityLM) = DictLM([i for i in 1 : nv(x)])
 
 
 # Accessors
@@ -68,9 +68,7 @@ type_promote{Tv}(x::DictLM, ls::AbstractVector{Tv}) = type_promote(x, Tv)
 
 function type_promote{T,Tv}(x::DictLM{T}, ::Type{Tv})
    Tn = typejoin(T, Tv)
-   fmap = Dict{Tn,VertexID}(fmap(x))
-   rmap = Array{Tn}(rmap(x))
-   DictLM{Tn}(nv(x), fmap, rmap)
+   DictLM{Tn}(nv(x), Dict{Tn,VertexID}(fmap(x)), Array{Tn}(rmap(x)))
 end
 
 
@@ -129,13 +127,15 @@ setlabel!(x::DictLM, vs::AbstractVector{VertexID}, ls::AbstractVector) =  setlab
 ################################################# HASLABEL ############################################################
 
 haslabel(x::LabelModule, l) = haslabel(lmap(x), l)
-haslabel(x::IdentityLM, v::VertexID) = true
+haslabel(x::IdentityLM, v::VertexID) = 1 <= v <= nv(x)
+haslabel(x::IdentityLM, l) = false
 haslabel(x::DictLM, l) = haskey(fmap(x), l)
 
 ################################################# RESOLVE VERTEX ############################################################
 
 resolve(x::LabelModule, l) = resolve(lmap(x), l)
 resolve(x::IdentityLM, v::VertexID) = v
+resolve(x::IdentityLM, l) = error("Couldn't resolve vertex label $l")
 
 function resolve(x::DictLM, l)
    get(fmap(x), l) do
@@ -199,15 +199,19 @@ addvertex!(x::DictLM) = error("Please supply a label")
 # WITH LABEL
 ###
 function addvertex!(x::LabelModule, l)
-   x.lmap = addvertex!(lmap(x), l)
-   nothing
+   if haslabel(x, l)
+      resolve(x, l)
+   else
+      x.lmap = addvertex!(lmap(x), l)
+      nv(x)
+   end
 end
 
 addvertex!(x::IdentityLM, l) = addvertex!(DictLM(x), l)
 
 function addvertex!{T}(x::DictLM{T}, l::T)
    push!(rmap(x), l)
-   x.nv += 1
+   fmap(x)[l] = (x.nv += 1)
    x
 end
 

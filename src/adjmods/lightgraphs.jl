@@ -100,7 +100,9 @@ end
 
 @inline hasvertex(x::LightGraphsAM, v::VertexID) = 1 <= v <= nv(x)
 function hasvertex(x::LightGraphsAM, vs::AbstractVector{VertexID})
-   issorted(vs) && 1 <= start(vs) && last(vs) <= nv(x) && return true
+   if !isempty(vs) && issorted(vs)
+      return 1 <= start(vs) && last(vs) <= nv(x)
+   end
    for v in vs
       hasvertex(x, v) || return false
    end

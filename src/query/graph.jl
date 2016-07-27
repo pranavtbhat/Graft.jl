@@ -2,6 +2,10 @@
 
 # This file contains methods, macros and operators for the Graph Datatype
 
+export
+# Macros
+@bfs
+
 ################################################# IMPORT/EXPORT ############################################################
 
 # Make the graph type iterable
@@ -42,13 +46,7 @@ end
 # + FOR ADDVERTEX
 ###
 function (+)(g::Graph, x)
-   if !haslabel(g, x)
-      addvertex!(g)
-      setlabel!(g, nv(g), x)
-      nv(g)
-   else
-      resolve(g, x)
-   end
+   addvertex!(g, x)
 end
 
 (+)(g::Graph, xs::Vector) = [g + x for x in xs]
@@ -84,4 +82,30 @@ function Graph(V::VertexDescriptor, E::EdgeDescriptor)
    lm = subgraph(labelmod(g), vlist)
 
    Graph(am, pm, lm)
+end
+
+################################################# SEARCHING ###################################################################
+
+function bfs_list(g::Graph, l)
+   v = resolve(g, l)
+   parvec = bfs(g, v)
+   encode(g, find(x->x>0, parvec))
+end
+
+###
+# TODO: OPTIMIZE
+###
+function bfs_list(V::VertexDescriptor, l)
+   v = resolve(V.g, l)
+   parvec = bfs(V.g, v)
+   vs = intersect(V.vs, find(x->x>0, parvec))
+   VertexDescriptor(V, vs)
+end
+
+macro bfs(x, y)
+   quote
+      local container = $(esc(x))
+      local label = $(esc(y))
+      bfs_list(container, label)
+   end
 end

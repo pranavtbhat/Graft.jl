@@ -10,7 +10,7 @@ for AM in subtypes(AdjacencyModule)
          gtype = Graph{AM,PM{typ,typ}}
          @testset "Subgraph test for Graph{$AM,$(PM{typ,typ})}" begin
 
-            g = complete_graph(gtype, 10)
+            g = completegraph(gtype, 10)
             vlist = 3:8
             elist = 11:20
             es = edges(g)[elist]

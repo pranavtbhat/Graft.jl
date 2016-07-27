@@ -9,7 +9,7 @@ for AM in subtypes(AdjacencyModule)
       for typ in [Any,TestType]
          gtype = Graph{AM,PM{typ,typ}}
          @testset "Parsing tests for $gtype" begin
-            g = complete_graph(gtype, 10)
+            g = completegraph(gtype, 10)
 
             # Vertex Properties
             setvprop!(g, :, rand(Int, 10), "f1")

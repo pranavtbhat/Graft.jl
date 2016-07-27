@@ -32,7 +32,7 @@ end
 
 
 @testset "Label Module" begin
-   g = complete_graph(SparseGraph, 10)
+   g = completegraph(SparseGraph, 10)
 
    ###
    # IDENTITYLM
@@ -57,8 +57,7 @@ end
    @test resolve(g, labels[[1, 3, 4, 8, 9]]) == [1, 2, 3, 5, 6]
 
    # addvertex
-   @test addvertex!(g, labels[9]) == nothing
-   @test resolve(g, labels[9]) == 6
+   @test addvertex!(g, labels[9]) == 6
 
    # Disable labelling
    setlabel!(g) == nothing

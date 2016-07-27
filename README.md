@@ -4,179 +4,181 @@
 [![codecov.io](http://codecov.io/github/pranavtbhat/ParallelGraphs.jl/coverage.svg?branch=master)](http://codecov.io/github/pranavtbhat/ParallelGraphs.jl)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/pranavtbhat/ParallelGraphs.jl/master/LICENSE.md)
 
-ParallelGraphs hopes to be a general purpose graph processing framework. Some of the use cases addressed are:
-- Storing and querying vertex or edge properties. ParallelGraphs allows the assignment of key-value pairs to vertices and edges, which can be used in various graph algorithms.
-- Vertex Labelling. ParallelGraphs allows users to refer to vertices using arbitrary Julia types.
-- Graph DB queries(WIP). ParallelGraphs will support SQL-like queries for graphs, such as filtering on vertex and edge properties.
-- Massive Graph Analysis(WIP). ParallelGraphs will leverage [Dagger.jl](https://github.com/JuliaParallel/Dagger.jl) to allow for the parallel processing of very large graphs.
+ParallelGraphs is a general purpose graph processing framework, and can be thought of as a *DataFrames.jl* for Graphs. ParallelGraphs supports
+vertex and edge metadata, vertex labelling and SQL-like queries.
 
-Every Graph type in ParallelGraphs is built with three separate modular components:
-- An `AdjacencyModule` that stores all structural information in the graph. All structural queries are redirected to the `AdjacencyModule` in the graph.
-- A `PropertyModule` that stores the property information in the graph. This component will serve as a Graph-DB and will handle all property related queries and operations.
-- An `LabelModule`. Since vertices are referred to internally by integer indices, this module will translate arbitrary julia objects (as required by the user) into the integer indices required by internal implementations. Label support will be provided only for user queries (to improve performance).
+Two separate views of a graph are presented:
 
-
-## Adjacency Module
-The Adjacency Module will be responsible for maintaining the structure of the graph. Methods implemented on the Adjacency Module will allow the user to mutate the graph, query adjacency information and perform graph algorithms.
-
-ParallelGraphs has the following `AdjacencyModule`s implemented:
-- `LightGraphsAM` : This module contains a `DiGraph` from *[LightGraphs.jl](https://github.com/JuliaGraphs/LightGraphs.jl)* and therefore will support most of the graph algorithms from *LightGraphs*.
-- `SparseMatrixAM` : This module maintains a matrix in the Compressed Sparse Column format (`SparseMatrixCSC`), and is expected to be more compact than `LightGraphsAM`. However, this module will not support as many algorithms.
-
-## PropertyModule
-The `PropertyModule` will be responsible for maintaining vertex and edge metadata. A Property Module is parameterized by two templates:
-
-- `V` : The vertex descriptor.
-- `E` : The edge descriptor.
-
-If you know the field names and their types beforehand, you can pass them in as a User defined type and get better performance. However, if you cannot anticipate the number or types of the fields, pass in type `Any` to use a ditctionary instead.
-
-ParallelGraphs provides two separate implementations:
-- `LinearPM` : Based on the Array of Structures paradigm.
-- `VectorPM` : Based on the Structure of Arrays paragigm.
-
-## Graph Types
-ParallelGraphs allows users to mix and match Adjacency and Property modules to create graph structures that suit their needs. A graph can be created using the parametric constructor.
-
+# Graph Datastructure
+ParallelGraphs provides a generic graph interface that can have multiple implementations:
 ```julia
+# Create a (10,90) directed graph with a LightGraphs backend. Use this interface if you want to
+# apply sequential algorithms on smallish graphs
+g = randgraph(SimpleGraph, 10^3, 10^5)
 
-# Create smaller graphs
-g = Graph{LightGraphsAM,LinearPM}()                   # Create an empty graph
-g = Graph{LightGraphsAM,LinearPM}(100)                # Create a graph with 100 vertices
+# Create a (10,90) directed graph with a SparseMatrixCSC backend. Use this if you want to work  
+# with very large graphs.  
+g = randgraph(SparseGraph, 10^6, 10^8)      
 
-# Create Large Sparse Graphs
-g = Graph{SparseMatrixAM,Vector}(10^6, 10^8) # Create a graph with 1M vertices and 100M edges.
+# If you really don't care about interfaces, skip the graph type argument
+g = emptygraph(0)
+
+# Add a vertex labelled v1
+g + "v1";
+
+# Add v1's friends
+g + ["v2", "v3", "v4", "v5", "v6"];
+
+# Draw edges between v1 and its friends
+g["v1"] = ["v2"];
+g["v2"] = ["v3", "v4", "v5", "v6"];
+
+# Check out v1's new neighbors
+g["v1"]
+# ["v2"]
+
+# Run a vfs starting from vertex v1
+@bfs g "v1"
+# ["v2", "v3", "v4", "v5", "v6"]
 ```
 
-For less picky users, ParallelGraphs provides two typealiases:
-- `SimpleGraph` : Graph type that supports LightGraphs.jl algorithms, and is suited to smaller graphs.
-- `SparseGraph` : Graph type that use sparse datastructures, and is targetted at larger graphs.
+By default vertices have the internally assigned integer indices. Labels can be when adding new vertices,
+or by calling the `setlabel!` method.
 
-## Queries
-Most adjacency/property operations will be supported through indexing. Additionally, SQL like queries such as filter are also provided.
+# Vertex and Edge Descriptors
+Descriptors behave like table-views of graphs:
 
 ```julia
-using ParallelGraphs
+g = randgraph(10^4, 10^6)
 
-# Randomly generate a graph with 50 vertices and 500 edges.
-srand(101)
-g = SimpleGraph(50, 500)
-# Graph{ParallelGraphs.LightGraphsAM,ParallelGraphs.PureDictPM{String,Any}} with 50 vertices and 500 edges
+# Label every vertex with "v$i"
+setlabel!(g, ["v$i" for i in 1:10^4])
 
-# Generate properties and attach them to vertices.
-setvprop!(g, :, v -> Faker.first_name(), "Name")
-setvprop!(g, :, v -> rand(1:80), "Age")
-setvprop!(g, :, v -> Faker.date(), "DoB")
+# Vertex and Edge Descriptors
+V, E = g
+```
 
-# Generate properties and attach them to edges.
-seteprop!(g, :, (u,v)->rand(1:10), "Weight")
-seteprop!(g, :, (u,v)->Faker.color_name(), "Color")
+Descriptors can be used to run a Julia statement on every vertex/edge.
+```julia
+# Attach randomly generated properties to each vertex
+V |> @query v.p1 = rand()
+V |> @query v.p2 = rand(1:100)
+V |> @query v.p3 = randstring()
 
-# Instruct ParallelGraphs to use every Vertex's name property as its label
-setlabel!(g, "Name")
+# Attach randomly generated properties to each edge (u,v)
+E |> @query e.p1 = u.p1 + v.p1
+E |> @query e.p2 = u.p2 * v.p2
+E |> @query e.p3 = string(u.p3, v.p3)
 
-# Vertex and Edge descriptors for the graph
-V,E = g
-
-# Display a view of all vertices in the graph
-println(V)
-# Vertex Descriptor, with  50 Vertices and 3 Properties
-#
+# Table view of the Vertex Descriptor
+V
+# Vertex Descriptor, with  10000 Vertices and 3 Properties
 # ┌────────────────────┬────────────────────┬────────────────────┬────────────────────┐
-# │Vertex Label        │Age                 │DoB                 │Name                │
+# │Vertex Label        │p1                  │p2                  │p3                  │
 # ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
-# │Reina               │23                  │2015-3-7            │Reina               │
+# │v1                  │0.0886765703681...  │84                  │8Oo7yCnn            │
 # ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
-# │Andrés              │30                  │1976-12-8           │Andrés              │
+# │v2                  │0.5447535485492...  │5                   │jeLoDfpJ            │
 # ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
-# │Mónica              │53                  │2002-9-13           │Mónica              │
+# │v3                  │0.7073385816035...  │25                  │CeKD51Cf            │
 # ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
-# │Aldonza             │11                  │2005-4-18           │Aldonza             │
+# │v4                  │0.4913099817997...  │3                   │ONMmhhZG            │
 # ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
-# │Norma               │77                  │2020-4-12           │Norma               │
+# │v5                  │0.5623334623679...  │14                  │uKvS5xu3            │
 # ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
 # │                    │                    │                    │                    │
 # ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
-# │Pedro               │23                  │1988-1-7            │Pedro               │
+# │v9995               │0.5613852334899...  │97                  │knBYJQWf            │
 # ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
-# │Liliana             │50                  │1975-1-22           │Liliana             │
+# │v9996               │0.4898850457780...  │30                  │NbAT75gc            │
 # ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
-# │Armando             │32                  │2005-9-6            │Armando             │
+# │v9997               │0.3108808790190...  │87                  │IeKA5qLe            │
 # ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
-# │Elvia               │4                   │1976-9-1            │Elvia               │
+# │v9998               │0.9409665402523...  │20                  │IsFazqQ8            │
 # ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
-# │Alicia              │27                  │1978-2-28           │Alicia              │
+# │v9999               │0.9292089950377...  │64                  │Zzw1eada            │
 # ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
-# │Socorro             │8                   │2007-2-19           │Socorro             │
+# │v10000              │0.3583293715985...  │70                  │RrcMkYxW            │
 # └────────────────────┴────────────────────┴────────────────────┴────────────────────┘
 
-# Display a view of all edges in the graph
-println(E)
-# Edge Descriptor with 500 edges and 2 properties
-#
-# ┌────────────────────┬────────────────────┬────────────────────┐
-# │Edge Label          │Color               │Weight              │
-# ├────────────────────┼────────────────────┼────────────────────┤
-# │Reina,Norma         │LightGoldenRodY...  │4                   │
-# ├────────────────────┼────────────────────┼────────────────────┤
-# │Reina,Ana           │DarkSalmon          │1                   │
-# ├────────────────────┼────────────────────┼────────────────────┤
-# │Reina,Helena        │FireBrick           │10                  │
-# ├────────────────────┼────────────────────┼────────────────────┤
-# │Reina,Minerva       │Moccasin            │3                   │
-# ├────────────────────┼────────────────────┼────────────────────┤
-# │Reina,Sergio        │LawnGreen           │2                   │
-# ├────────────────────┼────────────────────┼────────────────────┤
-# │                    │                    │                    │
-# ├────────────────────┼────────────────────┼────────────────────┤
-# │Socorro,Gerónim     │PaleGreen           │6                   │
-# ├────────────────────┼────────────────────┼────────────────────┤
-# │Socorro,María d     │MediumVioletRed     │2                   │
-# ├────────────────────┼────────────────────┼────────────────────┤
-# │Socorro,Octavio     │Wheat               │4                   │
-# ├────────────────────┼────────────────────┼────────────────────┤
-# │Socorro,Wendolin    │LawnGreen           │3                   │
-# ├────────────────────┼────────────────────┼────────────────────┤
-# │Socorro,Manuel      │MistyRose           │7                   │
-# ├────────────────────┼────────────────────┼────────────────────┤
-# │Socorro,Armando     │DarkGoldenRod       │4                   │
-# └────────────────────┴────────────────────┴────────────────────┘
-
-# Fetch all the properties assigned to vertex Silvano
-V["Silvano"]
-Vertex Descriptor, with  1 Vertices and 3 Properties
-
+# Table view of the Edge Descriptor
+E
+# Edge Descriptor with 1001959 edges and 3 properties
 # ┌────────────────────┬────────────────────┬────────────────────┬────────────────────┐
-# │Vertex Label        │Age                 │DoB                 │Name                │
+# │Edge Label          │p1                  │p2                  │p3                  │
 # ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
-# │Silvano             │31                  │2007-11-16          │Silvano             │
+# │v1,v114             │0.4570625414951...  │5628                │8Oo7yCnnLdyJMZC...  │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │v1,v177             │0.8510643282339...  │6636                │8Oo7yCnn9s8raFg...  │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │v1,v336             │0.2863039980798...  │5964                │8Oo7yCnni7wiA87...  │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │v1,v478             │0.6739877221233...  │4536                │8Oo7yCnno3fa9bq...  │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │v1,v729             │0.6719885669343...  │3780                │8Oo7yCnnQZNPcwq...  │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │                    │                    │                    │                    │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │v10000,v9814        │1.1602328312601...  │70                  │RrcMkYxWnD37V9g...  │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │v10000,v9816        │1.3545157779170...  │3570                │RrcMkYxWnbL68NL...  │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │v10000,v9848        │0.6012915336647...  │4060                │RrcMkYxWLiG6NXq...  │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │v10000,v9851        │0.8759764277288...  │2380                │RrcMkYxWmGkgmZY...  │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │v10000,v9959        │0.9247948535083...  │2940                │RrcMkYxWLdmQi4C...  │
+# ├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+# │v10000,v9974        │0.4030419119765...  │280                 │RrcMkYxWDeA1shF...  │
 # └────────────────────┴────────────────────┴────────────────────┴────────────────────┘
 
-# Fetch all the properties assigned to association "Cynthia" => "Alfonso"
-g["Sara" => "Carolina"]
-# Edge Descriptor with 1 edges and 2 properties
+# Compute a value on every vertex
+V |> @query v.p1 + 2 * v.p2
+
+# Find the largest value for field p1
+V |> @query(v.p1) |> maximum
+```
+
+Descriptors can also be `filter`ed, and `select`ed to yield smaller Descriptors.
+
+```julia
+# Filter out all vertices with p1 > 0.5
+V |> @filter v.p1 <= 0.5
+
+# Chain filtering
+V |> @filter(0.1 <= v.p1 <= 0.5) |> @filter(v.p2 < 50)
+
+# Select only p1
+select(V, "p1")
+# Vertex Descriptor, with  10000 Vertices and 1 Properties
 #
-# ┌────────────────────┬────────────────────┬────────────────────┐
-# │Edge Label          │Color               │Weight              │
-# ├────────────────────┼────────────────────┼────────────────────┤
-# │Sara,Carolina       │DarkMagenta         │2                   │
-# └────────────────────┴────────────────────┴────────────────────┘
-
-# Fetch associations from Silvano
-g["Silvano"]'
-# 1x8 Array{String,2}:
- # "Alejandro"  "Trinidad"  "Verónica"  "Minerva"  "Liliana"  "María Eugenia"  "Manuel"  "Alicia"
-
-# Get a subgraph with vertices of age less than 65
-vs = filter(V, "v.Age < 65")
-
-# Get a subgraph with edges of weight less than 7
-es = filter(g, "e.Weight < 7")
-
-# Get a subgraph with vertices of age less than 65 and edges of weight less than 7
-Graph(vs, es)
-# Graph{ParallelGraphs.LightGraphsAM,ParallelGraphs.VectorPM{Any,Any}} with 40 vertices and 188 edges
-
+# ┌────────────────────┬────────────────────┐
+# │Vertex Label        │p1                  │
+# ├────────────────────┼────────────────────┤
+# │v1                  │0.4359654138336...  │
+# ├────────────────────┼────────────────────┤
+# │v2                  │0.6531249345440...  │
+# ├────────────────────┼────────────────────┤
+# │v3                  │0.7285400192499...  │
+# ├────────────────────┼────────────────────┤
+# │v4                  │0.9706805845443...  │
+# ├────────────────────┼────────────────────┤
+# │v5                  │0.0658167326554...  │
+# ├────────────────────┼────────────────────┤
+# │                    │                    │
+# ├────────────────────┼────────────────────┤
+# │v9995               │0.3949059321178...  │
+# ├────────────────────┼────────────────────┤
+# │v9996               │0.1933076479556...  │
+# ├────────────────────┼────────────────────┤
+# │v9997               │0.0840808256994...  │
+# ├────────────────────┼────────────────────┤
+# │v9998               │0.6368603632994...  │
+# ├────────────────────┼────────────────────┤
+# │v9999               │0.8213442058510...  │
+# ├────────────────────┼────────────────────┤
+# │v10000              │0.7188503605295...  │
+# └────────────────────┴────────────────────┘
 ```
 
 ## Acknowledgements

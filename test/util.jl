@@ -44,7 +44,7 @@ for AM in subtypes(AdjacencyModule)
       for typ in [Any,TestType]
          gtype = Graph{AM,PM{typ,typ}}
          @testset "Tests for Display of $gtype" begin
-            V,E = complete_graph(gtype, 10)
+            V,E = completegraph(gtype, 10)
 
             # Vertex Properties
             map!(v->rand(Int), V, "f1")

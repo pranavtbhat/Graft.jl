@@ -10,21 +10,8 @@
 using ParallelGraphs
 srand(101)
 
-# Generate an empty SparseGraph
-g = SparseGraph()
-
-# Add a few vertices to it
-addvertex!(g, 100)
-
-# Add a couple of edges to it
-addedge!(g, 1=>2)
-addedge!(g, 2=>3)
-
-# Check the graph's size
-size(g)
-
 # Construct a small random graph with approximately 500k edges
-g = SparseGraph(10^3, 10^5)
+g = randgraph(10^3, 10^5)
 
 # Get a range of vertices in g
 vertices(g)
@@ -33,57 +20,51 @@ vertices(g)
 edges(g)
 
 # Examine vertex 1's neighbors
-fadj(g, 1)
+g[1]
+
+# Split the graph into vertex and edge descriptors
+V,E = g
 
 # Assign a (hopefully unique) name to each vertex in g
-setvprop!(g, :, v->randstring(), "name")
+V |> @query v.name = randstring()
 
 # Assign an age to each vertex in g
-setvprop!(g, :, v->rand(1:100), "age")
+V |> @query v.age = rand(1:100)
 
 # Assign a weight to each vertex in g
-setvprop!(g, :, v->rand(30:100), "weight")
+V |> @query v.weight = rand(30:100)
 
 # See how many vertices "like" every vertex in g
-setvprop!(g, :, v->indegree(g, v), "liked by")
+V |> @query v.likedby = indegree(g, v)
 
 # See how many vertices every vertex in g likes
-setvprop!(g, :, v->outdegree(g, v), "likes")
+V |> @query v.likes = outdegree(g, v)
 
 # Count the number of mutual likes for each edge
-function count_mutual_friends(g, u, v)
-   mfu = out_neighbors(g, u)
-   mfv = out_neighbors(g, v)
-   length(intersect(mfu, mfv))
-end
-seteprop!(g, :, (u,v)->count_mutual_friends(g, u, v), "mutual likes")
+E |> @query e.mutual_likes = length(intersect(g[u], g[v]))
+
+# Calculate the minimum and maximum mutual likes
+min_likes = E |> @query(e.mutual_likes) |> minimum
+max_likes = E |> @query(e.mutual_likes) |> maximum
 
 # Assign a normalized strength to each edge
-mutual_likes = geteprop(g, :, "mutual likes")
-min_likes = minimum(mutual_likes)
-max_likes = maximum(mutual_likes)
-str(g, u, v) = (geteprop(g, u, v, "mutual likes") - min_likes)/max_likes
-seteprop!(g, :, (u,v)->str(g, u, v), "strength")
+E |> @query e.strength = (e.mutual_likes - $min_likes) / $max_likes
 
 # Now to color these edges, based on strength
-function color_edge(g, u, v)
-   s = geteprop(g, u, v, "strength")
+function color_edge(s)
    s < 0.1 && return "red"
    s < 0.3 && return "orange"
    s < 0.5 && return "yellow"
    s < 0.8 && return "blue"
    s <= 1 && return "green"
 end
-seteprop!(g, :, (u,v)->color_edge(g, u, v), "color")
+E |> @query e.color = $color_edge(e.strength)
 
-# Label the vertices by name
-setlabel!(g, "name")
+# Label the vertices
+setlabel!(g, ["v$v" for v in vertices(g)])
 
 # Store the Graph in a file
 storegraph(g, "graph.txt")
-
-# Split the graph into its descriptors
-V, E = g
 
 # Display the Vertex Descriptor
 println(V)
@@ -95,19 +76,19 @@ println(E)
 V[1:10]
 
 # Find the senior citizens in the graph
-senior_citizens = filter(V, "65 <= v.age")
+senior_citizens = V |> @filter 65 <= v.age
 
 # Find people with abnormal weights
-abnormal_weights = filter(V, "v.weight < 40 && v.weight > 90")
+abnormal_weights = V |> @filter v.weight < 40 && v.weight > 90
 
 # Find all strong associations
-strong_edges = filter(E, "e.strength > 0.5")
+strong_edges = E |> @filter(e.strength > 0.5)
 
 # Isolate a subgraph with only senior citizens and strong associations
 h = Graph(senior_citizens, strong_edges)
 
-# Run a bfs to get a subgraph containing all vertices reachable from the first vertex
-V,E = bfs_subgraph(h, 1)
+# Run a bfs to get the set of all vertices reachable from the first vertex
+@bfs V "v1"
 
 # See only the names of the people in the subgraph
 println(select(V, "weight"))

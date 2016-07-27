@@ -9,7 +9,7 @@ for PM in subtypes(PropertyModule)
    for typ in [Any,TestType]
       pmtype = PM{typ,typ}
       @testset "Properties Interface for $pmtype" begin
-         x = complete_graph(Graph{SparseMatrixAM,pmtype}, 10)
+         x = completegraph(Graph{SparseMatrixAM,pmtype}, 10)
          d = Dict("f1"=>1, "f2"=>0.0, "f3"=>"3", "f4"=>nothing, "f5"=>'5')
          es = collect(edges(x))
 

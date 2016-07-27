@@ -97,11 +97,17 @@ Base.deepcopy(g::Graph) = Graph(deepcopy(adjmod(g)), deepcopy(propmod(g)), deepc
 
 """ Add a vertex to the graph """
 function addvertex!(g::Graph)
-   addvertex!(adjmod(g)); addvertex!(propmod(g)); addvertex!(labelmod(g))
+   addvertex!(adjmod(g))
+   addvertex!(propmod(g))
+   addvertex!(labelmod(g))
 end
 
 function addvertex!(g::Graph, l)
-   addvertex!(adjmod(g)); addvertex!(propmod(g)); addvertex!(labelmod(g), l)
+   if nv(g) < addvertex!(labelmod(g), l)
+      addvertex!(adjmod(g))
+      addvertex!(propmod(g))
+   end
+   resolve(g, l)
 end
 
 

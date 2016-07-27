@@ -46,10 +46,11 @@ end
 fetch_setfield_property(x::Expr) = fetch_getfield_property(x.args[1])
 ################################################# RECURSIVE EXECUTION ######################################################
 
-exec_query(x::Number, desc) = fill(x, length(desc))
-exec_query(x::Bool, desc) = fill(x, length(desc))
-exec_query(x::String, desc) = fill(x, length(desc))
-exec_query(x::AbstractArray, desc) = fill(x, length(desc))
+exec_query(x::Number, desc) = FakeVector(x, length(desc))
+exec_query(x::Bool, desc) = FakeVector(x, length(desc))
+exec_query(x::String, desc) = FakeVector(x, length(desc))
+exec_query(x::AbstractArray, desc) = FakeVector(x, length(desc))
+exec_query(g::Graph, desc) = FakeVector(g, length(desc))
 
 # Convert unit operators into
 const _sym_map = Dict{Symbol,Symbol}(
@@ -72,8 +73,10 @@ function exec_query(x::Symbol, V::VertexDescriptor)
       _sym_map[x]
    elseif x == :v
       encode(V.g, V.vs)
+   elseif x == :g
+      FakeVector(V.g, length(V))
    else
-      fill(eval(x), length(V))
+      FakeVector(eval(x), length(V))
    end
 end
 
@@ -148,10 +151,12 @@ function exec_query(x::Symbol, E::EdgeDescriptor)
       encode(E.g, map(x->x.second, E.es))
    elseif x == :e
       _encode(E.g, E.es)
+   elseif x == :g
+      FakeVector(E.g, length(E))
    elseif isdefined(x)
-      fill(eval(x), length(E))
+      FakeVector(eval(x), length(E))
    else
-      fill(eval(x), length(E))
+      FakeVector(eval(x), length(E))
    end
 end
 

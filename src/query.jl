@@ -61,11 +61,16 @@ macro query(desc, x)
 end
 
 macro query(x)
-   QueryNode(x)
+   x = Expr(:quote, x)
+   quote
+      local Q = $(esc(x))
+      QueryNode(Q)
+   end
+
 end
 
 |>(desc, x::QueryNode) = exec_query(x.expr, desc)
-
+|>(x::QueryNode, f::Function) = QueryNode(Expr(:call, f, x.expr))
 ################################################# @FILTER #####################################################################
 
 type FilterNode
@@ -82,7 +87,13 @@ macro filter(desc, x)
 end
 
 macro filter(x)
-   FilterNode(x)
+   x = Expr(:quote, x)
+   quote
+      local Q = $(esc(x))
+      FilterNode(Q)
+   end
 end
 
 |>(desc, x::FilterNode) = _filter(exec_query(x.expr, desc), desc)
+
+|>(x::FilterNode, f::Function) = FilterNode(Expr(:call, f, x.expr))

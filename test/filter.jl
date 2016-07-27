@@ -9,7 +9,7 @@ for PM in subtypes(PropertyModule)
    for typ in [Any,TestType]
       gtype = Graph{SparseMatrixAM,PM{typ,typ}}
       @testset "Filter test for $gtype" begin
-         V,E = complete_graph(gtype, 10)
+         V,E = completegraph(gtype, 10)
 
          ###
          # VERTEX

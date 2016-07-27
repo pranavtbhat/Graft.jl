@@ -6,7 +6,7 @@
 if ParallelGraphs.CAN_USE_LG
 
    @testset "LightGraphs Edge Interface" begin
-      g = complete_graph(SimpleGraph, 10)
+      g = completegraph(SimpleGraph, 10)
       seteprop!(g, :, (u,v)->rand(1:10), "weight")
 
       ei = ParallelGraphs.EdgePropInterface(g, "weight")
@@ -53,7 +53,7 @@ if ParallelGraphs.CAN_USE_LG
    # Shortest Paths
 
    @testset "LightGraphs Shortest Paths" begin
-      g = complete_graph(SimpleGraph, 10)
+      g = completegraph(SimpleGraph, 10)
       seteprop!(g, :, (u,v)->2, "weight")
 
       @test a_star(g, 1, 10) == Pair[1=>10]
@@ -71,7 +71,7 @@ if ParallelGraphs.CAN_USE_LG
 
    # Centrality
    @testset "LightGraphs Centrality" begin
-      g = complete_graph(SimpleGraph, 10)
+      g = completegraph(SimpleGraph, 10)
       h = g.adjmod.data
       @test betweenness_centrality(g) == LightGraphs.betweenness_centrality(h)
       @test degree_centrality(g) == LightGraphs.degree_centrality(h)

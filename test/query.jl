@@ -9,7 +9,7 @@ for PM in subtypes(PropertyModule)
    for typ in [Any,TestType]
       gtype = Graph{SparseMatrixAM,PM{typ,typ}}
       @testset "VertexDescriptor tests for $gtype" begin
-         g = complete_graph(gtype, 10)
+         g = completegraph(gtype, 10)
          ls = map(string, 1:10)
          setlabel!(g, ls)
 
@@ -65,7 +65,7 @@ for PM in subtypes(PropertyModule)
       end
 
       @testset "Query tests for $gtype" begin
-         g = complete_graph(gtype, 10)
+         g = completegraph(gtype, 10)
          V, = g
 
          # Label substitution
@@ -89,7 +89,7 @@ for PM in subtypes(PropertyModule)
    for typ in [Any,TestType]
       gtype = Graph{SparseMatrixAM,PM{typ,typ}}
       @testset "EdgeDescriptor tests for $gtype" begin
-         g = complete_graph(gtype, 10)
+         g = completegraph(gtype, 10)
          ls = map(string, 1:10)
          setlabel!(g, ls)
 
@@ -139,7 +139,7 @@ for PM in subtypes(PropertyModule)
       end
 
       @testset "Query tests for $gtype" begin
-         g = complete_graph(gtype, 10)
+         g = completegraph(gtype, 10)
          V,E = g
 
          # Label substitution

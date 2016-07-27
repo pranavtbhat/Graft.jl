@@ -41,13 +41,12 @@ include("core/geteprop.jl")
 include("core/setvprop.jl")
 include("core/seteprop.jl")
 
+# Graph Algortithms
+include("algorithms.jl")
+
 # Querying
 include("query.jl")
 
 # Parse Graphs from files etc.
 include("parse.jl")
-
-# Graph Algortithms
-include("algorithms.jl")
-
 end # module
