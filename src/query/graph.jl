@@ -49,7 +49,7 @@ function (+)(g::Graph, x)
    addvertex!(g, x)
 end
 
-(+)(g::Graph, xs::Vector) = [g + x for x in xs]
+(+)(g::Graph, xs::AbstractVector) = [g + x for x in xs]
 
 
 ###

@@ -123,12 +123,14 @@ end
 """ Add an edge u->v to the graph """
 function addedge!(g::Graph, u::VertexID, v::VertexID)
    can_add_edge(g, u, v)
-   addedge!(adjmod(g), u, v); addedge!(propmod(g), u, v)
+   addedge!(propmod(g), u, v)
+   addedge!(adjmod(g), u, v)
 end
 
 function addedge!(g::Graph, es::Union{EdgeID,AbstractVector{EdgeID}})
    can_add_edge(g, es)
-   addedge!(adjmod(g), es); addedge!(propmod(g), es)
+   addedge!(propmod(g), es)
+   addedge!(adjmod(g), es)
 end
 
 

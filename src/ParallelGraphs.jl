@@ -47,15 +47,17 @@ include("core/seteprop.jl")
 # Graph Algortithms
 include("algorithms.jl")
 
-# Conversions
-include("conv/conversion.jl")
-include("conv/condensation.jl")
 
 # REPL IO
 include("utils/display.jl")
 
 # Querying
 include("query.jl")
+
+# Conversions
+include("conv/conversion.jl")
+include("conv/condensation.jl")
+include("conv/merging.jl")
 
 # Parse Graphs from files etc.
 include("parse.jl")

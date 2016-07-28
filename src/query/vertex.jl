@@ -98,7 +98,7 @@ Base.done(x::VertexDescriptor, i) = done(x.vs, i)
 Base.getindex(x::VertexDescriptor, label) = VertexDescriptor(x, resolve(x.g, label))
 
 # Vector getindex for subset VertexDescriptors
-Base.getindex(x::VertexDescriptor, vs::AbstractVector{VertexID}) = VertexDescriptor(x, vs)
+Base.getindex(x::VertexDescriptor, ls::AbstractVector) = VertexDescriptor(x, resolve(x.g, ls))
 Base.getindex(x::VertexDescriptor, ::Colon) = VertexDescriptor(x, :)
 
 ################################################# GET and SET! ##############################################################

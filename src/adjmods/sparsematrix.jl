@@ -215,12 +215,15 @@ function rmvertex!(x::SparseMatrixAM, vs)
 end
 
 function addedge!(x::SparseMatrixAM, u::Int, v::Int)
-   fdata(x)[v,u] = true
-   bdata(x)[u,v] = true
-   x.ne += 1
-   nothing
+   if !hasedge(x, u, v)
+      x.ne += 1
+      fdata(x)[v,u] = bdata(x)[v,u] = true
+   else
+      false
+   end
 end
-@inline addedge!(x::SparseMatrixAM, e::EdgeID) = addedge!(x, e...)
+
+addedge!(x::SparseMatrixAM, e::EdgeID) = addedge!(x, e...)
 
 function addedge!(x::SparseMatrixAM, elist::AbstractVector{EdgeID})
    for e in elist

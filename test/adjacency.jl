@@ -23,7 +23,9 @@ for AM in subtypes(AdjacencyModule)
       addvertex!(x)
       @test nv(x) == 12
 
-      @test addedge!(x, 10, 11) == nothing
+      @test addedge!(x, 10, 11) == true
+      @test addedge!(x, 10, 11) == false
+      
       @test addedge!(x, [EdgeID(10, 12), EdgeID(11, 12)]) == nothing
       @test ne(x) == 93
 

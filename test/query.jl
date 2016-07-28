@@ -32,7 +32,7 @@ for PM in subtypes(PropertyModule)
          @test length(v1) == 1
          @test v1.props == V.props
 
-         v38 = V[3:8]
+         v38 = V[ls[3:8]]
          @test isa(v38, VertexDescriptor)
          @test length(v38) == 6
          @test v38.props == V.props
@@ -45,8 +45,8 @@ for PM in subtypes(PropertyModule)
          @test get(V, "f1") == val
 
          val = rand(5)
-         set!(V[1:5], val, "f2")
-         @test get(V[1:5], "f2") == val
+         set!(V[ls[1:5]], val, "f2")
+         @test get(V[ls[1:5]], "f2") == val
 
          val = randstring()
          set!(V["5"], val, "f3")

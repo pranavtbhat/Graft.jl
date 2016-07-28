@@ -77,8 +77,8 @@ for PM in subtypes(PropertyModule)
          addvertex!(x)
          addvertex!(x)
          addvertex!(x)
-         @test addedge!(x, 11, 12) == nothing
-         @test addedge!(x, EdgeID[12=>13, 11=>13]) == nothing
+         addedge!(x, 11, 12)
+         addedge!(x, EdgeID[12=>13, 11=>13])
 
          # Remove vertices and edges
          rmvertex!(x, 13) == nothing
