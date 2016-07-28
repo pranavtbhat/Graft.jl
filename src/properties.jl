@@ -27,7 +27,7 @@ Base.zero(::Type{Dict}) = Dict()
 Base.zero{K,V}(::Type{Dict{K,V}}) = Dict{K,V}()
 
 # Arrays
-Base.zero{T,N}(x::Type{Array{T,N}}) = zeros(T, zeros(Int, N)...)
+Base.zero{T,N}(::Type{Array{T,N}}) = Array{T,N}(zeros(Int, N)...)
 
 # User defined types
 Base.zero{T}(::Type{T}) = T([zero(fieldtype(T, field)) for field in fieldnames(T)]...)

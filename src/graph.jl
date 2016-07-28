@@ -29,6 +29,8 @@ end
 
 typealias SparseGraph Graph{SparseMatrixAM,VectorPM}
 
+Base.zero{AM,PM}(::Type{Graph{AM,PM}}) = emptygraph(Graph{AM,PM}, 0)
+
 ################################################# VALIDATION ################################################################
 
 # Vertex validation

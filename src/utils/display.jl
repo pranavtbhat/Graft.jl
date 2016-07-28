@@ -5,22 +5,47 @@
 ################################################# IMPORT/EXPORT ############################################################
 
 
-################################################# BOX PRINTING #############################################################
+################################################# PRINTVAL #################################################################
+
+spaces(i) = join(fill(" ", i))
 
 function printval(io::IO, x)
    s = string(x)
-   if length(s) > 15
-      @printf io "%-15s...  " join(s[1:15])
+   print(io, sprintval(x, 20))
+end
+
+function padding(s::String, len)
+   if length(s) > (len - 2)
+      string(s[1:(len-5)], "...  ")
    else
-      @printf io "%-20s" s
+      string(s, spaces(len - length(s)))
    end
 end
 
-function printval(io::IO, e::Pair)
-   s1 = string(e.first)
-   s2 = string(e.second)
-   @printf io "%-20s" "$(s1[1:min(8,length(s1))]),$(s2[1:min(8,length(s2))])"
+sprintval(x::Number, len) = padding(string(x), len)
+sprintval(x::Symbol, len) = padding(string(":", string(x)), len)
+sprintval(x::Char, len)   = padding("\'$x\'", len)
+sprintval(x::String, len) = padding("\"$x\"", len)
+
+sprintval(e::Pair, len)   = padding(string(e.first,",",e.second), len)
+sprintval(g::Graph, len)  = padding("Graph{$(nv(g)) X $(ne(g))}", len)
+
+function sprintval{T,N}(x::AbstractArray{T,N}, len)
+   sz = N == 1 ? "[$(length(x))]" : "[$(size(x))]"
+   typ = string(T)
+   if length(sz) + length(typ) > (len - 2)
+      string(typ[1:(len-length(sz)-5)], "...", sz, spaces(2))
+   else
+      string(typ, sz, spaces(len - length(sz) - length(typ)))
+   end
 end
+
+sprintval(x::Dict, len) = padding("Dict{$(length(x))}", len)
+
+
+
+################################################# DRAW BOX ###############################################################
+
 
 drawhl(io::IO, len) = print(io, join(fill('\u2500', len)))
 drawvl(io::IO) = print(io, "\u2502")

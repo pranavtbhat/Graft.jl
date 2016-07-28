@@ -126,13 +126,3 @@ macro interface(expr)
         error(string("The method ", $sig, " hasn't been implemented on ", ($typs[1])))
     end)
 end
-
-
-
-################################################# SPARSEMATRIXCSC ############################################################
-
-include("utils/sparsematrix.jl")
-
-################################################# DISPLAY ####################################################################
-
-include("utils/display.jl")

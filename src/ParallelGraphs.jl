@@ -20,6 +20,9 @@ import Base: deepcopy, ==, +, -, |>
 # Package Wide Utilities
 include("util.jl")
 
+#  SparseMatrixCSC utils
+include("utils/sparsematrix.jl")
+
 # Adjacency Modules
 include("adjacency.jl")
 
@@ -48,9 +51,14 @@ include("algorithms.jl")
 include("conv/conversion.jl")
 include("conv/condensation.jl")
 
+# REPL IO
+include("utils/display.jl")
+
 # Querying
 include("query.jl")
 
 # Parse Graphs from files etc.
 include("parse.jl")
+
+
 end # module

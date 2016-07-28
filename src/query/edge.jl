@@ -54,15 +54,15 @@ function display_edge_list(io::IO, x::EdgeDescriptor)
 
    if n <= 10
       for i in 1:min(n,10)
-         push!(rows, [encode(x.g, es[i]) [string(geteprop(x.g, es[i], prop)) for prop in props]...])
+         push!(rows, vcat(encode(x.g, es[i]), Any[geteprop(x.g, es[i], prop) for prop in props]))
       end
    else
       for i in 1:min(n,5)
-         push!(rows, [encode(x.g, es[i]) [string(geteprop(x.g, es[i], prop)) for prop in props]...])
+         push!(rows, vcat(encode(x.g, es[i]), Any[geteprop(x.g, es[i], prop) for prop in props]))
       end
       push!(rows, ["⋮", ["⋮" for prop in props]...])
       for i in n-5:n
-         push!(rows, [encode(x.g, es[i]) [string(geteprop(x.g, es[i], prop)) for prop in props]...])
+         push!(rows, vcat(encode(x.g, es[i]), Any[geteprop(x.g, es[i], prop) for prop in props]))
       end
    end
    drawbox(io, rows)
