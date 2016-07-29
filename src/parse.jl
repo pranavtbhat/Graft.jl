@@ -69,34 +69,48 @@ function printif(cond, s::String)
 end
 ################################################# READ GRAPHS ##############################################################
 
+function loadheader(io::IO)
+   size_line = split(rstrip(readline(io)), ',')
+   vprops_line = split(rstrip(readline(io)), ',')
+   vtypes_line = split(rstrip(readline(io)), ',')
+   eprops_line = split(rstrip(readline(io)), ',')
+   etype_line = split(rstrip(readline(io)), ',')
+
+   Nv,Ne = map(parse, size_line)
+
+   vprops = parseprops(filter(x -> x != "", vprops_line))
+   vtypes = map(x->eval(parse(x)), filter(x -> x != "", vtypes_line))
+
+   eprops = parseprops(filter(x -> x != "", eprops_line))
+   etypes = map(x->eval(parse(x)), filter(x -> x != "", etype_line))
+
+   return(Nv, Ne, vprops, vtypes, eprops, etypes)
+end
+
+
 function loadgraph(io::IO, graph_type=SparseGraph, verbose=false)
-   arr = readcsv(io; skipblanks=false)
-
    printif(verbose, "Fetching Graph Header")
-   Nv, Ne = collect(Int, arr[1,1:2])
+   Nv, Ne, vprops, vtypes, eprops, etypes = loadheader(io)
 
-   vprops = parseprops(filter(x -> x != "", arr[2,:]))
-   vtypes = map(x->eval(parse(x)), filter(x -> x != "", arr[3,:]))
-
-   eprops = parseprops(filter(x -> x != "", arr[4,:]))
-   etypes = map(x->eval(parse(x)), filter(x -> x != "", arr[5,:]))
+   dims = (Nv + Ne, max(1 + length(vprops), 2 + length(eprops)))
+   arr = readcsv(io; dims=dims)
 
    g = emptygraph(graph_type, Nv)
 
    printif(verbose, "Fetching Vertex Labels")
-   labels = arr[6:(Nv+5), 1]
+   labels = arr[1:Nv, 1]
    setlabel!(g, labels)
 
    printif(verbose, "Fetching Vertex Data")
    # vdata = arr[6:(Nv+6), 2:end]
    for (i,prop) in enumerate(vprops)
-      vals = promote_vector(vtypes[i], arr[6:(Nv+5),i+1])
+      vals = promote_vector(vtypes[i], arr[1:Nv,i+1])
       setvprop!(g, :, vals, prop)
    end
 
    printif(verbose, "Fetching Edges")
-   us = resolve(g, arr[(Nv+6):(Nv+5+Ne),1])
-   vs = resolve(g, arr[(Nv+6):(Nv+5+Ne),2])
+   us = resolve(g, arr[(Nv+1):(Nv+Ne),1])
+   vs = resolve(g, arr[(Nv+1):(Nv+Ne),2])
    es = map(EdgeID, us, vs)
 
    printif(verbose, "Adding Edges")
@@ -106,7 +120,7 @@ function loadgraph(io::IO, graph_type=SparseGraph, verbose=false)
    printif(verbose, "Fetching Edge Data")
    # edata = arr[(Nv+6):(Nv+5+Ne), 3:end]
    for (i,prop) in enumerate(eprops)
-      vals = promote_vector(etypes[i], arr[(Nv+6):(Nv+5+Ne),i+2])
+      vals = promote_vector(etypes[i], arr[(Nv+1):(Nv+Ne),i+2])
       seteprop!(g, :, vals, prop)
    end
 
