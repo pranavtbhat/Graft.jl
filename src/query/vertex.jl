@@ -91,6 +91,7 @@ end
 
 Base.done(x::VertexDescriptor, i) = done(x.vs, i)
 
+Base.eachindex(x::VertexDescriptor) = 1 : length(x )
 
 ################################################# GETINDEX ##################################################################
 

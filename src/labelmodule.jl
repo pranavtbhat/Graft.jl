@@ -63,9 +63,6 @@ rmap(x::DictLM) = x.rmap
 Base.eltype{T}(x::DictLM{T}) = T
 
 # Type compatibility
-type_promote{Tv}(x::DictLM, l::Tv) = type_promote(x, Tv)
-type_promote{Tv}(x::DictLM, ls::AbstractVector{Tv}) = type_promote(x, Tv)
-
 function type_promote{T,Tv}(x::DictLM{T}, ::Type{Tv})
    Tn = typejoin(T, Tv)
    DictLM{Tn}(nv(x), Dict{Tn,VertexID}(fmap(x)), Array{Tn}(rmap(x)))
@@ -94,12 +91,14 @@ end
 
 setlabel!(x::IdentityLM, v::VertexID, l) = setlabel!(DictLM(x), v, l)
 
-function setlabel!{T}(x::DictLM{T}, v::VertexID, l::T)
+function setlabel!{T,Tv}(x::DictLM{T}, v::VertexID, l::Tv)
+   if !(T <: Tv)
+      x = type_promote(x, Tv)
+   end
    fmap(x)[l] = v
    rmap(x)[v] = l
-   nothing
+   x
 end
-setlabel!(x::DictLM, v::VertexID, l) =  setlabel!(type_promote(x, l), v, l)
 
 ################################################# SETLABEL MUTLI ######################################################
 
@@ -117,12 +116,17 @@ function setlabel!(x::IdentityLM, vs::AbstractVector{VertexID}, ls::AbstractVect
    setlabel!(DictLM(x), vs, ls)
 end
 
-function setlabel!{T}(x::DictLM{T}, vs::AbstractVector{VertexID}, ls::AbstractVector{T})
-   broadcast(setlabel!, x, vs, ls)
+function setlabel!{T,Tv}(x::DictLM{T}, vs::AbstractVector{VertexID}, ls::AbstractVector{Tv})
+   if !(T <: Tv)
+      x = type_promote(x, Tv)
+   end
+   D = fmap(x)
+   for i in eachindex(vs, ls)
+      D[ls[i]] = vs[i]
+   end
    rmap(x)[vs] = ls
-   nothing
+   x
 end
-setlabel!(x::DictLM, vs::AbstractVector{VertexID}, ls::AbstractVector) =  setlabel!(type_promote(x, ls), vs, ls)
 
 ################################################# HASLABEL ############################################################
 

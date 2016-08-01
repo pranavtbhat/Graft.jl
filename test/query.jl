@@ -71,6 +71,10 @@ for PM in subtypes(PropertyModule)
          # Label substitution
          @test (@query V v) == 1:10
 
+         # Relabel
+         @query V v = 1
+         @test (@query V v) == fill(1, 10)
+         
          # getfield/setfield
          @query V v.f1 = 1
          @test all(@query V v.f1 == 1)

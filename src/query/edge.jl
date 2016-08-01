@@ -88,6 +88,7 @@ end
 
 Base.done(x::EdgeDescriptor, i) = done(x.es, i)
 
+Base.eachindex(x::EdgeDescriptor) = 1 : length(x)
 
 ################################################# GETINDEX ##################################################################
 

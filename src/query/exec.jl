@@ -13,21 +13,61 @@ exec_query
 
 cant_parse(x::Expr) = error("Couldn't parse (sub)expression $x")
 
+# Vectorized function execution
+function exec_function(x::Expr, desc)
+   fargs = Any[exec_query(y, desc) for y in x.args[2:end]]
+   if length(fargs) == 0
+      Expr(:comprehension, Expr(:call, x.args[1]), Expr(:(=), :i, eachindex(desc)))
+   else
+      Expr(:call, :map, x.args[1], fargs...)
+   end
+end
+
+################################################# TOKEN MATCHERS ###########################################################
+
+###
+# GETFIELD
+###
 match_getfield(x, s) = false
+
 function match_getfield(x::Expr, s)
    x.head == :. && x.args[1] == s
 end
 
+
+###
+# SETFIELD
+###
 match_setfield(x, s) = false
+
 function match_setfield(x::Expr, s)
    (x.head == :(=) || x.head ==:kw) && match_getfield(x.args[1], s) # KEYWORD ARG CONFLICT!!!
 end
 
+
+###
+# ADJACENCY
+###
 match_adj(x, s) = false
+
 function match_adj(x::Expr, s)
    x.head == :ref && x.args[1] == :g && x.args[2] == s
 end
 
+###
+# RELABEL
+###
+match_relabel(x, s) = false
+
+function match_relabel(x::Expr, s)
+   (x.head == :(=) || x.head == :kw) && x.args[1] == s
+end
+
+################################################# TOKEN EXTRACTION ###########################################################
+
+###
+# GETFIELD
+###
 fetch_getfield_property(x) = x
 fetch_getfield_property(x::QuoteNode) = fetch_getfield_property(eval(x))
 fetch_getfield_property(x::Symbol) = isdefined(x) ? x : string(x)
@@ -43,7 +83,11 @@ function fetch_getfield_property(x::Expr)
 end
 
 
+###
+# SETFIELD
+###
 fetch_setfield_property(x::Expr) = fetch_getfield_property(x.args[1])
+
 ################################################# RECURSIVE EXECUTION ######################################################
 
 exec_query(x::Number, desc) = FakeVector(x, length(desc))
@@ -52,7 +96,7 @@ exec_query(x::String, desc) = FakeVector(x, length(desc))
 exec_query(x::AbstractArray, desc) = FakeVector(x, length(desc))
 exec_query(g::Graph, desc) = FakeVector(g, length(desc))
 
-# Convert unit operators into
+# Convert unit operators into vectorized operators
 const _sym_map = Dict{Symbol,Symbol}(
    :+ => :.+,
    :- => :.-,
@@ -80,11 +124,10 @@ function exec_query(x::Symbol, V::VertexDescriptor)
    end
 end
 
+
 function exec_query(x::Expr, V::VertexDescriptor)
    # Get field override
-   if match_getfield(x, :v)
-      return get(V, fetch_getfield_property(x))
-   end
+   match_getfield(x, :v) && return get(V, fetch_getfield_property(x))
 
    # Set field override
    if match_setfield(x, :v)
@@ -95,8 +138,12 @@ function exec_query(x::Expr, V::VertexDescriptor)
    end
 
    # Getindex override for graph
-   if match_adj(x, :v)
-      return [V.g[v] for v in V]
+   match_adj(x, :v) && return [V.g[v] for v in V]
+
+   # Relabel override
+   if match_relabel(x, :v)
+      ls = exec_query(x.args[2], V)
+      return setlabel!(V.g, V.vs, ls)
    end
 
    # Convert non-adherent query into either :comparison or :call types
@@ -108,24 +155,12 @@ function exec_query(x::Expr, V::VertexDescriptor)
 
    # Substitute into adherent query type
    if x.head == :comparison
-      # Only substitution required
-      map!(y->exec_query(y, V), x.args, x.args)
-
+      map!(y->exec_query(y, V), x.args, x.args)    # Only substitution required
    elseif x.head == :call
       if haskey(_sym_map, x.args[1])
-         # Only substitution required
-         map!(y->exec_query(y, V), x.args, x.args)
-
+         map!(y->exec_query(y, V), x.args, x.args) # Only substitution required
       else
-         # Substition and broadcast required
-         fargs = Any[exec_query(y, V) for y in x.args[2:end]]
-
-         if length(fargs) == 0
-            # Unary function
-            x = Expr(:comprehension, Expr(:call, x.args[1]), Expr(:(=), :i, V.vs))
-         else
-            x.args = vcat(:map, x.args[1], fargs)
-         end
+         x = exec_function(x, V)
       end
    else
       # We don't understand this query. Try an exec
@@ -225,24 +260,12 @@ function exec_query(x::Expr, E::EdgeDescriptor)
 
    # Substitute into adherent query type
    if x.head == :comparison
-      # Only substitution required
-      x.args[2:end] = map(y->exec_query(y, E), x.args[2:end])
-
+      map!(y->exec_query(y, E), x.args, x.args) # Only substitution required
    elseif x.head == :call
       if haskey(_sym_map, x.args[1])
-         # Only substitution required
-         map!(y->exec_query(y, E), x.args, x.args)
-
+         map!(y->exec_query(y, E), x.args, x.args) # Only substitution required
       else
-         # Substition and broadcast required
-         fargs = Any[exec_query(y, E) for y in x.args[2:end]]
-
-         if length(fargs) == 0
-            # Unary function
-            x = Expr(:comprehension, Expr(:call, x.args[1]), Expr(:(=), :i, E.es))
-         else
-            x.args = vcat(:map, x.args[1], fargs)
-         end
+         x = exec_function(x, E)
       end
    else
       # We don't understand this query. Try an exec
