@@ -29,6 +29,8 @@ include("labelling.jl")
 
 include("util.jl")
 
+include("generator.jl")
+
 include("subgraph.jl")
 
 include("query.jl")

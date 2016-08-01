@@ -5,6 +5,8 @@
 ############################################################################################################################
 
 function test_label_module(g, ls)
+   @test nv(g.labelmod) == nv(g)
+
    es = collect(edges(g))
 
    # resolve vertex
@@ -42,24 +44,36 @@ end
    ###
    ## DICTLM
    ###
-   labels = map(string, 1:10)
+   ls = map(string, 1:10)
 
    # Initialize labelling
-   @test setlabel!(g, labels) == nothing
+   @test setlabel!(g, ls) == nothing
 
-   test_label_module(g, labels)
+   test_label_module(g, ls)
 
    # rmvertex
    @test rmvertex!(g, 5) == nothing
-   @test resolve(g, labels[6]) == 5
+   @test resolve(g, ls[6]) == 5
 
    @test rmvertex!(g, [2,6,9]) == nothing
-   @test resolve(g, labels[[1, 3, 4, 8, 9]]) == [1, 2, 3, 5, 6]
+   @test resolve(g, ls[[1, 3, 4, 8, 9]]) == [1, 2, 3, 5, 6]
 
    # addvertex
-   @test addvertex!(g, labels[9]) == 6
+   @test addvertex!(g, ls[9]) == 6
 
    # Disable labelling
    setlabel!(g) == nothing
    @test isa(g.labelmod.lmap, IdentityLM)
+
+   ###
+   # MIXED TYPES
+   ###
+   g = completegraph(SparseGraph, 10)
+
+   addvertex!(g, 11.0)
+   setlabel!(g, 3, '3')
+   setlabel!(g, 5:9, map(string, 5:9))
+   ls = encode(g, vertices(g))
+
+   test_label_module(g, ls)
 end

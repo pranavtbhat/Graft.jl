@@ -213,13 +213,14 @@ end
 
 addvertex!(x::IdentityLM, l) = addvertex!(DictLM(x), l)
 
-function addvertex!{T}(x::DictLM{T}, l::T)
+function addvertex!{T,Tv}(x::DictLM{T}, l::Tv)
+   if !(Tv <: T)
+      x = type_promote(x, Tv)
+   end
    push!(rmap(x), l)
    fmap(x)[l] = (x.nv += 1)
    x
 end
-
-addvertex!(x::DictLM, l) = addvertex!(type_promote(x, l), l)
 
 ################################################# RMVERTEX ###################################################################
 
