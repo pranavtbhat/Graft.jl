@@ -61,35 +61,34 @@ end
 end
 
 
-for AM in subtypes(AdjacencyModule)
-   for PM in subtypes(PropertyModule)
-      for typ in [Any,TestType]
-         gtype = Graph{AM,PM{typ,typ}}
-         @testset "Tests for Display of $gtype" begin
-            V,E = completegraph(gtype, 10)
+@testset "Tests for Display" begin
+   for AM in subtypes(AdjacencyModule), PM in subtypes(PropertyModule), typ in [Any,TestType]
+      gtype = Graph{AM,PM{typ,typ}}
+      introduce("$gtype")
+      V,E = completegraph(gtype, 10)
 
-            # Vertex Properties
-            map!(v->rand(Int), V, "f1")
-            map!(v->rand(), V, "f2")
-            map!(v->randstring(), V, "f3")
-            map!(v->rand(Bool), V, "f4")
-            map!(v->'0', V, "f5")
+      # Vertex Properties
+      map!(v->rand(Int), V, "f1")
+      map!(v->rand(), V, "f2")
+      map!(v->randstring(), V, "f3")
+      map!(v->rand(Bool), V, "f4")
+      map!(v->'0', V, "f5")
 
-            # Edge properties
-            map!((u,v)->rand(Int), E, "f1")
-            map!((u,v)->rand(), E, "f2")
-            map!((u,v)->randstring(), E, "f3")
-            map!((u,v)->rand(Bool), E, "f4")
-            map!((u,v)->'0', E, "f5")
+      # Edge properties
+      map!((u,v)->rand(Int), E, "f1")
+      map!((u,v)->rand(), E, "f2")
+      map!((u,v)->randstring(), E, "f3")
+      map!((u,v)->rand(Bool), E, "f4")
+      map!((u,v)->'0', E, "f5")
 
-            # Labels
-            setlabel!(V.g, "f3")
+      # Labels
+      setlabel!(V.g, "f3")
 
-            # Drawing
-            ss = IOBuffer()
-            println(ss, V)
-            println(ss, E)
-         end
-      end
+      # Drawing
+      ss = IOBuffer()
+      println(ss, V)
+      println(ss, E)
+
+      tick()
    end
 end

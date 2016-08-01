@@ -4,7 +4,6 @@
 ############################################################################################################################
 
 if ParallelGraphs.CAN_USE_LG
-
    @testset "LightGraphs Edge Interface" begin
       g = completegraph(SimpleGraph, 10)
       seteprop!(g, :, (u,v)->rand(1:10), "weight")
@@ -18,8 +17,9 @@ end
 
 
 # Traversals
-for AM in subtypes(AdjacencyModule)
-   @testset "Traversals for $AM" begin
+@testset "Traversals tests" begin
+   for AM in subtypes(AdjacencyModule)
+      introduce("$AM")
       g = loadgraph("testgraph.txt", Graph{AM,VectorPM})
 
       @test bfs(g, 1) == [0,1,1,3,4,4,4,4,4,4]
@@ -27,6 +27,8 @@ for AM in subtypes(AdjacencyModule)
 
       @test ne(bfs_subgraph(g, 1)) == 9
       @test ne(dfs_subgraph(g, 1)) == 9
+
+      tick()
    end
 end
 
@@ -40,7 +42,7 @@ if ParallelGraphs.CAN_USE_LG
    # Connectivity
 
    @testset "LightGraphs Connectivity" begin
-      g = SimpleGraph(10,90)
+      g = completegraph(SimpleGraph, 10)
 
       @test is_connected(g) == true
       @test is_strongly_connected(g) == true

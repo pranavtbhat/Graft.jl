@@ -20,7 +20,15 @@ import Base: ==
 
 (==)(x::TestType, y::TestType) = x.f1 == y.f1 && x.f2 == y.f2 && x.f3 == y.f3 && x.f4 == y.f4 && x.f5 == y.f5
 
+###
+# DISPLAY HELPERS
+###
+introduce(x::String) = print_with_color(:magenta, x, join(fill(" ", 100 - length(x))))
+tick() = print_with_color(:magenta, " \u2714\n")
 
+###
+# TEST FILES
+###
 include("adjacency.jl")
 
 include("properties.jl")

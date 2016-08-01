@@ -5,51 +5,58 @@
 ############################################################################################################################
 
 
-for AM in subtypes(AdjacencyModule)
-   @testset "AdjacencyModule interface for $AM" begin
-      x = AM(10, 90)
+@testset "AdjacencyModule interface" begin
+   for AM in subtypes(AdjacencyModule)
+      introduce("$AM")
+      g = completegraph(Graph{AM,LinearPM},10)
 
-      @test nv(x) == 10
-      @test ne(x) == 90
-      @test size(x) == (10,90)
-      @test vertices(x) == 1 : 10
+      @test nv(g) == 10
+      @test ne(g) == 90
+      @test size(g) == (10,90)
+      @test vertices(g) == 1 : 10
 
-      @test all(e->hasedge(x, e), edges(x))
+      @test all(e->hasedge(g, e), edges(g))
 
-      @test fadj(x, 1) == collect(2:10)
-      @test badj(x, 10) == collect(1:9)
+      @test fadj(g, 1) == collect(2:10)
+      @test badj(g, 10) == collect(1:9)
 
-      addvertex!(x)
-      addvertex!(x)
-      @test nv(x) == 12
+      addvertex!(g)
+      addvertex!(g)
+      @test nv(g) == 12
 
-      @test addedge!(x, 10, 11) == true
-      @test addedge!(x, 10, 11) == false
-      
-      @test addedge!(x, [EdgeID(10, 12), EdgeID(11, 12)]) == nothing
-      @test ne(x) == 93
+      @test addedge!(g, 10, 11) == true
+      @test addedge!(g, 10, 11) == false
 
-      @test rmedge!(x, 11, 12) == nothing
-      @test rmedge!(x, [EdgeID(10, 12), EdgeID(10, 11)]) == nothing
-      @test ne(x) == 90
+      addedge!(g, [EdgeID(10, 12), EdgeID(11, 12)])
+      @test ne(g) == 93
 
-      @test rmvertex!(x, [11, 12]) == nothing
-      @test rmvertex!(x, 10) == nothing
-      @test nv(x) == 9
-      @test ne(x) == 72
+      rmedge!(g, 11, 12)
+      rmedge!(g, [EdgeID(10, 12), EdgeID(10, 11)])
+      @test ne(g) == 90
+
+      rmvertex!(g, [11, 12])
+      rmvertex!(g, 10)
+
+      @test nv(g) == 9
+      @test ne(g) == 72
+
+      tick()
    end
 end
 
 # Edge Iteration
 
-for AM in subtypes(AdjacencyModule)
-   @testset "Edge iteration interface for $AM" begin
-      x = AM(10, 90)
-      eit = edges(x)
+@testset "Edge iteration interface" begin
+   for AM in subtypes(AdjacencyModule)
+      introduce("$AM")
+      g = completegraph(Graph{AM,LinearPM},10)
+      eit = edges(g)
       es = collect(eit)
 
       @test [e for e in eit] == es
 
       @test all(eit .== es)
+
+      tick()
    end
 end
