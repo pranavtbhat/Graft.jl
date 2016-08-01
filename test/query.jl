@@ -187,3 +187,38 @@ end
       tick()
    end
 end
+
+@testset "Query tests for G" begin
+   for PM in subtypes(PropertyModule), typ in [Any,TestType]
+      gtype = Graph{SparseMatrixAM,PM{typ,typ}}
+      introduce("$gtype")
+
+      g = completegraph(gtype, 10)
+      @test start(g) == 1
+
+      @test g + 11 == 11
+      @test nv(g) == 11
+
+      @test g + [12,13,14,15] == [12,13,14,15]
+      @test nv(g) == 15
+
+      g[11] = 12
+      @test g[11] == [12]
+
+      g[12] = [13,14,15]
+      @test g[12] == [13,14,15]
+
+      V,E = g
+      @test isa(V, VertexDescriptor)
+      @test isa(E, EdgeDescriptor)
+
+      @test Graph(V[1:5]) == subgraph(g, 1:5)
+      @test Graph(E[1:5]) == subgraph(g, E.es[1:5])
+      @test Graph(V[1:5], E[1:4])  == subgraph(g, 1:5, E.es[1:5])
+
+      @test @bfs(g, 1) == collect(2:10)
+      @test @bfs(V, 1) == V[2:10]
+
+      tick()
+   end
+end

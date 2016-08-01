@@ -15,7 +15,6 @@ Base.done(g::Graph, i) = i == 3
 function Base.next(g::Graph, i)
    i == 1 && return VertexDescriptor(g), 2
    i == 2 && return EdgeDescriptor(g), 3
-   return nothing, 3
 end
 
 
@@ -67,13 +66,13 @@ end
 
 Graph(x::VertexDescriptor) = subgraph(x.g, x.vs, x.props)
 
-Graph(x::EdgeDescriptor) = subgraph(x.g, x.es, x.props)
+Graph(x::EdgeDescriptor) = subgraph(x.g, collect(x.es), x.props)
 
 # Pray that they were derived from the same graphs :P
 function Graph(V::VertexDescriptor, E::EdgeDescriptor)
    g = V.g
    vlist = V.vs
-   elist = E.es
+   elist = collect(E.es)
    vproplist = V.props
    eproplist = E.props
 

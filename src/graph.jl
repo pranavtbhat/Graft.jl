@@ -50,6 +50,13 @@ validate_edge_property(g::Graph, props) = validate_edge_property(propmod(g), pro
 
 ################################################# MISC #####################################################################
 
+function (==)(g1::Graph, g2::Graph)
+   nv(g1) == nv(g2) || return false
+   ne(g1) == ne(g2) || return false
+   edges(g1) == edges(g2) || return false
+end
+
+
 # Deepcopy
 Base.deepcopy(g::Graph) = Graph(deepcopy(adjmod(g)), deepcopy(propmod(g)), deepcopy(labelmod(g)))
 

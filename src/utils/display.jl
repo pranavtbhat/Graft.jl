@@ -26,6 +26,7 @@ sprintval(x::Number, len) = padding(string(x), len)
 sprintval(x::Symbol, len) = padding(string(":", string(x)), len)
 sprintval(x::Char, len)   = padding("\'$x\'", len)
 sprintval(x::String, len) = padding("\"$x\"", len)
+sprintval(x::Void, len)   = padding(string(x), len)
 
 sprintval(e::Pair, len)   = padding(string(e.first,",",e.second), len)
 sprintval(g::Graph, len)  = padding("Graph{$(nv(g)) X $(ne(g))}", len)
