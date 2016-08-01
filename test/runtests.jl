@@ -48,3 +48,5 @@ include("filter.jl")
 include("parse.jl")
 
 include("algorithms.jl")
+
+include("conv.jl")
