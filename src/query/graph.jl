@@ -97,7 +97,7 @@ end
 function bfs_list(V::VertexDescriptor, l)
    v = resolve(V.g, l)
    parvec = bfs(V.g, v)
-   vs = intersect(V.vs, find(x->x>0, parvec))
+   vs = find(x->x>0, parvec)
    VertexDescriptor(V, vs)
 end
 
