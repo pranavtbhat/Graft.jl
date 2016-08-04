@@ -2,6 +2,7 @@ using Base.Test
 
 using ParallelGraphs
 
+import ParallelGraphs: randindxs, completeindxs
 
 ###
 # TEST FILES
@@ -9,12 +10,15 @@ using ParallelGraphs
 include("util.jl")
 
 include("SparseMatrixCSC.jl")
-# include("adjacency.jl")
+
+include("edgeiter.jl")
+
+include("labelmap.jl")
+
+include("graph.jl")
+
 # include("properties.jl")
-#
-# include("labelling.jl")
-#
-#
+
 # include("generator.jl")
 #
 # include("subgraph.jl")

@@ -4,8 +4,6 @@
 
 ############################################################################################################################
 
-import ParallelGraphs: randindxs, completeindxs
-
 @testset "SparseMatrixCSC Generation" begin
    Nv = 10
    Ne = 90

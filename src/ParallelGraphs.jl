@@ -15,7 +15,7 @@ include("edgeiter.jl")
 include("SparseMatrixCSC.jl")
 
 # Vertex Labelling
-include("labelmodule.jl")
+include("labelmap.jl")
 
 # Basic Graph Definition
 include("graph.jl")

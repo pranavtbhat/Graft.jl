@@ -14,7 +14,7 @@ type Graph
    ne::Int
    indxs::AbstractArray{Int,2}
    vdata::AbstractDataFrame
-   bdata::AbstractDataFrame
+   edata::AbstractDataFrame
    lmap::LabelMap
 end
 
@@ -81,16 +81,16 @@ end
 
 #################################################  BASICS ###################################################################
 
-(==)(g1::Graph, g2::Graph) = nv(g1) == nv(g2) && edges(g1) == edges(g2)
+(==)(g1::Graph, g2::Graph) = nv(g1) == nv(g2) && edges(g1) == edges(g2) && lmap(g1) == lmap(g2)
 
 
 function Base.copy(g::Graph)
-   Graph(g.nv, g.ne, copy(indxs), copy(x.vdata), copy(x.edata), copy(x.lmap))
+   Graph(nv(g), ne(g), copy(indxs(g)), copy(vdata(g)), copy(edata(g)), copy(lmap(g)))
 end
 
 
 function Base.deepcopy(g::Graph)
-   Graph(g.nv, g.ne, deepcopy(indxs), deepcopy(x.vdata), deepcopy(x.edata), deepcopy(x.lmap))
+   Graph(nv(g), ne(g), deepcopy(indxs(g)), deepcopy(vdata(g)), deepcopy(edata(g)), deepcopy(lmap(g)))
 end
 
 ################################################# COMBINATORIAL ############################################################
@@ -139,12 +139,12 @@ end
 # RELABEL
 ###
 function relabel!(g::Graph, v::VertexID, l)
-   g.lmap = setlabel!(lmap(g), v, l)
+   g.lmap = relabel!(lmap(g), v, l)
    return
 end
 
 function relabel!(g::Graph, vs::VertexList, ls::AbstractVector)
-   g.lmap = setlabel!(lmap(g), vs, ls)
+   g.lmap = relabel!(lmap(g), vs, ls)
    return
 end
 
@@ -165,6 +165,7 @@ decode(g::Graph, x) = decode(lmap(g), x)
 ###
 # ENCODE
 ###
+encode(g::Graph) = encode(lmap(g))
 encode(g::Graph, x) = encode(lmap(g), x)
 
 ################################################# DISPLAY ##################################################################

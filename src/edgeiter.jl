@@ -65,11 +65,11 @@ end
 
 (==)(x::EdgeIter, y::EdgeIter) = x.m == y.m && x.us == y.us && x.vs == y.vs
 
-Base.size(x::EdgeIter) = (x.m,)
 Base.length(x::EdgeIter) = x.m
+Base.size(x::EdgeIter) = (x.m,)
 
-Base.copy(x::EdgeIter) = EdgeIter(nnz(x), copy(x.us), copy(x.vs))
-Base.deepcopy(x::EdgeIter) = EdgeIter(nnz(x), deepcopy(x.us, deepcopy(x.vs)))
+Base.copy(x::EdgeIter) = EdgeIter(x.m, copy(x.us), copy(x.vs))
+Base.deepcopy(x::EdgeIter) = EdgeIter(x.m, deepcopy(x.us), deepcopy(x.vs))
 
 Base.issorted(x::EdgeIter) = true
 Base.eltype(x::EdgeIter) = EdgeID

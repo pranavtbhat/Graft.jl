@@ -65,7 +65,7 @@ Base.eltype{T}(x::DictLM{T}) = T
 ###
 # ==
 ###
-(==)(x::IdentityLM, y::IdentityLM) = encode(x) == encode(y)
+(==)(x::LabelMap, y::LabelMap) = encode(x) == encode(y)
 
 
 ###
@@ -97,7 +97,7 @@ setlabel!(x::DictLM, ls::AbstractVector) = DictLM(ls)
 
 ################################################# RELABEL SINGLE ######################################################
 
-relabel!(x::IdentityLM, v::VertexID, l) = setlabel!(DictLM(x), v, l)
+relabel!(x::IdentityLM, v::VertexID, l) = relabel!(DictLM(x), v, l)
 
 function relabel!{T}(x::DictLM{T}, v::VertexID, l)
    l = convert(T, l)
@@ -108,9 +108,9 @@ end
 
 ################################################# RELABEL MUTLI #######################################################
 
-setlabel!(x::IdentityLM, vs::VertexList, ls::AbstractVector) = setlabel!(DictLM(x), vs, ls)
+relabel!(x::IdentityLM, vs::VertexList, ls::AbstractVector) = relabel!(DictLM(x), vs, ls)
 
-function setlabel!{T}(x::DictLM{T}, vs::VertexList, ls::AbstractVector)
+function relabel!{T}(x::DictLM{T}, vs::VertexList, ls::AbstractVector)
    ls = collect(T, ls)
    D = fmap(x)
    for i in eachindex(vs, ls)
@@ -155,8 +155,13 @@ encode(x::DictLM, v::VertexID) = getindex(rmap(x), v)
 
 ################################################# ENCODE VERTICES ##########################################################
 
-encode(x::IdentityLM, vs::VertexList) = vs
+encode(x::IdentityLM, vs::VertexList) = collect(vs)
 encode(x::DictLM, vs::VertexList) = getindex(rmap(x), vs)
+
+################################################# FETCH ALL LABELS #########################################################
+
+encode(x::IdentityLM) = collect(1 : x.nv)
+encode(x::DictLM) = copy(rmap(x))
 
 ################################################# ENCODE EDGE ##############################################################
 
@@ -208,15 +213,27 @@ function rmvertex!(x::IdentityLM, vs)
 end
 
 function rmvertex!(x::DictLM, vs)
+   F = fmap(x)
+   R = rmap(x)
+
    ls = encode(x, vs)
+
+   # Remove labels from Forward map
    for l in ls
-      delete!(fmap(x), l)
+      delete!(F, l)
    end
-   deleteat!(rm, vs)
-   for v in minimum(vs) : length(rm)
-      fmap(x)[rm[v]] = v
+
+   # Remove labels from Reverse map
+   deleteat!(R, vs)
+
+   # Redirect labels in Forward map to new indexes
+   for v in minimum(vs) : length(R)
+      F[R[v]] = v
    end
+
+   # Decrement Label Map size
    x.nv -= length(vs)
+
    return x
 end
 
