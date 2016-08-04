@@ -39,8 +39,8 @@
       h = subgraph(g, vlist)
       @test size(h) == (6, 30)
       @test getvprop(h, :, "f1") == vf1[vlist]
-      @test resolve(h, 3) == 1
-      @test resolve(h, 8) == 6
+      @test decode(h, 3) == 1
+      @test decode(h, 8) == 6
 
       # Vertex and Property Subgraphing
       h = subgraph(g, vlist, ["f1", "f3"])

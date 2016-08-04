@@ -6,7 +6,7 @@
 
 ################################################# ADJACENCY ################################################################
 
-function Base.merge(::Type{SparseGraph}, g1::Graph, g2::Graph)
+function Base.merge(g1::Graph, g2::Graph)
    g = emptygraph(SparseGraph, 0)
 
    # Add vertices from g1
@@ -14,7 +14,7 @@ function Base.merge(::Type{SparseGraph}, g1::Graph, g2::Graph)
    g + ls1
 
    # Add vertex properties from g1
-   vs1 = resolve(g, ls1)
+   vs1 = decode(g, ls1)
    for prop in listvprops(g1)
       setvprop!(g, vs1, getvprop(g1, :, prop), prop)
    end
@@ -24,7 +24,7 @@ function Base.merge(::Type{SparseGraph}, g1::Graph, g2::Graph)
    g + ls2
 
    # Add vertex properties from g2
-   vs2 = resolve(g, ls2)
+   vs2 = decode(g, ls2)
    for prop in listvprops(g2)
       setvprop!(g, vs2, getvprop(g2, :, prop), prop)
    end
@@ -41,5 +41,3 @@ function Base.merge(::Type{SparseGraph}, g1::Graph, g2::Graph)
 
    g
 end
-
-Base.merge(g1::Graph, g2::Graph) = merge(SparseGraph, g1, g2)

@@ -1,33 +1,25 @@
 ################################################# FILE DESCRIPTION #########################################################
 
-# ParallelGraphs allows users to refer to vertices externally, through arbitrary Julia types. The LabelModule is responsible
+# ParallelGraphs allows users to refer to vertices externally, through arbitrary Julia types. The LabelMap is responsible
 # for the resolution of these arbitrary objects into the internally used Integer indices.
 
-################################################# IMPORT/EXPORT ############################################################
+################################################# IMPORT/EXPORT #######################################################
 
 export
 # Types
-LabelMap, LabelModule,
+LabelMap,
 # LabelMaps
-IdentityLM,
+IdentityLM, DictLM,
 # Implementation
-setlabel!, haslabel, resolve, encode
+setlabel!, relabel!, haslabel, decode, encode
 
 abstract LabelMap{T}
 
-""" A type to map VertexIDs to Labels """
-type LabelModule
-   lmap::LabelMap
-end
-
-lmap(x::LabelModule) = x.lmap
-nv(x::LabelModule) = nv(lmap(x))
-
 ################################################# CONSTRUCTORS ########################################################
 
-LabelModule(nv::Int) = LabelModule(IdentityLM(nv))
+LabelMap(nv::Int) = IdentityLM(nv)
 
-LabelModule(labels::AbstractVector) = LabelModule(DictLM(labels))
+LabelMap{T}(ls::Vector{T}) = DictLM(ls)
 
 ################################################# IDENTITYLM ##########################################################
 
@@ -49,7 +41,7 @@ end
 function DictLM{T}(labels::AbstractVector{T})
    nv = length(labels)
    fmap = Dict(l => i for (i,l) in enumerate(labels))
-   DictLM{T}(nv, fmap, copy(labels))
+   return DictLM{T}(nv, fmap, copy(labels))
 end
 
 # Convert from IdentityLM
@@ -60,141 +52,131 @@ DictLM(x::IdentityLM) = DictLM([i for i in 1 : nv(x)])
 nv(x::DictLM) = x.nv
 fmap(x::DictLM) = x.fmap
 rmap(x::DictLM) = x.rmap
+
+################################################# MSC ################################################################
+
+###
+# ELTYPE
+###
+Base.eltype(x::IdentityLM) = Int
 Base.eltype{T}(x::DictLM{T}) = T
 
-# Type compatibility
-function type_promote{T,Tv}(x::DictLM{T}, ::Type{Tv})
-   Tn = typejoin(T, Tv)
-   DictLM{Tn}(nv(x), Dict{Tn,VertexID}(fmap(x)), Array{Tn}(rmap(x)))
-end
+
+###
+# ==
+###
+(==)(x::IdentityLM, y::IdentityLM) = encode(x) == encode(y)
 
 
-################################################# DEEPCOPY #############################################################
+###
+# COPY
+###
+Base.copy(x::IdentityLM) = IdentityLM(nv(x))
+Base.copy(x::DictLM) = DictLM(nv(x), copy(fmap(x)), copy(rmap(x)))
 
-Base.deepcopy(x::LabelModule) = LabelModule(deepcopy(lmap(x)))
 
+###
+# DEEPCOPY
+###
 Base.deepcopy(x::IdentityLM) = IdentityLM(nv(x))
-
 Base.deepcopy(x::DictLM) = DictLM(nv(x), deepcopy(fmap(x)), deepcopy(rmap(x)))
 
-################################################# SETLABEL SINGLE ######################################################
+################################################# SETLABEL ############################################################
 
-function setlabel!(x::LabelModule)
-   x.lmap = IdentityLM(nv(x))
-   nothing
-end
+###
+# REMOVE LABELS
+###
+setlabel!(x::LabelMap) = IdentityLM(x.nv)
 
-function setlabel!(x::LabelModule, v::VertexID, l)
-   x.lmap = setlabel!(lmap(x), v, l)
-   nothing
-end
 
-setlabel!(x::IdentityLM, v::VertexID, l) = setlabel!(DictLM(x), v, l)
+###
+# SET NEW LABELS
+###
+setlabel!(x::IdentityLM, ls::AbstractVector) = DictLM(ls)
+setlabel!(x::DictLM, ls::AbstractVector) = DictLM(ls)
 
-function setlabel!{T,Tv}(x::DictLM{T}, v::VertexID, l::Tv)
-   if !(T <: Tv)
-      x = type_promote(x, Tv)
-   end
+################################################# RELABEL SINGLE ######################################################
+
+relabel!(x::IdentityLM, v::VertexID, l) = setlabel!(DictLM(x), v, l)
+
+function relabel!{T}(x::DictLM{T}, v::VertexID, l)
+   l = convert(T, l)
    fmap(x)[l] = v
    rmap(x)[v] = l
-   x
+   return x
 end
 
-################################################# SETLABEL MUTLI ######################################################
+################################################# RELABEL MUTLI #######################################################
 
-function setlabel!(x::LabelModule, ls::AbstractVector)
-   x.lmap = DictLM(ls)
-   nothing
-end
+setlabel!(x::IdentityLM, vs::VertexList, ls::AbstractVector) = setlabel!(DictLM(x), vs, ls)
 
-function setlabel!(x::LabelModule, vs::AbstractVector{VertexID}, ls::AbstractVector)
-   x.lmap = setlabel!(lmap(x), vs, ls)
-   nothing
-end
-
-function setlabel!(x::IdentityLM, vs::AbstractVector{VertexID}, ls::AbstractVector)
-   setlabel!(DictLM(x), vs, ls)
-end
-
-function setlabel!{T,Tv}(x::DictLM{T}, vs::AbstractVector{VertexID}, ls::AbstractVector{Tv})
-   if !(T <: Tv)
-      x = type_promote(x, Tv)
-   end
+function setlabel!{T}(x::DictLM{T}, vs::VertexList, ls::AbstractVector)
+   ls = collect(T, ls)
    D = fmap(x)
    for i in eachindex(vs, ls)
       D[ls[i]] = vs[i]
    end
    rmap(x)[vs] = ls
-   x
+   return x
 end
 
 ################################################# HASLABEL ############################################################
 
-haslabel(x::LabelModule, l) = haslabel(lmap(x), l)
 haslabel(x::IdentityLM, v::VertexID) = 1 <= v <= nv(x)
 haslabel(x::IdentityLM, l) = false
+
 haslabel(x::DictLM, l) = haskey(fmap(x), l)
 
-################################################# RESOLVE VERTEX ############################################################
+################################################# DECODE VERTEX #######################################################
 
-resolve(x::LabelModule, l) = resolve(lmap(x), l)
-resolve(x::IdentityLM, v::VertexID) = v
-resolve(x::IdentityLM, l) = error("Couldn't resolve vertex label $l")
+decode(x::IdentityLM, v::VertexID) = v
+decode(x::IdentityLM, l) = error("Couldn't decode vertex label $l")
 
-function resolve(x::DictLM, l)
+function decode(x::DictLM, l)
    get(fmap(x), l) do
-      error("Couldn't resolve vertex label $l")
+      error("Couldn't decode vertex label $l")
    end
 end
 
-################################################# RESOLVE VERTICES ##########################################################
+################################################# DECODE VERTICES ##########################################################
 
-resolve(x::LabelModule, ls::AbstractVector) = resolve(lmap(x), ls)
-resolve(x::LabelModule, vs::AbstractVector{VertexID}) = vs
-resolve(x::DictLM, ls::AbstractVector) = broadcast(resolve, [x], ls)
+decode(x::IdentityLM, vs::VertexList) = vs
+decode(x::DictLM, ls::AbstractVector) = [decode(x, l) for l in ls]
 
-################################################# RESOLVE EDGE ##############################################################
+################################################# DECODE EDGE ##############################################################
 
-resolve(x::LabelModule, u, v) = resolve(lmap(x), u, v)
-resolve(x::IdentityLM, u::VertexID, v::VertexID) = EdgeID(u, v)
-resolve(x::DictLM, ul, vl) = EdgeID(resolve(x, ul), resolve(x, vl))
+decode(x::IdentityLM, e::EdgeID) = e
+decode(x::DictLM, el::Pair) = EdgeID(decode(x, el.first), decode(x, el.second))
 
 ################################################# ENCODE VERTEX ############################################################
 
-encode(x::LabelModule, v::VertexID) = encode(lmap(x), v)
 encode(x::IdentityLM, v::VertexID) = v
 encode(x::DictLM, v::VertexID) = getindex(rmap(x), v)
 
 ################################################# ENCODE VERTICES ##########################################################
 
-encode(x::LabelModule, vs::AbstractVector{VertexID}) = encode(lmap(x), vs)
-encode(x::IdentityLM, vs::AbstractVector{VertexID}) = vs
-encode(x::DictLM, vs::AbstractVector{VertexID}) = getindex(rmap(x), vs)
+encode(x::IdentityLM, vs::VertexList) = vs
+encode(x::DictLM, vs::VertexList) = getindex(rmap(x), vs)
 
 ################################################# ENCODE EDGE ##############################################################
 
-encode(x::LabelModule, e::EdgeID) = encode(lmap(x), e)
 encode(x::IdentityLM, e::EdgeID) = e
 encode{T}(x::DictLM{T}, e::EdgeID) = Pair{T,T}(encode(x, e.first), encode(x, e.second))
 
 ################################################# ENCODE EDGES #############################################################
 
-encode(x::LabelModule, es::AbstractVector{EdgeID}) = encode(lmap(x), es)
-encode(x::IdentityLM, es::AbstractVector{EdgeID}) = es
+encode(x::IdentityLM, es::EdgeList) = es
 
-function encode(x::DictLM, es::AbstractVector{EdgeID})
-   [encode(x, e) for e in es]
-end
+encode(x::DictLM, es::EdgeList) = [encode(x, e) for e in es]
 
 ################################################# ADDVERTEX ################################################################
 
 ###
 # WITHOUT LABEL
 ###
-addvertex!(x::LabelModule) = addvertex!(lmap(x))
-
 function addvertex!(x::IdentityLM)
    x.nv += 1
+   return x
 end
 
 addvertex!(x::DictLM) = error("Please supply a label")
@@ -202,53 +184,46 @@ addvertex!(x::DictLM) = error("Please supply a label")
 ###
 # WITH LABEL
 ###
-function addvertex!(x::LabelModule, l)
-   if haslabel(x, l)
-      resolve(x, l)
+function addvertex!(x::IdentityLM, l)
+   if l == nv(x) + 1
+      addvertex!(x)
    else
-      x.lmap = addvertex!(lmap(x), l)
-      nv(x)
+      addvertex!(DictLM(x), l)
    end
 end
 
-addvertex!(x::IdentityLM, l) = addvertex!(DictLM(x), l)
-
-function addvertex!{T,Tv}(x::DictLM{T}, l::Tv)
-   if !(Tv <: T)
-      x = type_promote(x, Tv)
-   end
+function addvertex!{T}(x::DictLM{T}, l)
+   l = convert(T, l)
+   x.nv += 1
    push!(rmap(x), l)
-   fmap(x)[l] = (x.nv += 1)
-   x
+   fmap(x)[l] = nv(x)
+   return x
 end
 
 ################################################# RMVERTEX ###################################################################
 
-rmvertex!(x::LabelModule, vs) = rmvertex!(lmap(x), vs)
-
 function rmvertex!(x::IdentityLM, vs)
    x.nv -= length(vs)
+   return x
 end
 
 function rmvertex!(x::DictLM, vs)
-   fm = fmap(x)
-   rm = rmap(x)
-   broadcast(delete!, [fm], vs)
+   ls = encode(x, vs)
+   for l in ls
+      delete!(fmap(x), l)
+   end
    deleteat!(rm, vs)
    for v in minimum(vs) : length(rm)
       fmap(x)[rm[v]] = v
    end
    x.nv -= length(vs)
-   nothing
+   return x
 end
 
 ################################################# SUBGRAPH ####################################################################
 
-subgraph(x::LabelModule, vlist::AbstractVector{VertexID}) = LabelModule(subgraph(lmap(x), vlist))
-subgraph(x::LabelModule, elist::AbstractVector{EdgeID}) = x
+subgraph(x::IdentityLM, vlist::VertexList) = IdentityLM(length(vlist))
 
-subgraph(x::IdentityLM, vlist::AbstractVector{VertexID}) = IdentityLM(length(vlist))
-
-function subgraph(x::DictLM, vlist::AbstractVector{VertexID})
+function subgraph(x::DictLM, vlist::VertexList)
    DictLM(rmap(x)[vlist])
 end

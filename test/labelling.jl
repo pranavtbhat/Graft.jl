@@ -9,14 +9,14 @@ function test_label_module(g, ls)
 
    es = collect(edges(g))
 
-   # resolve vertex
-   @test resolve(g, ls[1]) == 1
+   # decode vertex
+   @test decode(g, ls[1]) == 1
 
-   # resolve vertices
-   @test all(resolve(g, ls[2:7]) .== 2:7)
+   # decode vertices
+   @test all(decode(g, ls[2:7]) .== 2:7)
 
-   # resolve edge
-   @test resolve(g, ls[2], ls[9]) == EdgeID(2, 9)
+   # decode edge
+   @test decode(g, ls[2], ls[9]) == EdgeID(2, 9)
 
    # encode vertex
    @test encode(g, 3) == ls[3]
@@ -53,10 +53,10 @@ end
 
    # rmvertex
    @test rmvertex!(g, 5) == nothing
-   @test resolve(g, ls[6]) == 5
+   @test decode(g, ls[6]) == 5
 
    @test rmvertex!(g, [2,6,9]) == nothing
-   @test resolve(g, ls[[1, 3, 4, 8, 9]]) == [1, 2, 3, 5, 6]
+   @test decode(g, ls[[1, 3, 4, 8, 9]]) == [1, 2, 3, 5, 6]
 
    # addvertex
    @test addvertex!(g, ls[9]) == 6

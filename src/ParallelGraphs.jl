@@ -1,66 +1,41 @@
 module ParallelGraphs
 
-const CAN_USE_LG = false
-# begin
-#    try
-#       import LightGraphs
-#       true
-#    catch e
-#       println(e)
-#       println("Cannot load LightGraphs. LightGraphsAM will be disabled.")
-#       false
-#    end
-# end
-
-
-using Faker
+using StatsBase
+using DataFrames
 
 import Base: deepcopy, ==, +, -, |>
 
 # Package Wide Utilities
 include("util.jl")
 
-#  SparseMatrixCSC utils
-include("utils/sparsematrix.jl")
-
-# Adjacency Modules
-include("adjacency.jl")
-
-# Property Modules
-include("properties.jl")
-
-# Vertex Labelling
-include("labelmodule.jl")
-
-# Basic Graph Definition
-include("graph.jl")
-
-# Graph Generators
-include("generator.jl")
-
-# Core implementation
-include("core/getvprop.jl")
-include("core/geteprop.jl")
-include("core/setvprop.jl")
-include("core/seteprop.jl")
-
-# Graph Algortithms
-include("algorithms.jl")
-
-
-# REPL IO
-include("utils/display.jl")
-
-# Querying
-include("query.jl")
-
-# Conversions
-include("conv/conversion.jl")
-include("conv/condensation.jl")
-include("conv/merging.jl")
-
-# Parse Graphs from files etc.
-include("parse.jl")
-
+# # Edge Iteration
+# include("edgeiter.jl")
+#
+# # SparseMatrixCSC compatibilty
+# include("SparseMatrixCSC.jl")
+#
+# # Vertex Labelling
+# include("labelmodule.jl")
+#
+# # Basic Graph Definition
+# include("graph.jl")
+#
+# # Graph Generators
+# include("generator.jl")
+#
+# # Graph Algortithms
+# include("algorithms.jl")
+#
+#
+# # Operations
+# include("ops/export.jl")
+# include("ops/condensation.jl")
+# include("ops/merging.jl")
+#
+# # Parse Graphs from files etc.
+# include("graphio.jl")
+#
+# # Querying
+# include("query.jl")
 
 end # module

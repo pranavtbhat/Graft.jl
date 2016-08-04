@@ -16,7 +16,7 @@ function condensation(g::Graph, d::Dict)
    h = emptygraph(Graph{SparseMatrixAM,LinearPM}, 0)
 
    for (l,vlist) in d
-      vs = resolve(g, vlist)
+      vs = decode(g, vlist)
 
       v = addvertex!(h, l)
       setvprop!(h, v, subgraph(g, vs), "graph")

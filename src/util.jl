@@ -8,9 +8,7 @@ export
 # Types
 FakeVector,
 # Type Aliases
-Edge, VertexID, EdgeID, PropID,
-# Constants
-MAX_VERTEX, MAX_EDGE, MAX_GRAPH_SIZE
+VertexID, EdgeID, VertexList, EdgeList
 
 ################################################# TYPE ALIASES #############################################################
 
@@ -20,15 +18,11 @@ typealias VertexID Int
 """ Datatype used to store edges """
 typealias EdgeID Pair{VertexID,VertexID}
 
-################################################# CONSTANTS ################################################################
+""" A list of Vertex IDs """
+typealias VertexList AbstractVector{VertexID}
 
-""" Maximum number of vertices supported """
-const MAX_VERTEX = typemax(Int)
-
-""" Maximum number of edges supported """
-const MAX_EDGE = typemax(Int)
-
-const MAX_GRAPH_SIZE = (10^8,10^8)
+""" A list of Edge IDs """
+typealias EdgeList AbstractVector{EdgeID}
 
 ################################################# FAKE VECTOR ##############################################################
 
@@ -59,31 +53,3 @@ Base.getindex(x::FakeVector, ::Colon) = x
 
 # Setindex!
 Base.setindex!{T}(x::FakeVector{T}, args...) = error("Type FakeVector{$T} doesn't support setindex!")
-
-
-
-################################################# MACROS ###################################################################
-
-getvarname(x::Expr) = x.args[1]
-getvarname(x::Symbol) = x
-
-"""
-Declare that a function definition is an interface declaration. If multiple dispatch fails to find a more specialized
-method, then throw a method undefinded error.
-Borrowed from ComputeFramework.
-"""
-macro interface(expr)
-    @assert expr.head == :call
-
-    fname = expr.args[1]
-    args = expr.args[2:end]
-    sig = string(expr)
-
-    vars = map(x->getvarname(x), args)
-    typs = Expr(:vect, map(x -> :(typeof($x)), vars)...)
-
-
-    :(function $(esc(fname))($(args...))
-        error(string("The method ", $sig, " hasn't been implemented on ", ($typs[1])))
-    end)
-end
