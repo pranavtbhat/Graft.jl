@@ -8,21 +8,21 @@ import Base: deepcopy, ==, +, -, |>
 # Package Wide Utilities
 include("util.jl")
 
-# # Edge Iteration
-# include("edgeiter.jl")
-#
-# # SparseMatrixCSC compatibilty
-# include("SparseMatrixCSC.jl")
-#
-# # Vertex Labelling
-# include("labelmodule.jl")
-#
-# # Basic Graph Definition
-# include("graph.jl")
-#
-# # Graph Generators
-# include("generator.jl")
-#
+# Edge Iteration
+include("edgeiter.jl")
+
+# SparseMatrixCSC compatibilty
+include("SparseMatrixCSC.jl")
+
+# Vertex Labelling
+include("labelmodule.jl")
+
+# Basic Graph Definition
+include("graph.jl")
+
+# Graph Generators
+include("generator.jl")
+
 # # Graph Algortithms
 # include("algorithms.jl")
 #

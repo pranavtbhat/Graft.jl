@@ -2,7 +2,11 @@
 
 # This file contains graph compatibility methods for SparseMatrixCSC.
 
-################################################# IMPORT/EXPORT #############################################################
+################################################# ACCESSORS #################################################################
+
+nv(x::SparseMatrixCSC{Int}) = x.m
+
+ne(x::SparseMatrixCSC{Int}) = nnz(x)
 
 ################################################# GENERATION ################################################################
 
@@ -48,7 +52,14 @@ end
 # EDGE ITER
 ###
 function Base.getindex(x::SparseMatrixCSC{Int}, eit::EdgeIter)
-   x[sub2ind(size(x), eit.us, eit.vs)]
+   n = length(eit)
+   vals = sizehint!(Vector{Int}(), n)
+   for i in 1 : n
+      @inbounds u = eit.us[i]
+      @inbounds v = eit.vs[i]
+      push!(vals, getindex(x, v, u))
+   end
+   return vals
 end
 
 ################################################# PAIR SETINDEX #############################################################
@@ -76,7 +87,9 @@ end
 ###
 function Base.setindex!(x::SparseMatrixCSC{Int}, vals::AbstractVector{Int}, es::EdgeList)
    for i in eachindex(vals, es)
-      x[es[i]] = vals[i]
+      @inbounds e = es[i]
+      @inbounds val = vals[i]
+      x[e] = val
    end
 end
 
@@ -84,10 +97,24 @@ end
 ###
 # EDGE ITER
 ###
-function Base.setindex!(x::SparseMatrixCSC{Int}, vals, eit::EdgeIter)
-   x[sub2ind(size(x), eit.us, eit.vs)] = vals
+function Base.setindex!(x::SparseMatrixCSC{Int}, val::Int, eit::EdgeIter)
+   n = length(eit)
+   for i in 1 : n
+      @inbounds u = eit.us[i]
+      @inbounds v = eit.vs[i]
+      x[v,u] = val
+   end
 end
 
+function Base.setindex!(x::SparseMatrixCSC{Int}, vals::AbstractVector{Int}, eit::EdgeIter)
+   n = length(eit)
+   for i in 1 : n
+      @inbounds u = eit.us[i]
+      @inbounds v = eit.vs[i]
+      @inbounds val = vals[i]
+      x[v,u] = val
+   end
+end
 ################################################# ADJACENCY #################################################################
 
 ###
@@ -102,11 +129,10 @@ end
 # FADJ!
 ###
 function fadj!(x::SparseMatrixCSC{Int}, v::VertexID, adj::Vector{Int})
-   p1 = x.colptr[v]
-   p2 = x.colptr[v+1]
-   sz = p2 - p1 + 1
-   resize!(x.adjvec, sz)
-   copy!(adj, 1, x.rowval, p1, sz)
+   @inbounds p1 = x.colptr[v]
+   @inbounds p2 = x.colptr[v+1]
+   resize!(adj, p2 - p1)
+   copy!(adj, 1, x.rowval, p1, p2 - p1)
 end
 
 
@@ -114,7 +140,9 @@ end
 # OUTDEGREE
 ###
 function outdegree(x::SparseMatrixCSC{Int}, v::VertexID)
-   x.colptr[v+1] - x.colptr[v] + 1
+   @inbounds p1 = x.colptr[v]
+   @inbounds p2 = x.colptr[v+1]
+   return p2 - p1
 end
 
 
@@ -128,7 +156,7 @@ end
 ################################################# ADDVERTEX ###############################################################
 
 function addvertex!(x::SparseMatrixCSC{Int,Int})
-   SparseMatrixCSC{Int,Int}(x.m+1, x.n+1, push!(x.colptr, x.colptr[end]), x.rowval, x.nzval)
+   SparseMatrixCSC{Int,Int}(nv(x)+1, nv(x)+1, push!(x.colptr, x.colptr[end]), x.rowval, x.nzval)
 end
 
 ################################################# ADDEDGE #################################################################
@@ -144,6 +172,7 @@ end
 ################################################# RMVERTEX ################################################################
 
 function rmvertex!(x::SparseMatrixCSC{Int,Int}, vs)
+   erows = x[EdgeIter(x, vs)]
    vlist = collect(1 : x.m)
    deleteat!(vlist, vs)
    return(x[vlist,vlist], erows)
@@ -170,8 +199,8 @@ end
 ###
 function subgraph(x::SparseMatrixCSC{Int}, vs::VertexList)
    sv = x[vs,vs]
-   erows = nonzeros(sv)
-   sv.nzval[:] = 1 : length(vs)
+   erows = copy(nonzeros(sv))
+   sv.nzval[:] = 1 : nnz(sv)
    return(sv, erows)
 end
 
@@ -184,7 +213,7 @@ subgraph(x::SparseMatrixCSC{Int}, es::EdgeList) = subgraph(x, EdgeIter(es))
 function subgraph(x::SparseMatrixCSC{Int}, eit::EdgeIter)
    nv = size(x, 1)
    erows = x[eit]
-   sv = sparse(eit.us, eit.vs, collect(1 : nv), nv, nv)
+   sv = sparse(eit.us, eit.vs, collect(1 : length(eit)), nv, nv)
    return(sv, erows)
 end
 
@@ -197,7 +226,7 @@ subgraph(x::SparseMatrixCSC{Int}, vs::VertexList, es::EdgeList) = subgraph(x, vs
 function subgraph(x::SparseMatrixCSC{Int}, vs::VertexList, eit::EdgeIter)
    nv = size(x, 1)
    sv = sparse(eit.us, eit.vs, x[eit], nv, nv)[vs,vs]
-   erows = nonzeros(sv)
-   sv.nzval[:] = 1 : length(vs)
+   erows = sort(nonzeros(sv))
+   sv.nzval[:] = 1 : nnz(sv)
    return(sv, erows)
 end

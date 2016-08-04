@@ -8,6 +8,7 @@ using ParallelGraphs
 ###
 include("util.jl")
 
+include("SparseMatrixCSC.jl")
 # include("adjacency.jl")
 # include("properties.jl")
 #

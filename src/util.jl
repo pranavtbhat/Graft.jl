@@ -26,7 +26,9 @@ typealias EdgeList AbstractVector{EdgeID}
 
 ################################################# FAKE VECTOR ##############################################################
 
-""" A cunning alternative to fill when mutation isn't required """
+###
+# A cunning alternative to fill when mutation isn't required
+###
 type FakeVector{T} <: AbstractVector{T}
    val::T
    n::Int

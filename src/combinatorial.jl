@@ -3,9 +3,8 @@
 # This file contains the combinatorial API for Graph.
 
 ################################################# IMPORT/EXPORT #############################################################
-export
-nv, ne, vertices, edges, hasvertex, hasedge, fadj, badj, out_neighbors, in_neighbors, outdegree, indegree, addvertex!,
-rmvertex!, addedge!, rmedge!
+
+export nv, ne, vertices, edges, hasvertex, hasedge, fadj, fadj!, outdegree, indegree
 
 ################################################# COMBINATORIAL BASICS ######################################################
 
