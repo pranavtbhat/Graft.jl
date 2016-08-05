@@ -5,6 +5,10 @@ using DataFrames
 
 import Base: deepcopy, ==, +, -, |>
 
+# Export DataFrame stuff
+export NA
+
+
 # Package Wide Utilities
 include("util.jl")
 

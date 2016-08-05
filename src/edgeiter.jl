@@ -21,15 +21,20 @@ function EdgeIter(x::SparseMatrixCSC{Int})
    EdgeIter(nnz(x), us, vs)
 end
 
-# Return an iterator with v's edges in x
+# Return an iterator containing edge from v
 function EdgeIter(x::SparseMatrixCSC{Int}, v::Int)
    adj = fadj(x, v)
    m = length(adj)
    EdgeIter(m, fill(v, m), adj)
 end
 
-# Return an iterator with edges starting from v in vs
-function EdgeIter(x::SparseMatrixCSC{Int}, vlist::AbstractVector{Int})
+# Return an iterator containing edges to v
+function EdgeIter(x::SparseMatrixCSC{Int}, ::Colon, v::VertexID)
+   EdgeIter(x.', v).'
+end
+
+# Return an iterator containing edges starting from v in vs
+function EdgeIter(x::SparseMatrixCSC{Int}, vlist::VertexList)
    Nerows = sum([outdegree(x, v) for v in vlist])
    us = Vector{Int}(Nerows)
    vs = Vector{Int}(Nerows)
@@ -45,6 +50,12 @@ function EdgeIter(x::SparseMatrixCSC{Int}, vlist::AbstractVector{Int})
    end
 
    EdgeIter(Nerows, us, vs)
+end
+
+# Return an iterator containing edges to v in vs
+# TODO: OPTIMZE
+function EdgeIter(x::SparseMatrixCSC{Int}, ::Colon, vlist::VertexList)
+   EdgeIter(x.', vlist).'
 end
 
 # Split a list of edges into its constituent indexes.
@@ -73,6 +84,8 @@ Base.deepcopy(x::EdgeIter) = EdgeIter(x.m, deepcopy(x.us), deepcopy(x.vs))
 
 Base.issorted(x::EdgeIter) = true
 Base.eltype(x::EdgeIter) = EdgeID
+
+Base.transpose(x::EdgeIter) = EdgeIter(x.m, copy(x.vs), copy(x.us))
 
 ################################################# ITERATION ################################################################
 

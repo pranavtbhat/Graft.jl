@@ -114,7 +114,7 @@ include("edata.jl")
 ###
 # SETLABEL
 ###
-function setlabel!{T}(g::Graph, ls::Vector{T})
+function setlabel!(g::Graph, ls::AbstractVector)
    if length(ls) == nv(g)
       g.lmap = setlabel!(lmap(g), ls)
       return

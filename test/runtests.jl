@@ -17,10 +17,16 @@ include("labelmap.jl")
 
 include("graph.jl")
 
-# include("properties.jl")
+include("combinatorial.jl")
 
-# include("generator.jl")
-#
+include("vdata.jl")
+
+include("edata.jl")
+
+include("mutation.jl")
+
+include("generator.jl")
+
 # include("subgraph.jl")
 #
 # include("query.jl")

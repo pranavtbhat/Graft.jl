@@ -4,18 +4,27 @@
 
 ################################################# IMPORT/EXPORT ############################################################
 
-export geteprop, seteprop!
+export listeprops, haseprop, geteprop, seteprop!
 
 ################################################# MUTATION #################################################################
 
+# Use this to reorder the rows Edge DataFrame, so that they align perfectly with the index table.
+function reorder!(x::AbstractDataFrame, indxs::Vector{Int})
+   for eprop in names(x)
+      x[eprop] = x[eprop][indxs]
+   end
+end
+
 function addedge!(x::AbstractDataFrame)
-   push!(x, @data fill(NA, ncols(x)))
-   return
+   if !isempty(x)
+      push!(x, @data fill(NA, ncol(x)))
+   end
 end
 
 function rmedge!(x::AbstractDataFrame, erows)
-   deleterows!(x, erows)
-   return
+   if !isempty(x)
+      deleterows!(x, erows)
+   end
 end
 
 ################################################# EPROPS ACCESSORS ##########################################################
@@ -27,23 +36,10 @@ haseprop(g::Graph, eprop::Symbol) = haskey(edata(g), eprop)
 ################################################# GETEPROP ##################################################################
 
 """
-Retrieve edge properties. ParallelGraphs presents a sparse storage interface. If an edge doesn't have a property attached,
-a default value is returned.
+Retrieve edge properties.
 
-geteprop(g::Graph, e::EdgeID) -> Sub DataFrame containing edge e's properties
+geteprop(g::Graph, e::EdgeID, eprop::Symbol) -> Fetch the value of a property for edge e
 """
-geteprop(g::Graph, e::EdgeID) = edata(g)[indxs(g)[e], :]
-
-
-""" geteprop(g::Graph, es::EdgeList) -> Sub DataFrame containing properties for e in es """
-geteprop(g::Graph, es::EdgeList) = edata(g)[indxs(g)[es], :]
-
-
-""" geteprop(g::Graph, ::Colon) -> Fetch the Edge DataFrame """
-geteprop(g::Graph, ::Colon) = edata(g)
-
-
-""" geteprop(g::Graph, e::EdgeID, eprop::Symbol) -> Fetch the value of a property for edge e """
 geteprop(g::Graph, e::EdgeID, eprop::Symbol) = edata(g)[indxs(g)[e], eprop]
 
 
@@ -60,51 +56,37 @@ geteprop(g::Graph, ::Colon, eprop::Symbol) = edata(g)[:,eprop][:]
 """
 Set edge properties.
 
-seteprop!(g::Graph, e::EdgeID, ps::Pair...) -> Set properties for an edge e
+seteprop!(g::Graph, e::EdgeID, val, eprop::Symbol) -> Set a property for an edge e
 """
-function seteprop!(g::Graph, e::EdgeID, ps::Pair...)
-   for (eprop,val) in ps
-      seteprop!(g, e, val, eprop)
-   end
-   return ps
-end
-
-
-""" seteprop!(g::Graph, e::EdgeID, ps::AbstractDataFrame) -> Set all properties for an edge e """
-function seteprop!(g::Graph, e::EdgeID, ps::AbstractDataFrame)
-   nrow(ps) != 1 && error("Please supply a dataframe with 1 row")
-   ncol(ps) != ncol(edata(g)) && error("Please supply a dataframe with $(ncol(edata(g))) columns")
-
-   edata(g)[indxs(g)[e],:] = ps
-end
-
-
-""" seteprop!(g::Graph, es::EdgeList, ps::AbstractDataFrame) -> Set all properties for edge e in es """
-function seteprop!(g::Graph, es::EdgeList, ps::AbstractDataFrame)
-   nrow(ps) != length(es) && error("Please supply a dataframe with $(length(es)) row")
-   ncol(ps) != ncol(edata(g)) && error("Please supply a dataframe with $(ncol(edata(g))) columns")
-
-   edata(g)[indxs(g)[es],:] = ps
-end
-
-
-
-""" seteprop!(g::Graph, e::EdgeID, val, eprop::Symbol) -> Set a property for an edge e """
 function seteprop!(g::Graph, e::EdgeID, val, eprop::Symbol)
-   edata(g)[indxs(g)[e], eprop] = val
+   if haseprop(g, eprop)
+      edata(g)[indxs(g)[e], eprop] = val
+   else
+      error("Property $eprop doesn't exist. Please create it on all edges first.")
+   end
 end
 
 
 """ seteprop!(g::Graph, es::EdgeList, val(s), eprop::Symbol) -> Set a property for e in es """
 function seteprop!(g::Graph, es::EdgeList, val, eprop::Symbol)
-   edata(g)[indxs(g)[es], eprop] = val
+   if haseprop(g, eprop)
+      edata(g)[eprop][indxs(g)[es]] = val
+   else
+      error("Property $eprop doesn't exist. Please create it on all edges first.")
+   end
 end
 
 
 """ seteprop!(g::Graph, ::Colon, val(s), eprop::Symbol) """
-function seteprop!(g::Graph, ::Colon, val, eprop::Symbol)
-   edata(g)[:, eprop] = val
+function seteprop!(g::Graph, ::Colon, vals::AbstractVector, eprop::Symbol)
+   if length(vals) == ne(g)
+      edata(g)[eprop] = vals
+   else
+      error("Trying to set $(length(vals)) values to $(ne(g)) properties")
+   end
 end
+
+seteprop!(g::Graph, ::Colon, val, eprop::Symbol) = seteprop!(g, :, fill(val, ne(g)), eprop)
 
 ################################################# SUBGRAPH #################################################################
 

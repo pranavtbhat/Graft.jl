@@ -172,10 +172,19 @@ end
 ################################################# RMVERTEX ################################################################
 
 function rmvertex!(x::SparseMatrixCSC{Int,Int}, vs)
-   erows = x[EdgeIter(x, vs)]
+   # Reorder entries in the index table
+   x.nzval[:] = 1 : nnz(x)
+
+   # Check which entries in the edge table have to be removed
+   erows = vcat(x[EdgeIter(x, vs)], x[EdgeIter(x, :, vs)])
+
+   # Delete entries from index table
    vlist = collect(1 : x.m)
    deleteat!(vlist, vs)
-   return(x[vlist,vlist], erows)
+   x = x[vlist,vlist]
+   x.nzval[:] = 1 : nnz(x)
+
+   return(x, erows)
 end
 
 ################################################# RMVERTEX ################################################################
@@ -183,12 +192,16 @@ end
 function rmedge!(x::SparseMatrixCSC{Int}, e::EdgeID)
    erow = x[e]
    x[e] = 0
+   dropzeros!(x)
+   x.nzval[:] = 1 : nnz(x)
    return erow
 end
 
 function rmedge!(x::SparseMatrixCSC{Int}, es::EdgeList)
    erows = x[es]
    x[es] = 0
+   dropzeros!(x)
+   x.nzval[:] = 1 : nnz(x)
    return erows
 end
 

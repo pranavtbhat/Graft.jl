@@ -3,19 +3,20 @@
 # This file contains the implementation of the Vertex DataFrame.
 
 ################################################# IMPORT/EXPORT ############################################################
-export getvprop, setvprop!
+export listvprops, hasvprop, getvprop, setvprop!
 
 
 ################################################# MUTATION #################################################################
 
 function addvertex!(x::AbstractDataFrame)
-   push!(x, @data fill(NA, ncols(x)))
+   push!(x, @data fill(NA, ncol(x)))
    return
 end
 
 function rmvertex!(x::AbstractDataFrame, vs)
-   deleterows!(x, vs)
-   return
+   if !isempty(x)
+      deleterows!(x, vs)
+   end
 end
 
 ################################################# PROPERTY ACCESSORS #######################################################
@@ -29,20 +30,8 @@ hasvprop(g::Graph, prop::Symbol) = haskey(vdata(g), prop)
 """
 Retrieve vertex properties.
 
-getvprop(g::Graph, v::VertexID) -> Sub DataFrame containing vertex v's properties.
+getvprop(g::Graph, v::VertexID, vprop::Symbol) -> Fetch the value of a property for vertex v
 """
-getvprop(g::Graph, v::VertexID) = vdata(g)[v,:]
-
-
-""" getvprop(g::Graph, vs::VertexList) -> Sub DataFrame containing properties for v in vs """
-getvprop(g::Graph, vs::VertexList) = vdata(g)[vs,:]
-
-
-""" getvprop(g::Graph, ::Colon) -> Fetch the Vertex DataFrame """
-getvprop(g::Graph, ::Colon) = vdata(g)
-
-
-""" getvprop(g::Graph, v::VertexID, vprop::Symbol) -> Fetch the value of a property for vertex v """
 getvprop(g::Graph, v::VertexID, vprop::Symbol) = vdata(g)[vprop][v]
 
 
@@ -58,44 +47,36 @@ getvprop(g::Graph, ::Colon, vprop::Symbol) = vdata(g)[vprop][:]
 """
 Set vertex properties.
 
-setvprop!(g::Graph, v::VertexID, ps::Pair...) -> Set properties for for a vertex
+setvprop!(g::Graph, v::VertexID, val(s), vprop::Symbol) -> Set a property for v
 """
-function setvprop!(g::Graph, v::VertexID, ps::Pair...)
-   for (vprop,val) in ps
-      setvprop!(g, v, val, vprop)
+function setvprop!(g::Graph, v::VertexID, val, vprop::Symbol)
+   if hasvprop(g, vprop)
+      vdata(g)[vprop][v] = val
+   else
+      error("Property $vprop doesn't exist. Please create it on all vertices first.")
    end
-   return ps
 end
-
-
-""" setvprop!(g::Graph, v::VertexID, ps::AbstractDataFrame) -> Set all properties for a vertex """
-function setvprop!(g::Graph, v::VertexID, ps::AbstractDataFrame)
-   nrow(ps) != 1 && error("Please supply a dataframe with 1 row")
-   ncol(ps) != ncol(vdata(g)) && error("Please supply a dataframe with $(ncol(vdata(g))) columns")
-
-   vdata(g)[v] = ps
-end
-
-
-""" setvprop!(g::Graph, vs::VertexList, ps::AbstractDataFrame) -> Set all properties for v in vs """
-function setvprop!(g::Graph, vs::VertexList, ps::AbstractDataFrame)
-   nrow(ps) != length(vs) && error("Please supply a dataframe with $(length(vs)) rows")
-   ncol(ps) != ncol(vdata(g)) && error("Please supply a dataframe with $(ncol(vdata(g))) columns")
-
-   vdata(g)[v] = ps
-end
-
 
 """ setvprop!(g::Graph, vs::VertexList, val(s), vprop::Symbol) -> Set a property for v in vs """
 function setvprop!(g::Graph, vs::VertexList, val, vprop::Symbol)
-   vdata(g)[vprop][vs] = val
+   if hasvprop(g, vprop)
+      vdata(g)[vprop][vs] = val
+   else
+      error("Property $vprop doesn't exist. Please create it on all vertices first.")
+   end
 end
 
 
-""" setvprop!(g::Graph, ::Colon, val(s), vprop::Symbol) -> Set a property for v in vertices(g) """
-function setvprop!(g::Graph, ::Colon, val, vprop::Symbol)
-   vdata(g)[vprop] = val
+""" setvprop!(g::Graph, ::Colon, val(s), vprop::Symbol) -> Set a property for all vertices in g """
+function setvprop!(g::Graph, ::Colon, vals::AbstractVector, vprop::Symbol)
+   if length(vals) == nv(g)
+      vdata(g)[vprop] = vals
+   else
+      error("Trying to set $(length(vals)) values to $(nv(g)) properties")
+   end
 end
+
+setvprop!(g::Graph, ::Colon, val, vprop::Symbol) = setvprop!(g, :, fill(val, nv(g)), vprop)
 
 ################################################# SUBGRAPHING ##############################################################
 
