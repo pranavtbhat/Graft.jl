@@ -6,7 +6,7 @@
 
 import ParallelGraphs: eltypes
 
-@testset "Vertex DataFrame" begin
+@testset "Edge DataFrame" begin
    g = completegraph(10)
 
    eit = edges(g)

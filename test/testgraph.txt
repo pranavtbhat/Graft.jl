@@ -1,4 +1,4 @@
-10,28
+10,28,Int
 name,age
 String,Int
 relationship

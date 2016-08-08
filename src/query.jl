@@ -28,10 +28,21 @@ include("query/parse.jl")
 # BOTTOM UP EXECUTION FOR DAG
 ###
 
-# include("query/exec.jl")
+include("query/exec.jl")
 
 ################################################# MACROS ####################################################################
 
+# Macro for functional schematics
+macro query(obj, x)
+   x = Expr(:quote, x)
+   quote
+      local dag = parsequery($(esc(obj)), $(esc(x)))
+      println(dag)
+      exec(dag)
+   end
+end
+
+# Macro for Pipe schematics
 macro query(x)
    x = Expr(:quote, x)
    quote

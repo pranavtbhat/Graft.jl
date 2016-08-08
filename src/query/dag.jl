@@ -4,119 +4,74 @@
 
 ################################################# IMPORT/EXPORT ############################################################
 
-export
-# Abstract Nodes
-Node,
-QueryNode,
-FilterNode,
-
-
-# Internal Nodes
-VertexQueryNode,
-EdgeQueryNode,
-
-VertexDataNode,
-EdgeDataNode,
-
-VertexTableNode,
-EdgeTableNode,
-
-VertexFilterNode,
-EdgeFilterNode,
-
-
-# Abstract Leaf Nodes
-Operation, VertexOperation, EdgeOperation,
-
-# Leaf Nodes
-GraphNode, DataNode
-
+export Node, LiteralNode
 
 ###
-# ABSTRACT TYPES
+# A Part of the DAG. The execution of a node returns
+# a value which may be used higher up in the dag
 ###
 abstract Node
-abstract Operation
-
-# An internal node that returns data (array or dataframe)
-abstract QueryNode <: Node
-
-# An internal node that returns a graph
-abstract FilterNode <: Node
-
-# An operation to be applied on vertex properties
-abstract VertexOperation <: Operation
-
-# An operation to be applied on edge properties
-abstract EdgeOperation <: Operation
 
 ###
-# INTERNAL NODES
+# Denotes a Graph
 ###
+abstract GraphNode <: Node
 
-# An internal node that returns Vertex Data
-type VertexQueryNode <: QueryNode
-   lhs::QueryNode
-   op::VertexOperation
-   rhs::QueryNode
-end
+###
+# Denotes a vector of values
+###
+abstract VectorNode <: Node
 
-# An internal node that returns Edge Data
-type EdgeQueryNode <: QueryNode
-   lhs::QueryNode
-   op::EdgeOperation
-   df::QueryNode
-end
+################################################# GRAPHNODE ################################################################
 
-# An internal node that returns an array of vertex properties
-type VertexDataNode <: QueryNode
+###
+# Leaf node containing a graph
+###
+immutable SimpleGraphNode <: GraphNode
    g::Graph
+end
+
+Base.show(io::IO, x::SimpleGraphNode) = write(io, "Graph($(nv(x.g)),$(ne(x.g)))")
+
+###
+# Node denoting a filter on vertices, determined by an array of booleans.
+###
+immutable VertexFilterNode <: GraphNode
+   g::GraphNode
+   bools::VectorNode
+end
+
+################################################# LITERALNODE ##############################################################
+
+
+###
+# Denotes a single literal value.
+###
+immutable LiteralNode{T} <: Node
+   val::T
+end
+
+Base.show{T}(io::IO, x::LiteralNode{T}) = write(io, "Lt{$T}($(x.val))")
+
+
+################################################# VECTORNODE ###############################################################
+
+###
+# Denotes a column from the Vertex DataFrame
+###
+immutable VertexPropertyNode <: VectorNode
+   graph::GraphNode
    vprop::Symbol
 end
 
-# An internal node that returns an array of edge properties
-type EdgeDataNode <: QueryNode
-   g::Graph
+Base.show(io::IO, x::VertexPropertyNode) = write(io, "Vprop($(x.graph), $(x.vprop))")
+
+###
+# Denotes a column from the Edge DataFrame
+###
+immutable EdgePropertyNode <: VectorNode
+   graph::GraphNode
    eprop::Symbol
 end
 
-# An internal node that returns a table of vertex properties
-type VertexTableNode <: QueryNode
-   g::Graph
-   vprops::Union{Colon, Vector{Symbol}}
-end
-
-# An internal node that returns a table of edge properties
-type EdgeTableNode <: QueryNode
-   g::Graph
-   eprops::Union{Colon, Vector{Symbol}}
-end
-
-# An internal node that returns a graph
-type VertexFilterNode <: FilterNode
-   g::FilterNode
-   op::VertexOperation
-   df::QueryNode
-end
-
-# An internal node that returns a graph
-type EdgeFilterNode <: FilterNode
-   g::FilterNode
-   op::EdgeOperation
-   df::QueryNode
-end
-
-
-###
-# LEAF NODES
-###
-
-# A leaf node that simply returns a graph
-type GraphNode <: FilterNode
-   g::Graph
-end
-
-# A leaf node that returns a FakeVector
-type DataNode <: QueryNode
-   literal
-end
+Base.show(io::IO, x::EdgePropertyNode) = write(io, "Eprop($(x.graph), $(x.eprop))")

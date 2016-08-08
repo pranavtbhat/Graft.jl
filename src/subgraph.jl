@@ -39,7 +39,7 @@ end
 ###
 # ES & EPROPS
 ###
-function subgraph(g::Graph, elist::EdgeList, eprops::AbstractVector)
+function subgraph(g::Graph, es::EdgeList, eprops::AbstractVector)
    sv,erows = subgraph(indxs(g), es)
    Graph(nv(g), nnz(sv), sv, copy(vdata(g)), subgraph(edata(g), erows, eprops), copy(lmap(g)))
 end
@@ -50,7 +50,7 @@ end
 ###
 function subgraph(g::Graph, vs::VertexList, es::EdgeList)
    sv,erows = subgraph(indxs(g), vs, es)
-   Graph(length(vs), nnz(sv), subgraph(vdata(g), vs), subgraph(edata(g), erows), subgraph(lmap(g), vs))
+   Graph(length(vs), nnz(sv), sv, subgraph(vdata(g), vs), subgraph(edata(g), erows), subgraph(lmap(g), vs))
 end
 
 
@@ -68,6 +68,7 @@ function subgraph(
    Graph(
       length(vs),
       nnz(sv),
+      sv,
       subgraph(vdata(g), vs, vprops),
       subgraph(edata(g), erows, eprops),
       subgraph(lmap(g), vs)

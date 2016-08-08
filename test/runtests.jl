@@ -2,7 +2,7 @@ using Base.Test
 
 using ParallelGraphs
 
-import ParallelGraphs: randindxs, completeindxs
+import ParallelGraphs: vdata, edata, randindxs, completeindxs
 
 ###
 # TEST FILES
@@ -27,14 +27,10 @@ include("mutation.jl")
 
 include("generator.jl")
 
-# include("subgraph.jl")
-#
-# include("query.jl")
-#
-# include("filter.jl")
-#
-# include("parse.jl")
-#
-# include("algorithms.jl")
-#
-# include("conv.jl")
+include("graphio.jl")
+
+include("subgraph.jl")
+
+include("algorithms.jl")
+
+include("operations.jl")

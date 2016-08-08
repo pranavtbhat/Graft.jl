@@ -52,7 +52,7 @@ function Graph(x::SparseMatrixCSC)
    ne = nnz(x)
 
    sv = copy(x)
-   sv.nzval[:] = 1 : ne
+   reorder!(sv)
 
    Graph(nv, ne, sv, DataFrame(), DataFrame(), LabelMap(nv))
 end
@@ -83,6 +83,7 @@ end
 
 (==)(g1::Graph, g2::Graph) = nv(g1) == nv(g2) && edges(g1) == edges(g2) && lmap(g1) == lmap(g2)
 
+Base.isequal(g1::Graph, g2::Graph) = g1 == g2 && vdata(g1) == vdata(g2) && edata(g1) == edata(g2)
 
 function Base.copy(g::Graph)
    Graph(nv(g), ne(g), copy(indxs(g)), copy(vdata(g)), copy(edata(g)), copy(lmap(g)))

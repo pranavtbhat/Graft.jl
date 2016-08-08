@@ -66,9 +66,9 @@ function loadheader(io::IO)
 end
 
 
-function loadgraph(io::IO, graph_type=SparseGraph, verbose=false)
+function loadgraph(io::IO, verbose=false)
    printif(verbose, "Fetching Graph Header")
-   @show Nv, Ne, ltype, vprops, vtypes, eprops, etypes = loadheader(io)
+   Nv, Ne, ltype, vprops, vtypes, eprops, etypes = loadheader(io)
 
    # Prepend label type to vtypes
    vtypes = vcat(ltype, vtypes)
@@ -77,37 +77,38 @@ function loadgraph(io::IO, graph_type=SparseGraph, verbose=false)
    etypes = vcat(Int, Int, etypes)
 
    printif(verbose, "Fetching Vertex Data")
-   @show vdata = CSV.read(io; header=false, datarow=6, rows=Nv, types=vtypes)
+   vdata = CSV.read(io; header=false, datarow=6, rows=(Nv+5), types=vtypes)
 
    # Strip first column into labels
    printif(verbose, "Fetching Vertex Labels")
-   @show ls = vdata[1]
+   lm = LabelMap(vdata[1].values)              # Hack to avoid nullables
 
    # Process Vertex DataFrame
    delete!(vdata, 1)
    names!(vdata, vprops)
 
-
    printif(verbose, "Fetching Edge Data")
-   @show edata = CSV.read(io; header=false, datarow=(Nv+5), rows=Ne, types=etypes)
+   edata = CSV.read(io; header=false, datarow=(Nv+6), rows=(Nv+Ne+5), types=etypes)
 
    # Strip edge columns
-   us = edata[1]
-   vs = edata[2]
-   @show es = EdgeIter(Ne, us, vs)
+   us = decode(lm, edata[1].values)            # Hack to avoid nullable
+   vs = decode(lm, edata[2].values)            # Hack to avoid nullable
+   eit = EdgeIter(Ne, us, vs)
+   sv = SparseMatrixCSC(Nv, eit)
+   reorder!(sv)
 
    # Process Edge DataFrame
    delete!(edata, [1,2])
    names!(edata, eprops)
 
    printif(verbose, "Constructing Graph")
-   Graph(Nv, Ne, SparseMatrixCSC(Nv, eit, 1:Ne), vdata, edata, LabelMap(ls))
+   Graph(Nv, Ne, SparseMatrixCSC(Nv, eit), vdata, edata, lm)
 end
 
 """ Parse a text file GraphCSV format"""
-function loadgraph(filename::String, graph_type=SparseGraph; verbose=false)
+function loadgraph(filename::String; verbose=false)
    file = open(filename)
-   g = loadgraph(file, graph_type, verbose)
+   g = loadgraph(file, verbose)
    close(file)
    g
 end
@@ -124,14 +125,17 @@ function storegraph(g::Graph, io::IO)
    Eprops = listeprops(g)
    Etypes = eltypes(edata(g))
 
-   Ls = encode(g, vertices(g))
-   Vdata = hcat(ls, vdata(g))
+   ls = encode(g)
+   Vdata = copy(vdata(g))
+   insert!(Vdata, 1, ls, :dc)
 
    eit = edges(g)
    uls = encode(g, eit.us)
    vls = encode(g, eit.vs)
 
-   Edata = hcat(uls, vls, edata(g))
+   Edata = copy(edata(g))
+   insert!(Edata, 1, uls, :dc)
+   insert!(Edata, 2, vls, :dc)
 
    println(io, "$Nv,$Ne,$Ltype")
    println(io, join(Vprops, ','))
@@ -139,7 +143,7 @@ function storegraph(g::Graph, io::IO)
    println(io, join(Eprops, ','))
    println(io, join(Etypes, ','))
 
-   writedlm(io, Vdata, ',')
+   Data
    writedlm(io, Edata, ',')
    nothing
 end

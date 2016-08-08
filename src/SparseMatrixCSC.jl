@@ -2,6 +2,14 @@
 
 # This file contains graph compatibility methods for SparseMatrixCSC.
 
+################################################# HELPERS ###################################################################
+
+function reorder!(x::SparseMatrixCSC)
+   x.nzval[:] = 1 : nnz(x)
+   return x
+end
+
+
 ################################################# ACCESSORS #################################################################
 
 nv(x::SparseMatrixCSC{Int}) = x.m
@@ -10,20 +18,20 @@ ne(x::SparseMatrixCSC{Int}) = nnz(x)
 
 ################################################# GENERATION ################################################################
 
-function SparseMatrixCSC(nv::Int, eit::EdgeIter, erows::AbstractVector{Int})
-   sparse(eit.us, eit.vs, erows, nv, nv, min)
+function SparseMatrixCSC(nv::Int, eit::EdgeIter)
+   sparse(eit.us, eit.vs, 1, nv, nv, min)
 end
 
 function randindxs(nv::Int, ne::Int)
    sv = sprand(Int, nv, nv, ne/(nv*(nv-1)))
    sv = sv - spdiagm(diag(sv), 0)
-   sv.nzval[:] = 1 : nnz(sv)
+   reorder!(sv)
    return sv
 end
 
 function completeindxs(nv::Int)
    sv = sparse(spzeros(Int, nv, nv) .+ 1 - speye(Int, nv, nv))
-   sv.nzval[:] = 1 : nnz(sv)
+   reorder!(sv)
    return sv
 end
 
@@ -213,7 +221,7 @@ end
 function subgraph(x::SparseMatrixCSC{Int}, vs::VertexList)
    sv = x[vs,vs]
    erows = copy(nonzeros(sv))
-   sv.nzval[:] = 1 : nnz(sv)
+   reorder!(sv)
    return(sv, erows)
 end
 
@@ -238,8 +246,8 @@ subgraph(x::SparseMatrixCSC{Int}, vs::VertexList, es::EdgeList) = subgraph(x, vs
 
 function subgraph(x::SparseMatrixCSC{Int}, vs::VertexList, eit::EdgeIter)
    nv = size(x, 1)
-   sv = sparse(eit.us, eit.vs, x[eit], nv, nv)[vs,vs]
+   sv = sparse(eit.vs, eit.us, x[eit], nv, nv)[vs,vs]
    erows = sort(nonzeros(sv))
-   sv.nzval[:] = 1 : nnz(sv)
+   reorder!(sv)
    return(sv, erows)
 end
