@@ -11,83 +11,135 @@ parsequery
 ################################################# LEAVES ###################################################################
 
 ###
-# Literals
+# A symbol must be a graph
 ###
-parsequery(x::Number) = LiteralNode(x)
-parsequery(x::Bool) = LiteralNode(x)
-parsequery(x::String) = LiteralNode(x)
-
-###
-# Graphs
-###
-parsequery(g::Graph) = SimpleGraphNode(g)
-
-
-###
-# Symbol
-###
-parsequery(s::Symbol) = parsequery(eval(s))
+function parsequery(cache::Dict, s::Symbol)
+   # Signal that a global variable is in play
+   gn = SimpleGraphNode(s)
+   push!(cache, gn => nothing)
+   return gn
+end
 
 
 ################################################# RECURSIVE DESCENT PARSER #################################################
 
 ###
-# Top level dispatch for functional schematics
+# Recursive pipe translation
 ###
-function parsequery(obj, x::Expr)
-   # Grammar rules:
-   x.head == :. && return parse_dot(parsequery(obj), x)
+function parsequery(cache::Dict, x::Expr)
+   @assert x.head == :call
+   @assert x.args[1] == :|>
+   pipedparse(cache, parsequery(cache, x.args[2]), x.args[3])
+end
 
-   x.head == :call && return parse_call(parsequery(obj), x)
+###
+# Top level dispatch
+###
+function pipedparse(cache::Dict, piped, x::Expr)
+   @assert x.head == :call
+   dispatch = x.args[1]
+
+   # Each vertex
+   if dispatch == :eachvertex
+      return parse_exp(cache, piped, x.args[2])
+   end
+
+   # Each edge
+   if dispatch == :eachedge
+      return parse_exp(cache, piped, x.args[2])
+   end
+
+   # Filter
+   if dispatch == :filter
+      return filter(cache, piped, x.args[2:end]...)
+   end
+
+   # Select
+   if dispatch == :select
+      return select(cache, piped, x.args[2:end]...)
+   end
 
    error("Couldn't parse (sub)expression $x")
 end
 
-###
-# Top level dispatch for piped schematics
-###
-function parsequery(x::Expr)
-   x.head == :|> && return parse_pipe(x)
+################################################# DISPATCH ##################################################################
 
-   error("Couldn't parse (sub)expression $x")
+function Base.filter(cache::Dict, graph::GraphNode, fcs::Expr...)
+   fc = last(fcs)
+   if length(fcs) == 1
+      FilterNode(graph, parse_exp(cache, graph, fc))
+   else
+      rfnode = filter(cache, graph, fcs[1:(end-1)]...)
+      FilterNode(rfnode, parse_exp(cache, rfnode, fc))
+   end
 end
 
-################################################# DOT OPERATOR #############################################################
+function Base.select(cache::Dict, graph::GraphNode, props::Expr...)
+   SelectNode(graph, [parse_property(cache, prop) for prop in props])
+end
 
-parseproperty(x::Symbol) = eval(x)
-parseproperty(x::QuoteNode) = eval(x)
+################################################# PARSING EXPRESSIONS #######################################################
 
-function parse_dot(gn::GraphNode, x::Expr)
+function parse_property(cache::Dict, x::Expr)
    lhs = x.args[1]
    rhs = x.args[2]
 
    # Grammar rules:
-   lhs == :v && return VertexPropertyNode(gn, parseproperty(rhs))
+   lhs == :v && return VertexProperty(rhs.args[1])
 
-   lhs == :e && return EdgePropertyNode(gn, parseproperty(rhs))
+   lhs == :e && return EdgeProperty(rhs.args[1])
 
-   error("Couldn't parse (sub)expression $x")
-end
+   lhs == :s && return EdgeSourceProperty(rhs.args[1])
 
-################################################# CALL OPERATOR #############################################################
-
-function parse_call(gn::GraphNode, x::Expr)
-   f = x.args[1]
-
-   # Grammar rules:
-   lhs == :vfilter && return parse_vfilter(gn, x.args[2:end]...)
+   lhs == :t && return EdgeTargetProperty(rhs.args[1])
 
    error("Couldn't parse (sub)expression $x")
 end
 
+###
+# Literals
+###
 
-################################################# CALL OPERATOR #############################################################
 
-parse_vfilter(gn::GraphNode) = error("Specify atleast one condition for vertex filter")
+parse_exp(cache::Dict, graph::GraphNode, x::Number) = LiteralNode(x)
+parse_exp(cache::Dict, graph::GraphNode, x::Bool) = LiteralNode(x)
+parse_exp(cache::Dict, graph::GraphNode, x::String) = LiteralNode(x)
 
-function parse_vfilter(gn::GraphNode, fcs::Expr...)
-   x = last(fcs)
-   if length(fcs) == 1
+###
+# OPERATIONS
+###
+const vectorize = Dict(
+   :+    =>   .+,
+   :-    =>   .-,
+   :*    =>   .*,
+   :/    =>   ./,
+   :(==) =>   .==,
+   :!=   =>   .!=,
+   :<    =>   .<,
+   :<=   =>   .<=,
+   :>    =>   .>,
+   :>=   =>   .>=,
+)
+
+function parse_exp(cache::Dict, graph::GraphNode, x::Symbol)
+   if haskey(vectorize, x)
+      return vectorize[x]
+   else
+      error("Couldn't parse (sub)expression $x")
    end
-   x = last(fcs)
+end
+
+function parse_exp(cache::Dict, graph::GraphNode, x::Expr)
+   if x.head == :.
+      return TableNode(graph, parse_property(cache, x))
+   end
+
+   if x.head == :call || x.head == :comparison
+      op  = parse_exp(cache, graph, x.args[1])
+      lhs = parse_exp(cache, graph, x.args[2])
+      rhs = parse_exp(cache, graph, x.args[3])
+      return VectorOperation(lhs, op, rhs)
+   end
+
+   error("Couldn't parse (sub)expression $x")
 end

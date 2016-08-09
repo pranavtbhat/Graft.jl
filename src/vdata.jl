@@ -40,7 +40,7 @@ getvprop(g::Graph, vs::VertexList, vprop::Symbol) = vdata(g)[vprop][vs]
 
 
 """ getvprop(g::Graph, ::Colon, vprop::Symbol) -> Fetch the value of a property for all verices """
-getvprop(g::Graph, ::Colon, vprop::Symbol) = vdata(g)[vprop][:]
+getvprop(g::Graph, ::Colon, vprop::Symbol) = copy(vdata(g)[vprop])
 
 ################################################# SETVPROP #################################################################
 

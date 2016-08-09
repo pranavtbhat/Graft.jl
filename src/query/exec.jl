@@ -7,16 +7,156 @@
 
 export exec
 
-################################################# LITERALS #################################################################
+################################################# LEAF NODES ###############################################################
 
-exec(x::LiteralNode) = x.val
+###
+# Extract Literal Node
+###
+exec(cache::Dict, x::LiteralNode) = x.val
 
-################################################# GRAPHS ###################################################################
+###
+# Fetch Graph Object
+###
+exec(cache::Dict, x::SimpleGraphNode) = cache[x]["OBJ"]
 
-exec(x::SimpleGraphNode) = x.g
+###
+# Extract Property
+###
+exec(cache::Dict, x::Property) = x.prop
 
-################################################# VECTOR NODES #############################################################
+################################################# VECTOR NODES ##############################################################
 
-exec(x::VertexPropertyNode) = getvprop(exec(x.graph), :, x.vprop)
+###
+# Split Table node query
+###
+exec(cache::Dict, x::TableNode) = exec(cache, x.graph, x.prop)
 
-exec(x::EdgePropertyNode) = geteprop(exec(x.graph), :, x.eprop)
+###
+# Fetch vertex property
+###
+function exec(cache::Dict, x::GraphNode, y::VertexProperty)
+   prop = exec(cache, y)
+   get!(cache[x]["VDATA"], y, getvprop(exec(cache, x), :, prop))
+end
+
+###
+# Fetch edge property
+###
+function exec(cache::Dict, x::GraphNode, y::EdgeProperty)
+   prop = exec(cache, y)
+   get!(cache[x]["EDATA"], y, geteprop(exec(cache, x), :, exec(cache, y)))
+end
+
+###
+# Fetch edge source property
+###
+function exec(cache::Dict, x::GraphNode, y::EdgeSourceProperty)
+   if haskey(cache[x]["EDATA"], y)
+      cache[x]["EDATA"][y]
+   else
+      g = exec(cache, x)
+      prop = exec(cache, y)
+      eit = get!(cache[x], "EIT", edges(g))
+      cache[x]["EDATA"][y] = getvprop(g, eit.us, prop)
+   end
+end
+
+###
+# Fetch edge source property
+###
+function exec(cache::Dict, x::GraphNode, y::EdgeTargetProperty)
+   if haskey(cache[x]["EDATA"], y)
+      cache[x]["EDATA"][y]
+   else
+      g = exec(cache, x)
+      prop = exec(cache, y)
+      eit = get!(cache[x], "EIT", edges(g))
+      cache[x]["EDATA"][y] = getvprop(g, eit.vs, prop)
+   end
+end
+
+###
+# Split Vector Operation
+###
+function exec(cache::Dict, x::VectorOperation)
+   get!(cache, x, exec(cache, x.op, x.lhs, x.rhs))
+end
+
+###
+# Execute Vector Operation
+###
+exec(cache::Dict, f::Function, x::VectorNode, y::VectorNode) = f(exec(cache, x), exec(cache, y))
+
+################################################# FILTER NODES ###############################################################
+
+###
+# Execute filter query
+###
+function exec(cache::Dict, x::FilterNode)
+   # Check if given node has already been executed
+   if haskey(cache, x)
+      return cache[x]["OBJ"]
+   end
+
+   # Recursively execute LHS
+   g = exec(cache, x.graph)
+
+   # Recursively execute RHS
+   bools = exec(cache, x.bools)
+
+   # Check if this is a vertex filter
+   if length(bools) == nv(g)
+      # Execute subgraph operation
+      sg = subgraph(g, find(bools))
+
+      # Register this FilterNode
+      cache[x] = Dict("OBJ"=>sg, "VDATA"=>Dict(), "EDATA"=>Dict())
+
+      return sg
+   end
+
+   # It must be an edge query then
+   if length(bools) == ne(g)
+      # Fetch input graph's edges
+      eit = get!(cache[x.graph], "EIT", edges(g))
+
+      # Execute subgraph operation
+      sg = subgraph(g, eit[find(bools)])
+
+      # Register this FilterNode
+      cache[x] = Dict("OBJ"=>sg, "VDATA"=>Dict(), "EDATA"=>Dict())
+
+      return sg
+   end
+
+   # Wait, what?
+   error("Incompatible $(bools) for filtering")
+end
+
+###
+# Execute select query
+###
+function exec(cache::Dict, x::SelectNode)
+   # Check if given node has already been executed
+   if haskey(cache, x)
+      return cache[x]["OBJ"]
+   end
+
+   g = exec(cache, x.graph)
+
+   # Seperate vertex and edge properties
+   vprops = filter(x->isa(x, VertexProperty), x.props)
+   eprops = filter(x->isa(x, EdgeProperty), x.props)
+
+   # Fetch properties
+   vprops = collect(Symbol, map(prop->exec(cache, prop), vprops))
+   eprops = collect(Symbol, map(prop->exec(cache, prop), eprops))
+
+   # Execute subgraph operation
+   sg = subgraph(subgraph(g, :, :, eprops), :, vprops)
+
+   # Register this SelectNode
+   cache[x] = Dict("OBJ"=>sg, "VDATA"=>Dict(), "EDATA"=>Dict())
+
+   return sg
+end

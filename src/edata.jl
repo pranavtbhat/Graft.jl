@@ -40,15 +40,15 @@ Retrieve edge properties.
 
 geteprop(g::Graph, e::EdgeID, eprop::Symbol) -> Fetch the value of a property for edge e
 """
-geteprop(g::Graph, e::EdgeID, eprop::Symbol) = edata(g)[indxs(g)[e], eprop]
+geteprop(g::Graph, e::EdgeID, eprop::Symbol) = edata(g)[eprop][indxs(g)[e]]
 
 
 """ geteprop(g::Graph, es::EdgeList, eprop::Symbol) -> Fetch the value of a property for edge e in es """
-geteprop(g::Graph, es::EdgeList, eprop::Symbol) = edata(g)[indxs(g)[es], eprop]
+geteprop(g::Graph, es::EdgeList, eprop::Symbol) = edata(g)[eprop][indxs(g)[es]]
 
 
 """ geteprop(g::Graph, ::Colon, eprop::Symbol) -> Fetch the value of a property for all edges """
-geteprop(g::Graph, ::Colon, eprop::Symbol) = edata(g)[:,eprop][:]
+geteprop(g::Graph, ::Colon, eprop::Symbol) = copy(edata(g)[eprop])
 
 
 ################################################# SETEPROP ##################################################################

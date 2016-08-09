@@ -32,20 +32,24 @@ include("query/exec.jl")
 
 ################################################# MACROS ####################################################################
 
-# Macro for functional schematics
-macro query(obj, x)
-   x = Expr(:quote, x)
-   quote
-      local dag = parsequery($(esc(obj)), $(esc(x)))
-      println(dag)
-      exec(dag)
-   end
-end
-
 # Macro for Pipe schematics
 macro query(x)
-   x = Expr(:quote, x)
+   cache = Dict()
+   dag = parsequery(cache, x)
+
+   ks = collect(keys(cache))
+   syms = collect(keys(cache))
+
    quote
-      parsequery($(esc(x)))
+      local cache = $(esc(cache))
+      local ks    = $(esc(ks))
+
+      ###
+      # TODO: This is a runtime hack to translate input symbol
+      # into graph. Need something smoother
+      ###
+      cache[ks[1]] = Dict("OBJ"=>$(esc(syms[1].gs)), "VDATA"=>Dict(), "EDATA"=>Dict())
+
+      exec(cache, $(esc(dag)))
    end
 end
