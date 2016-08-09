@@ -4,6 +4,19 @@
 
 ############################################################################################################################
 
+@testset "Export" begin
+   g = completegraph(10)
+
+   setvprop!(g, :, 1:10, :p1)
+   seteprop!(g, :, 1:90, :p1)
+
+   @test export_adjacency(g) == indxs(g)
+   @test export_vertex_property(g, :p1) == collect(1:10)
+
+   sv = export_edge_property(g, :p1)
+   @test nnz(sv) == 90
+end
+
 @testset "Graph Merging" begin
    g = completegraph(10)
    eit = edges(g)

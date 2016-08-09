@@ -2,7 +2,7 @@ using Base.Test
 
 using ParallelGraphs
 
-import ParallelGraphs: vdata, edata, randindxs, completeindxs
+import ParallelGraphs: randindxs, completeindxs
 
 ###
 # TEST FILES

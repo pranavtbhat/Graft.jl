@@ -9,7 +9,7 @@ Graph,
 # Subgraph
 subgraph,
 # Methods
-vdata, edata
+indxs, vdata, edata
 
 type Graph
    nv::Int
