@@ -35,16 +35,18 @@ exec(cache::Dict, x::TableNode) = exec(cache, x.graph, x.prop)
 # Fetch vertex property
 ###
 function exec(cache::Dict, x::GraphNode, y::VertexProperty)
+   g = exec(cache, x)
    prop = exec(cache, y)
-   get!(cache[x]["VDATA"], y, getvprop(exec(cache, x), :, prop))
+   get!(cache[x]["VDATA"], y, getvprop(g, :, prop))
 end
 
 ###
 # Fetch edge property
 ###
 function exec(cache::Dict, x::GraphNode, y::EdgeProperty)
+   g = exec(cache, x)
    prop = exec(cache, y)
-   get!(cache[x]["EDATA"], y, geteprop(exec(cache, x), :, exec(cache, y)))
+   get!(cache[x]["EDATA"], y, geteprop(g, :, exec(cache, y)))
 end
 
 ###

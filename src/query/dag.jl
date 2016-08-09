@@ -81,6 +81,7 @@ Base.show(io::IO, x::TableNode) = write(io, "Property($(x.graph), $(x.prop))")
 
 ###
 # Denotes an operation to be performed on two vectors
+# TODO: Allow variable number of arguments, instead of just 2.
 ###
 immutable VectorOperation <: VectorNode
    lhs::VectorNode

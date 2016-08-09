@@ -34,3 +34,5 @@ include("subgraph.jl")
 include("algorithms.jl")
 
 include("operations.jl")
+
+include("query.jl")

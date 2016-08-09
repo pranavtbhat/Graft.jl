@@ -80,18 +80,21 @@ end
 
 ################################################# PARSING EXPRESSIONS #######################################################
 
+parse_property(x::Expr) = x.args[1]
+parse_property(x::QuoteNode) = eval(x)
+
 function parse_property(cache::Dict, x::Expr)
    lhs = x.args[1]
    rhs = x.args[2]
 
    # Grammar rules:
-   lhs == :v && return VertexProperty(rhs.args[1])
+   lhs == :v && return VertexProperty(parse_property(rhs))
 
-   lhs == :e && return EdgeProperty(rhs.args[1])
+   lhs == :e && return EdgeProperty(parse_property(rhs))
 
-   lhs == :s && return EdgeSourceProperty(rhs.args[1])
+   lhs == :s && return EdgeSourceProperty(parse_property(rhs))
 
-   lhs == :t && return EdgeTargetProperty(rhs.args[1])
+   lhs == :t && return EdgeTargetProperty(parse_property(rhs))
 
    error("Couldn't parse (sub)expression $x")
 end
@@ -133,7 +136,7 @@ function parse_exp(cache::Dict, graph::GraphNode, x::Expr)
    if x.head == :.
       return TableNode(graph, parse_property(cache, x))
    end
-
+   
    if x.head == :call || x.head == :comparison
       op  = parse_exp(cache, graph, x.args[1])
       lhs = parse_exp(cache, graph, x.args[2])

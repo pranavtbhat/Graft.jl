@@ -234,7 +234,7 @@ subgraph(x::SparseMatrixCSC{Int}, es::EdgeList) = subgraph(x, EdgeIter(es))
 function subgraph(x::SparseMatrixCSC{Int}, eit::EdgeIter)
    nv = size(x, 1)
    erows = x[eit]
-   sv = sparse(eit.us, eit.vs, collect(1 : length(eit)), nv, nv)
+   sv = sparse(eit.vs, eit.us, collect(1 : length(eit)), nv, nv)
    return(sv, erows)
 end
 
