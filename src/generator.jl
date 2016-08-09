@@ -7,6 +7,45 @@ export
 # Types
 emptygraph, randgraph, completegraph
 
+################################################# CONSTRUCTION #############################################################
+
+# NV
+function Graph(nv::Int)
+   Graph(nv, 0, spzeros(Int, nv, nv), DataFrame(), DataFrame(), LabelMap(nv))
+end
+
+# NV & NE
+function Graph(nv::Int, ne::Int)
+   sv = randindxs(nv, ne)
+   Graph(nv, nnz(sv), sv, DataFrame(), DataFrame(), IdentityLM(nv))
+end
+
+# NV & LS
+function Graph(nv::Int, ls::AbstractVector)
+   if length(ls) == nv
+      Graph(nv, 0, spzeros(Int, nv, nv), DataFrame(), DataFrame(), LabelMap(ls))
+   else
+      error("Trying to assign $(length(ls)) labels to $nv labels")
+   end
+end
+
+# NV & LS & NE
+function Graph(nv::Int, ls::Vector, ne::Int)
+   sv = randindxs(nv, ne)
+   Graph(nv, nnz(sv), sv, DataFrame(), DataFrame(), LabelMap(ls))
+end
+
+# SparseMatrixCSC
+function Graph(x::SparseMatrixCSC)
+   nv = size(x, 1)
+   ne = nnz(x)
+
+   sv = copy(x)
+   reorder!(sv)
+
+   Graph(nv, ne, sv, DataFrame(), DataFrame(), LabelMap(nv))
+end
+
 ################################################# EMTPY GRAPH ##############################################################
 
 emptygraph(nv::Int) = Graph(nv)

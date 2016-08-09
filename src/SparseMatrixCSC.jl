@@ -181,7 +181,7 @@ end
 
 function rmvertex!(x::SparseMatrixCSC{Int,Int}, vs)
    # Reorder entries in the index table
-   x.nzval[:] = 1 : nnz(x)
+   reorder!(x)
 
    # Check which entries in the edge table have to be removed
    erows = vcat(x[EdgeIter(x, vs)], x[EdgeIter(x, :, vs)])
@@ -190,7 +190,7 @@ function rmvertex!(x::SparseMatrixCSC{Int,Int}, vs)
    vlist = collect(1 : x.m)
    deleteat!(vlist, vs)
    x = x[vlist,vlist]
-   x.nzval[:] = 1 : nnz(x)
+   reorder!(x)
 
    return(x, erows)
 end

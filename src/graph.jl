@@ -7,7 +7,9 @@ export
 # Types
 Graph,
 # Subgraph
-subgraph
+subgraph,
+# Methods
+vdata, edata
 
 type Graph
    nv::Int
@@ -18,44 +20,9 @@ type Graph
    lmap::LabelMap
 end
 
-################################################# CONSTRUCTORS #############################################################
+################################################# GENERATION ################################################################
 
-# NV
-function Graph(nv::Int)
-   Graph(nv, 0, spzeros(Int, nv, nv), DataFrame(), DataFrame(), LabelMap(nv))
-end
-
-# NV & NE
-function Graph(nv::Int, ne::Int)
-   sv = randindxs(nv, ne)
-   Graph(nv, nnz(sv), sv, DataFrame(), DataFrame(), IdentityLM(nv))
-end
-
-# NV & LS
-function Graph(nv::Int, ls::Vector)
-   if length(ls) == nv
-      Graph(nv, 0, spzeros(Int, nv, nv), DataFrame(), DataFrame(), LabelMap(ls))
-   else
-      error("Trying to assign $(length(ls)) labels to $nv labels")
-   end
-end
-
-# NV & LS & NE
-function Graph(nv::Int, ls::Vector, ne::Int)
-   sv = randindxs(nv, ne)
-   Graph(nv, nnz(sv), sv, DataFrame(), DataFrame(), LabelMap(ls))
-end
-
-# SparseMatrixCSC
-function Graph(x::SparseMatrixCSC)
-   nv = size(x, 1)
-   ne = nnz(x)
-
-   sv = copy(x)
-   reorder!(sv)
-
-   Graph(nv, ne, sv, DataFrame(), DataFrame(), LabelMap(nv))
-end
+include("generator.jl")
 
 ################################################# ACCESSORS #################################################################
 
@@ -115,7 +82,7 @@ include("edata.jl")
 ###
 # SETLABEL
 ###
-function setlabel!(g::Graph, ls::AbstractVector)
+function setlabel!(g::Graph, ls::Vector)
    if length(ls) == nv(g)
       g.lmap = setlabel!(lmap(g), ls)
       return
@@ -131,7 +98,7 @@ function setlabel!(g::Graph, propname::Symbol)
 end
 
 function setlabel!(g::Graph)
-   setlabel!(lmap(g))
+   g.lmap = setlabel!(lmap(g))
    return
 end
 

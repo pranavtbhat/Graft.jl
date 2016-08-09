@@ -114,42 +114,46 @@ function loadgraph(filename::String; verbose=false)
 end
 ################################################# WRITE GRAPHS ##############################################################
 
-""" Write a graph to file """
-function storegraph(g::Graph, io::IO)
-   Nv,Ne = size(g)
-   Ltype = eltype(lmap(g))
+###
+# TODO: Figure out how to write multiple Dataframes to the same file, using CSV.jl
+###
 
-   Vprops = listvprops(g)
-   Vtypes = eltypes(vdata(g))
-
-   Eprops = listeprops(g)
-   Etypes = eltypes(edata(g))
-
-   ls = encode(g)
-   Vdata = copy(vdata(g))
-   insert!(Vdata, 1, ls, :dc)
-
-   eit = edges(g)
-   uls = encode(g, eit.us)
-   vls = encode(g, eit.vs)
-
-   Edata = copy(edata(g))
-   insert!(Edata, 1, uls, :dc)
-   insert!(Edata, 2, vls, :dc)
-
-   println(io, "$Nv,$Ne,$Ltype")
-   println(io, join(Vprops, ','))
-   println(io, join(Vtypes, ','))
-   println(io, join(Eprops, ','))
-   println(io, join(Etypes, ','))
-
-   Data
-   writedlm(io, Edata, ',')
-   nothing
-end
-
-function storegraph(g::Graph, filename::String)
-   file = open(filename, "w")
-   storegraph(g, file)
-   close(file)
-end
+# """ Write a graph to file """
+# function storegraph(g::Graph, io::IO)
+#    Nv,Ne = size(g)
+#    Ltype = eltype(lmap(g))
+#
+#    Vprops = listvprops(g)
+#    Vtypes = eltypes(vdata(g))
+#
+#    Eprops = listeprops(g)
+#    Etypes = eltypes(edata(g))
+#
+#    ls = encode(g)
+#    Vdata = copy(vdata(g))
+#    insert!(Vdata, 1, ls, :dc)
+#
+#    eit = edges(g)
+#    uls = encode(g, eit.us)
+#    vls = encode(g, eit.vs)
+#
+#    Edata = copy(edata(g))
+#    insert!(Edata, 1, uls, :dc)
+#    insert!(Edata, 2, vls, :dc)
+#
+#    println(io, "$Nv,$Ne,$Ltype")
+#    println(io, join(Vprops, ','))
+#    println(io, join(Vtypes, ','))
+#    println(io, join(Eprops, ','))
+#    println(io, join(Etypes, ','))
+#
+#    Data
+#    writedlm(io, Edata, ',')
+#    nothing
+# end
+#
+# function storegraph(g::Graph, filename::String)
+#    file = open(filename, "w")
+#    storegraph(g, file)
+#    close(file)
+# end

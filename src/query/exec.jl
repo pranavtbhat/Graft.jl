@@ -78,10 +78,18 @@ function exec(cache::Dict, x::GraphNode, y::EdgeTargetProperty)
 end
 
 ###
-# Split Vector Operation
+# Execute Vector Operation
 ###
 function exec(cache::Dict, x::VectorOperation)
-   get!(cache, x, exec(cache, x.op, x.lhs, x.rhs))
+   if haskey(cache, x)
+      cache[x]
+   else
+      # Recursively execute arguments
+      args = map(arg->exec(cache, arg), x.args)
+
+      # Execute queries
+      cache[x] = x.op(args...)
+   end
 end
 
 ###

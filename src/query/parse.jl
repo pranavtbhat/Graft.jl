@@ -136,12 +136,11 @@ function parse_exp(cache::Dict, graph::GraphNode, x::Expr)
    if x.head == :.
       return TableNode(graph, parse_property(cache, x))
    end
-   
+
    if x.head == :call || x.head == :comparison
       op  = parse_exp(cache, graph, x.args[1])
-      lhs = parse_exp(cache, graph, x.args[2])
-      rhs = parse_exp(cache, graph, x.args[3])
-      return VectorOperation(lhs, op, rhs)
+      args = map(arg->parse_exp(cache, graph, arg), x.args[2:end])
+      return VectorOperation(op, args)
    end
 
    error("Couldn't parse (sub)expression $x")

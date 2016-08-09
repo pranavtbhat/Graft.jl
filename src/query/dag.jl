@@ -36,7 +36,7 @@ immutable SimpleGraphNode <: GraphNode
    gs::Symbol
 end
 
-Base.show(io::IO, x::SimpleGraphNode) = write(io, "Graph $(x.gs)")
+Base.show(io::IO, x::SimpleGraphNode) = write(io, "Graph($(x.gs))")
 
 ###
 # Node denoting a filter on vertices, determined by an array of booleans.
@@ -46,7 +46,7 @@ immutable FilterNode <: GraphNode
    bools::VectorNode
 end
 
-Base.show(io::IO, x::FilterNode) = write(io, "Filter $(x.graph) on $(x.bools)")
+Base.show(io::IO, x::FilterNode) = write(io, "filter($(x.graph), $(x.bools))")
 
 ###
 # Node denoting a subset of either vertex properties, or edge properties, or subsets of both.
@@ -56,7 +56,7 @@ immutable SelectNode <: GraphNode
    props::Vector{Property}
 end
 
-Base.show(io::IO, x::SelectNode) = write(io, "Select $(x.props) from $(x.graph)")
+Base.show(io::IO, x::SelectNode) = write(io, "select($(x.props),$(x.graph))")
 
 ################################################# VECTORNODE ###############################################################
 
@@ -67,7 +67,7 @@ immutable LiteralNode{T} <: VectorNode
    val::T
 end
 
-Base.show{T}(io::IO, x::LiteralNode{T}) = write(io, "Lt{$T}($(x.val))")
+Base.show{T}(io::IO, x::LiteralNode{T}) = write(io, "$(x.val)")
 
 ###
 # Denotes a column from the vertex or edge dataframes
@@ -84,12 +84,11 @@ Base.show(io::IO, x::TableNode) = write(io, "Property($(x.graph), $(x.prop))")
 # TODO: Allow variable number of arguments, instead of just 2.
 ###
 immutable VectorOperation <: VectorNode
-   lhs::VectorNode
    op::Function
-   rhs::VectorNode
+   args::Vector{VectorNode}
 end
 
-Base.show(io::IO, x::VectorOperation) = write(io, "{$(x.lhs) $(x.op) $(x.rhs)}")
+Base.show(io::IO, x::VectorOperation) = write(io, "{$(x.op)($(x.args))}")
 
 ################################################# PROPERTY #################################################################
 

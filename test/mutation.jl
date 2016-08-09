@@ -5,7 +5,7 @@
 ############################################################################################################################
 
 @testset "Mutation Addvertex" begin
-   g = Graph(completeindxs(10))
+   g = completegraph(10)
 
    # Set vertex properties
    setvprop!(g, :, 1:10, :p1)
@@ -52,7 +52,7 @@ end
 
 
 @testset "Mutation Addedge" begin
-   g = Graph(completeindxs(10))
+   g = completegraph(10)
 
    # Set vertex properties
    setvprop!(g, :, 1:10, :p1)
@@ -82,7 +82,8 @@ end
 
 
 @testset "Mutation Rmvertex" begin
-   g = Graph(completeindxs(10))
+   g = completegraph(10)
+   setlabel!(g, collect(1:10))
 
    # Set vertex properties
    setvprop!(g, :, 1:10, :p1)
@@ -105,13 +106,17 @@ end
    @test g2 == g1
 
    g3 = deepcopy(g)
-   setlabel!(g3, 1:10)
    # Remove vertices 5, 8
    # Check for size of vdata
    # Check for edata entries
-   g3 - [5,8]
-   @test size(g3.vdata) == (8, 2)
-   @test size(g3.edata) == (56, 2)
+   rmvertex!(g3, [5,8])
+   @test nv(g3) == 8
+   @test size(vdata(g3)) == (8,2)
+   @test size(edata(g3)) == (56,2)
+
+   g4 = deepcopy(g)
+   g4 - [5,8]
+   @test g4 == g3
 end
 
 @testset "Mutation Rmedge" begin

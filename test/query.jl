@@ -66,7 +66,7 @@ end
 
 @testset "Filter" begin
    g = completegraph(10)
-   setlabel!(g, 1:10)
+   setlabel!(g, collect(1:10))
    # Set vertex properties
    setvprop!(g, :, 1 : 10, :p1)
    setvprop!(g, :, 1 : 10, :p2)

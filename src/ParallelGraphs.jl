@@ -28,9 +28,6 @@ include("graph.jl")
 # Subgraph
 include("subgraph.jl")
 
-# Graph Generators
-include("generator.jl")
-
 # Graph IO
 include("graphio.jl")
 

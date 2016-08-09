@@ -21,9 +21,16 @@ function addedge!(x::AbstractDataFrame)
    end
 end
 
-function rmedge!(x::AbstractDataFrame, erows)
+function rmedge!(x::AbstractDataFrame, erow::Int)
    if !isempty(x)
-      deleterows!(x, erows)
+      deleterows!(x, erow)
+   end
+end
+
+function rmedge!(x::AbstractDataFrame, erows::AbstractVector{Int})
+   erows = unique(sort(erows))
+   for prop in names(x)
+      deleteat!(x[prop], erows)
    end
 end
 
