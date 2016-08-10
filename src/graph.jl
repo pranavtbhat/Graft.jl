@@ -1,269 +1,141 @@
 ################################################# FILE DESCRIPTION #########################################################
 
-# This file contains the core graph definitions.
+# The Graph datatype is the core datastructure used in Graft.jl. The Graph datatype has the following fields:
+# 1. nv     : The number of vertices in the graph.
+# 2. ne     : The number of edges int he graph.
+# 3. indxs  : The adjacency matrix for the graph. The SparseMatrixCSC type is used here, both
+#             as an adjacency matrix and as an index table, that maps edges onto their entries in the
+#             edge dataframe.
+# 4. vdata  : A dataframe used to store vertex data. This dataframe is indexed by the internally used
+#             vertex identifiers.
+# 5. edata  : An edge dataframe used to store edge data. This dataframe is indexed by indxs datastructure.
+# 6. lmap   : A label map that maps externally used labels onto the internally used vertex identifiers and vice versa.
 
 ################################################# IMPORT/EXPORT ############################################################
 export
 # Types
 Graph,
-# Typealiases
-SimpleGraph, SparseGraph,
 # Subgraph
-subgraph
+subgraph,
+# Methods
+indxs, vdata, edata, lmap
 
-type Graph{AM,PM}
-   adjmod::AM
-   propmod::PM
-   labelmod::LabelModule
+type Graph
+   nv::Int
+   ne::Int
+   indxs::AbstractArray{Int,2}
+   vdata::AbstractDataFrame
+   edata::AbstractDataFrame
+   lmap::LabelMap
 end
 
-Graph(am, pm, lm=LabelModule(nv(am))) = Graph(am, pm, lm)
+################################################# GENERATION ################################################################
 
-adjmod(g::Graph) = g.adjmod
-propmod(g::Graph) = g.propmod
-labelmod(g::Graph) = g.labelmod
+include("generator.jl")
 
-if CAN_USE_LG
-   typealias SimpleGraph Graph{LightGraphsAM,VectorPM}
-end
-
-typealias SparseGraph Graph{SparseMatrixAM,VectorPM}
-
-################################################# VALIDATION ################################################################
-
-# Vertex validation
-validate_vertex(g::Graph, vs) = validate_vertex(adjmod(g), vs)
-
-# Edge checking
-can_add_edge(g::Graph, u::VertexID, v::VertexID) = can_add_edge(adjmod(g), u, v)
-can_add_edge(g::Graph, es) = can_add_edge(adjmod(g), es)
-
-# Edge validation
-validate_edge(g::Graph, u::VertexID, v::VertexID) = validate_edge(adjmod(g), u, v)
-validate_edge(g::Graph, es) = validate_edge(adjmod(g), es)
-
-# Property Validation
-validate_vertex_property(g::Graph, props) = validate_vertex_property(propmod(g), props)
-validate_edge_property(g::Graph, props) = validate_edge_property(propmod(g), props)
-
-################################################# MISC #####################################################################
-
-# Deepcopy
-Base.deepcopy(g::Graph) = Graph(deepcopy(adjmod(g)), deepcopy(propmod(g)), deepcopy(labelmod(g)))
-
-
-################################################# ADJACENCY ################################################################
+################################################# ACCESSORS #################################################################
 
 """ The number of vertices in the graph """
-@inline nv(g::Graph) = nv(adjmod(g))
+nv(g::Graph) = g.nv
 
 """ The number of edges in the graph """
-@inline ne(g::Graph) = ne(adjmod(g))
+ne(g::Graph) = g.ne
 
-""" Return V x E """
-@inline Base.size(g::Graph) = size(adjmod(g))
+""" Retrieve the adjacency matrix / edge index table """
+indxs(g::Graph) = g.indxs
 
-""" Return a list of the vertices in the graph """
-@inline vertices(g::Graph) = vertices(adjmod(g))
+""" Retrieve the vertex dataframe """
+vdata(g::Graph) = g.vdata
 
-""" Return a list of edge pairs in the graph """
-@inline edges(g::Graph) = edges(adjmod(g))
+""" Retrieve the edge dataframe """
+edata(g::Graph) = g.edata
 
-""" Check if vertex v is in the graph """
-@inline hasvertex(g::Graph, v::VertexID) = hasvertex(adjmod(g), v)
+""" Retrieve the label map """
+lmap(g::Graph)  = g.lmap
 
-""" Check if u=>v is in the graph """
-@inline hasedge(g::Graph, u::VertexID, v::VertexID) = hasedge(adjmod(g), u, v)
-@inline hasedge(g::Graph, es) = hasedge(adjmod(g), es)
+#################################################  BASICS ###################################################################
 
-""" Vertex v's out-neighbors in the graph (consistency and concurrency unsafe) """
-@inline fadj(g::Graph, v::VertexID) = fadj(adjmod(g), v)
-""" Vertex v's in-neighbors in the graph (consistency and concurrency unsafe) """
-@inline badj(g::Graph, v::VertexID) = badj(adjmod(g), v)
+(==)(g1::Graph, g2::Graph) = nv(g1) == nv(g2) && edges(g1) == edges(g2) && lmap(g1) == lmap(g2)
 
-""" Vertex v's out-neighbors in the graph (safe) """
-@inline out_neighbors(g::Graph, v::VertexID) = out_neighbors(adjmod(g), v)
+Base.isequal(g1::Graph, g2::Graph) = g1 == g2 && vdata(g1) == vdata(g2) && edata(g1) == edata(g2)
 
-""" Vertex v's in-neighbors in the graph (safe) """
-@inline in_neighbors(g::Graph, v::VertexID) = in_neighbors(adjmod(g), v)
-
-""" Get the outdegree of a vertex """
-@inline outdegree(g::Graph, v::VertexID) = outdegree(adjmod(g), v)
-
-""" Get the indegree of a vertex """
-@inline indegree(g::Graph, v::VertexID) = indegree(adjmod(g), v)
-
-################################################# MUTATION ################################################################
-
-""" Add a vertex to the graph """
-function addvertex!(g::Graph)
-   addvertex!(adjmod(g))
-   addvertex!(propmod(g))
-   addvertex!(labelmod(g))
-end
-
-function addvertex!(g::Graph, l)
-   if nv(g) < addvertex!(labelmod(g), l)
-      addvertex!(adjmod(g))
-      addvertex!(propmod(g))
-   end
-   resolve(g, l)
+function Base.copy(g::Graph)
+   Graph(nv(g), ne(g), copy(indxs(g)), copy(vdata(g)), copy(edata(g)), copy(lmap(g)))
 end
 
 
-""" Remove a vertex from the graph """
-function rmvertex!(g::Graph, vs::Union{VertexID,AbstractVector{VertexID}})
-   validate_vertex(g, vs)
-   rmvertex!(adjmod(g), vs); rmvertex!(propmod(g), vs); rmvertex!(labelmod(g), vs)
+function Base.deepcopy(g::Graph)
+   Graph(nv(g), ne(g), deepcopy(indxs(g)), deepcopy(vdata(g)), deepcopy(edata(g)), deepcopy(lmap(g)))
 end
 
+################################################# COMBINATORIAL ############################################################
 
-""" Add an edge u->v to the graph """
-function addedge!(g::Graph, u::VertexID, v::VertexID)
-   can_add_edge(g, u, v)
-   addedge!(adjmod(g), u, v); addedge!(propmod(g), u, v)
-end
+include("combinatorial.jl")
 
-function addedge!(g::Graph, es::Union{EdgeID,AbstractVector{EdgeID}})
-   can_add_edge(g, es)
-   addedge!(adjmod(g), es); addedge!(propmod(g), es)
-end
+################################################# MUTATION #################################################################
 
+include("mutation.jl")
 
-""" Remove edge u->v from the graph """
-function rmedge!(g::Graph, u::VertexID, v::VertexID)
-   validate_edge(g, u, v)
-   rmedge!(adjmod(g), u, v); rmedge!(propmod(g), u, v)
-end
+################################################# VDATA ####################################################################
 
-function rmedge!(g::Graph, es::Union{EdgeID,AbstractVector{EdgeID}})
-   validate_edge(g, es)
-   rmedge!(adjmod(g), es); rmedge!(propmod(g), es)
-end
+include("vdata.jl")
 
-################################################# LIST PROPS ##############################################################
+################################################# VDATA ####################################################################
 
-""" Check if a graph has a vertex field """
-@inline hasvprop(g::Graph, prop) = hasvprop(propmod(g), prop)
-
-""" Check if a graph has an edge field """
-@inline haseprop(g::Graph, prop) = haseprop(propmod(g), prop)
-
-""" List the vertex properties contained in the graph """
-@inline listvprops(g::Graph) = listvprops(propmod(g))
-
-""" List the edge properties contained in the graph """
-@inline listeprops(g::Graph) = listeprops(propmod(g))
-
+include("edata.jl")
 
 ################################################# LABELLING ################################################################
 
-###
-# RESOLVE
-###
-resolve(g::Graph, x) = resolve(labelmod(g), x)
-resolve(g::Graph, x, y) = resolve(labelmod(g), x, y)
-
-
-###
-# HALABEL
-###
-haslabel(g::Graph, x) = haslabel(labelmod(g), x)
-
-
-###
-# ENCODE
-###
-encode(g::Graph, v::VertexID) = (validate_vertex(g, v); encode(labelmod(g), v))
-encode(g::Graph, vs::AbstractVector{VertexID}) = (validate_vertex(g, vs); encode(labelmod(g), vs))
-
-_encode(g::Graph, e::EdgeID) = encode(labelmod(g), e)
-_encode(g::Graph, es::AbstractVector{EdgeID}) = encode(labelmod(g), es)
-
-function encode(g::Graph, e::EdgeID)
-   validate_edge(g, e)
-   _encode(g, e)
+""" Set labels for all vertices in the graph """
+function setlabel!(g::Graph, ls::Vector)
+   if length(ls) == nv(g)
+      g.lmap = setlabel!(lmap(g), ls)
+      return
+   else
+      error("Trying to assign $(length(ls)) labels to $(nv(g)) vertices")
+   end
 end
 
-function encode(g::Graph, es::AbstractVector{EdgeID})
-   validate_edge(g, es)
-   _encode(g, es)
+""" Use a vertex property as the vertex label """
+function setlabel!(g::Graph, propname::Symbol)
+   ls = getvprop(g, :, propname)
+   g.lmap = setlabel!(lmap(g), ls)
+   return
 end
 
-###
-# SETLABEL
-###
-function setlabel!{T}(g::Graph, ls::Vector{T})
-   length(ls) == nv(g) || error("Incorrect number of ls provided")
-   setlabel!(labelmod(g), ls)
-   nothing
-end
-
-function setlabel!(g::Graph, propname)
-   ls = [getvprop(g, v, propname) for v in vertices(g)]
-   setlabel!(labelmod(g), ls)
-   nothing
-end
-
+""" Remove all vertex labels """
 function setlabel!(g::Graph)
-   setlabel!(labelmod(g))
-   nothing
+   g.lmap = setlabel!(lmap(g))
+   return
 end
 
-function setlabel!(g::Graph, v::VertexID, l)
-   validate_vertex(g, v)
-   setlabel!(labelmod(g), v, l)
+
+""" Relabel a single vertex in the graph """
+function relabel!(g::Graph, v::VertexID, l)
+   g.lmap = relabel!(lmap(g), v, l)
+   return
 end
 
-function setlabel!(g::Graph, vs::AbstractVector{VertexID}, ls::AbstractVector)
-   validate_vertex(g, vs)
-   setlabel!(labelmod(g), vs, ls)
+""" Relabel a list of vertices in the graph """
+function relabel!(g::Graph, vs::VertexList, ls::AbstractVector)
+   g.lmap = relabel!(lmap(g), vs, ls)
+   return
 end
+
+
+""" Check if the input label is valid """
+haslabel(g::Graph, x) = haslabel(lmap(g), x)
+
+
+""" Translate the input label into the internally used vertex identifier """
+decode(g::Graph, x) = decode(lmap(g), x)
+
+
+
+""" Translate the input vertex identifier into its externally used label """
+encode(g::Graph) = encode(lmap(g))
+encode(g::Graph, x) = encode(lmap(g), x)
+
 ################################################# DISPLAY ##################################################################
 
-function Base.show{AM,PM}(io::IO, g::Graph{AM,PM})
-   write(io, "Graph{$AM,$PM} with $(nv(g)) vertices and $(ne(g)) edges")
-end
-
-################################################# SUBGRAPHS ################################################################
-
-subgraph(g::Graph) = deepcopy(g)
-
-# Vertex only
-function subgraph(g::Graph, vlist::AbstractVector{VertexID})
-   Graph(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist), subgraph(labelmod(g), vlist))
-end
-
-function subgraph(g::Graph, vlist::AbstractVector{VertexID}, vproplist::AbstractVector)
-   validate_vertex_property(g, vproplist)
-   Graph(subgraph(adjmod(g), vlist), subgraph(propmod(g), vlist, vproplist), subgraph(labelmod(g), vlist))
-end
-
-# Edge only
-function subgraph(g::Graph, elist::AbstractVector{EdgeID})
-   Graph(subgraph(adjmod(g), elist), subgraph(propmod(g), elist), deepcopy(labelmod(g)))
-end
-
-function subgraph(g::Graph, elist::AbstractVector{EdgeID}, eproplist::AbstractVector)
-   validate_edge_property(g, eproplist)
-   Graph(subgraph(adjmod(g), elist), subgraph(propmod(g), elist, eproplist), deepcopy(labelmod(g)))
-end
-
-# Vertex and Edge
-function subgraph(g::Graph, vlist::AbstractVector{VertexID}, elist::AbstractVector{EdgeID})
-   Graph(subgraph(adjmod(g), vlist, elist), subgraph(propmod(g), vlist, elist), subgraph(labelmod(g), vlist))
-end
-
-function subgraph(
-   g::Graph,
-   vlist::AbstractVector{VertexID},
-   elist::AbstractVector{EdgeID},
-   vproplist::AbstractVector,
-   eproplist::AbstractVector
-   )
-   Graph(
-      subgraph(adjmod(g), vlist, elist),
-      subgraph(propmod(g), vlist, elist, vproplist, eproplist),
-      subgraph(labelmod(g), vlist)
-   )
-end
+include("display.jl")

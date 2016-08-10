@@ -1,167 +1,149 @@
 ################################################# FILE DESCRIPTION #########################################################
 
-# This file contains tests for queries.
+# This file contains tests for graph conversions.
 
 ############################################################################################################################
 
-# Tests for VertexDescriptor
-for PM in subtypes(PropertyModule)
-   for typ in [Any,TestType]
-      gtype = Graph{SparseMatrixAM,PM{typ,typ}}
-      @testset "VertexDescriptor tests for $gtype" begin
-         g = completegraph(gtype, 10)
-         ls = map(string, 1:10)
-         setlabel!(g, ls)
+@testset "Eachvertex" begin
+   g = completegraph(10)
 
-         V, = g
+   # Set vertex properties
+   setvprop!(g, :, 1 : 10, :p1)
+   setvprop!(g, :, 1 : 10, :p2)
+   setvprop!(g, :, 1 : 10, :p3)
+   setvprop!(g, :, 1 : 10, :p4)
 
-         # Iteration
-         @test length(V) == 10
-         @test size(V) == (10,)
+   arr = getvprop(g, :, :p1)
 
-         @test start(V) == 1
-         @test endof(V) == 10
-         @test done(V, 11) == true
+   # Straightforward fetch prop
+   @test @query(g |> eachvertex(v.p1)) == arr
 
-         @test [v for v in V] == ls
+   # Add constant
+   @test @query(g |> eachvertex(v.p2 + 3)) == arr .+ 3
 
+   # Add two props
+   @test @query(g |> eachvertex(v.p2 + v.p3)) == arr .+ arr
 
-         # Getindex
-         v1 = V["1"]
-         @test isa(v1, VertexDescriptor)
-         @test length(v1) == 1
-         @test v1.props == V.props
-
-         v38 = V[3:8]
-         @test isa(v38, VertexDescriptor)
-         @test length(v38) == 6
-         @test v38.props == V.props
-
-         @test V[:] == V
-
-         # Get/Set
-         val = rand(Int, 10)
-         set!(V, val, "f1")
-         @test get(V, "f1") == val
-
-         val = rand(5)
-         set!(V[1:5], val, "f2")
-         @test get(V[1:5], "f2") == val
-
-         val = randstring()
-         set!(V["5"], val, "f3")
-         @test get(V["5"], "f3") == val
-
-
-         # Map
-         @test map(v->v, V) == ls
-
-         # Map!
-         map!(v->false, V, "f4")
-         @test all(get(V, "f4") .== false)
-
-         # Select
-         @test select(V, "f1", "f2", "f3").props == ["f1", "f2", "f3"]
-      end
-
-      @testset "Query tests for $gtype" begin
-         g = completegraph(gtype, 10)
-         V, = g
-
-         # Label substitution
-         @test (@query V v) == 1:10
-
-         # getfield/setfield
-         @query V v.f1 = 1
-         @test all(@query V v.f1 == 1)
-
-         # Adjacency substitution
-         @test (@query V[5] g[v]) == [V.g[5]]
-
-         # Function substitution
-         @query V v.f1 = zero(Int)
-         @test (@query V v.f1) == zeros(Int, 10)
-      end
-   end
+   # Parenthesis
+   @test @query(g |> eachvertex((v.p1 + v.p2)/(v.p3 * v.p4))) == (arr .+ arr) ./ (arr .* arr)
 end
 
-for PM in subtypes(PropertyModule)
-   for typ in [Any,TestType]
-      gtype = Graph{SparseMatrixAM,PM{typ,typ}}
-      @testset "EdgeDescriptor tests for $gtype" begin
-         g = completegraph(gtype, 10)
-         ls = map(string, 1:10)
-         setlabel!(g, ls)
+@testset "EachEdge" begin
+   g = completegraph(10)
 
-         _,E = g
+   # Set vertex properties
+   setvprop!(g, :, 1 : 10, :p1)
+   setvprop!(g, :, 1 : 10, :p2)
+   setvprop!(g, :, 1 : 10, :p3)
+   setvprop!(g, :, 1 : 10, :p4)
 
-         # Iteration
-         @test length(E) == 90
-         @test size(E) == (90,)
+   # Set edge properties
+   seteprop!(g, :, 1 : 90, :p1)
+   seteprop!(g, :, 1 : 90, :p2)
+   seteprop!(g, :, 1 : 90, :p3)
+   seteprop!(g, :, 1 : 90, :p4)
 
-         @test [e for e in E] == encode(g, edges(g))
+   arr = geteprop(g, :, :p1)
 
-         # Getindex
-         e1 = E[1]
-         @test isa(e1, EdgeDescriptor)
-         @test length(e1) == 1
-         @test e1.props == E.props
+   # Straightforward fetch prop
+   @test @query(g |> eachedge(e.p1)) == arr
 
-         e3060 = E[30:60]
-         @test isa(e3060, EdgeDescriptor)
-         @test length(e3060) == 31
-         @test e3060.props == E.props
+   # Add constant
+   @test @query(g |> eachedge(e.p2 + 3)) == arr .+ 3
 
-         @test E[:] == E
+   # Add two props
+   @test @query(g |> eachedge(e.p2 + e.p3)) == arr .+ arr
 
-         # Get/Set
-         val = collect(1:90)
-         set!(E, val, "f1")
-         get(E, "f1") == val
+   # Parenthesis
+   @test @query(g |> eachedge((e.p1 + e.p2)/(e.p3 * e.p4))) == (arr .+ arr) ./ (arr .* arr)
 
-         val = rand(45)
-         set!(E[1:45], val, "f2")
-         @test get(E[1:45], "f2") == val
+   # Source == target
+   @test @query(g |> eachedge(s.p1 == t.p1)) == falses(90)
 
-         val = randstring()
-         set!(E[45], val, "f3")
-         @test get(E[45], "f3") == val
+   # Source + target
+   @test @query(g |> eachedge(s.p1 + t.p2 > 0 )) == trues(90)
+end
 
-         # Map
-         @test all(map((u,v)->false, E) .== false)
+@testset "Filter" begin
+   g = completegraph(10)
+   setlabel!(g, collect(1:10))
+   # Set vertex properties
+   setvprop!(g, :, 1 : 10, :p1)
+   setvprop!(g, :, 1 : 10, :p2)
+   setvprop!(g, :, 1 : 10, :p3)
+   setvprop!(g, :, 1 : 10, :p4)
 
-         # Map!
-         map!((u,v)->true, E[:], "f4")
-         @test all(get(E[:], "f4") .== true)
+   # Set edge properties
+   seteprop!(g, :, 1 : 90, :p1)
+   seteprop!(g, :, 1 : 90, :p2)
+   seteprop!(g, :, 1 : 90, :p3)
+   seteprop!(g, :, 1 : 90, :p4)
 
-         # Select
-         @test select(E, "f1", "f2", "f3").props == ["f1", "f2", "f3"]
-      end
+   # Filter on vertex property
+   g1 = @query(g |> filter(v.p1 <= 5))
+   @test @query(g1 |> eachvertex(v.p1)) == collect(1:5)
+   @test nv(g1) == 5
+   @test ne(g1) == 20
+   @test encode(g1) == [1,2,3,4,5]
 
-      @testset "Query tests for $gtype" begin
-         g = completegraph(gtype, 10)
-         V,E = g
+   # Filter on edge property
+   g2 = @query(g |> filter(e.p1 <= 45))
+   @test @query(g2 |> eachedge(e.p1)) == collect(1:45)
+   @test nv(g2) == 10
+   @test ne(g2) == 45
 
-         # Label substitution
-         (@query E[1:10] u) == ones(Int, 10)
-         (@query E[1:10] v) == collect(1:10)
+   # Multiple vertex properties
+   g3 = @query(g |> filter(v.p1 <=10, v.p2 >= 7))
+   @test @query(g3 |> eachvertex(v.p1)) == collect(7:10)
+   @test nv(g3) == 4
+   @test ne(g3) == 12
+   @test encode(g3) == [7,8,9,10]
 
-         # getfield/setfield
-         @query E e.f1 = 1
-         @test all(@query(E, e.f1 == 1))
+   # Multiple edge properties
+   g4 = @query(g |> filter(e.p1 <= 70, e.p2 >= 60))
+   @test @query(g4 |> eachedge(e.p1)) == collect(60:70)
+   @test nv(g4) == 10
+   @test ne(g4) == 11
 
-         @query E u.f1 = 1
-         @test all(@query E u.f1 == 1)
+   # Mixed properties
+   g5 = @query(g |> filter(v.p1 <= 5, e.p1 <= 20))
+   @test nv(g5) == 5
+   @test ne(g5) == 10
 
-         @query E v.f2 = 1.0
-         @test all(@query(E, v.f2 == 1.0))
+   # Source and target properites
+   g6 = @query(g |> filter(s.p1 < t.p1))
+   @test nv(g6) == 10
+   @test ne(g6) == 45
+end
 
-         @query E e.f2 = u.f1 + v.f2
-         @test all(@query E e.f2 == 2.0)
+@testset "Select" begin
+   g = completegraph(10)
+   # Set vertex properties
+   setvprop!(g, :, 1 : 10, :p1)
+   setvprop!(g, :, 1 : 10, :p2)
+   setvprop!(g, :, 1 : 10, :p3)
+   setvprop!(g, :, 1 : 10, :p4)
 
-         # Function substitution
-         @query E e.f1 = zero(Int)
-         @test all(@query E e.f1 == 0)
-      end
-   end
+   # Set edge properties
+   seteprop!(g, :, 1 : 90, :p1)
+   seteprop!(g, :, 1 : 90, :p2)
+   seteprop!(g, :, 1 : 90, :p3)
+   seteprop!(g, :, 1 : 90, :p4)
+
+   # Vertex props
+   g1 = @query(g |> select(v.p1, v.p3))
+   @test listvprops(g1) == [:p1, :p3]
+   @test size(vdata(g1)) == (10,2)
+
+   # Edge props
+   g2 = @query(g |> select(e.p2, e.p4))
+   @test listeprops(g2) == [:p2, :p4]
+   @test size(edata(g2)) == (90,2)
+
+   # Mixed props
+   g3 = @query(g |> select(v.p1, v.p4, e.p2, e.p3))
+   @test listvprops(g3) == [:p1, :p4]
+   @test size(vdata(g3)) == (10,2)
+   @test listeprops(g3) == [:p2, :p3]
+   @test size(edata(g3)) == (90,2)
 end

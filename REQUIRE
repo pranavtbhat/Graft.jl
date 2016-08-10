@@ -1,4 +1,2 @@
 julia 0.5
-LightGraphs
-JLD
-Faker
+DataFrames

@@ -1,40 +1,40 @@
+using Base.Test
 
-if VERSION < v"0.5.0-dev"
-    using BaseTestNext
-else
-    using Base.Test
-end
+using Graft
 
-using ParallelGraphs
+import Graft: randindxs, completeindxs
 
-
-type TestType
-   f1::Int
-   f2::Float64
-   f3::String
-   f4::Any
-   f5::Char
-end
-
-import Base: ==
-
-(==)(x::TestType, y::TestType) = x.f1 == y.f1 && x.f2 == y.f2 && x.f3 == y.f3 && x.f4 == y.f4 && x.f5 == y.f5
-
-
-include("adjacency.jl")
-
-include("properties.jl")
-
-include("labelling.jl")
-
+###
+# TEST FILES
+###
 include("util.jl")
+
+include("sparsematrix.jl")
+
+include("edgeiter.jl")
+
+include("labelmap.jl")
+
+include("graph.jl")
+
+include("generator.jl")
+
+include("combinatorial.jl")
+
+include("vdata.jl")
+
+include("edata.jl")
+
+include("mutation.jl")
+
+include("display.jl")
+
+include("graphio.jl")
 
 include("subgraph.jl")
 
-include("query.jl")
-
-include("filter.jl")
-
-include("parse.jl")
-
 include("algorithms.jl")
+
+include("operations.jl")
+
+include("query.jl")

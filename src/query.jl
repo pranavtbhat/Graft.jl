@@ -5,95 +5,46 @@
 ################################################# IMPORT/EXPORT ############################################################
 
 export
-# Types
-VertexDescriptor, EdgeDescriptor,
 # Macros
-@query, @filter,
-# Methods
-set!
-################################################# BASICS ###################################################################
+@query
 
-""" Describes a subset of vertices and their properties """
-type VertexDescriptor
-   g::Graph
-   vs::AbstractVector{VertexID}
-   props::Vector
-   parent::Union{Void,VertexDescriptor}
-end
-
-""" Describes a subset of vertices and their properties """
-type EdgeDescriptor
-   g::Graph
-   es::AbstractVector{EdgeID}
-   props::Vector
-   parent::Union{Void,EdgeDescriptor}
-end
+###
+# DAG DEFINITIONS
+###
+include("query/dag.jl")
 
 
-# Graph structural queries
-include("query/graph.jl")
+###
+# RECURSIVE DESCENT PARSER FOR QUERIES
+###
+include("query/parse.jl")
 
-# Descriptor subsets
-include("query/subset.jl")
 
-# Vertex descriptor implementation
-include("query/vertex.jl")
+###
+# BOTTOM UP EXECUTION FOR DAG
+###
 
-# Edge descriptor implementation
-include("query/edge.jl")
-
-# Query execution
 include("query/exec.jl")
 
-################################################# @QUERY #####################################################################
-
-type QueryNode
-   expr
-end
-
-macro query(desc, x)
-   x = Expr(:quote, x)
-   quote
-      local Q = $(esc(x))
-      local D = $(esc(desc))
-      exec_query(Q, D)
-   end
-end
+################################################# MACROS ####################################################################
 
 macro query(x)
-   x = Expr(:quote, x)
+   cache = Dict()
+   dag = parsequery(cache, x)
+
+   ks = collect(keys(cache))
+   syms = collect(keys(cache))
+
    quote
-      local Q = $(esc(x))
-      QueryNode(Q)
-   end
+      local cache = $(esc(cache))
+      local ks    = $(esc(ks))
 
-end
+      ###
+      # TODO: This is a runtime hack to translate input symbol
+      # into graph. Need something smoother
+      ###
+      cache[ks[1]] = Dict("OBJ"=>$(esc(syms[1].gs)), "VDATA"=>Dict(), "EDATA"=>Dict())
 
-|>(desc, x::QueryNode) = exec_query(x.expr, desc)
-|>(x::QueryNode, f::Function) = QueryNode(Expr(:call, f, x.expr))
-################################################# @FILTER #####################################################################
-
-type FilterNode
-   expr
-end
-
-macro filter(desc, x)
-   x = Expr(:quote, x)
-   quote
-      local Q = $(esc(x))
-      local D = $(esc(desc))
-      _filter(exec_query(Q, D), D)
+      exec(cache, $(esc(dag)))
    end
 end
-
-macro filter(x)
-   x = Expr(:quote, x)
-   quote
-      local Q = $(esc(x))
-      FilterNode(Q)
-   end
-end
-
-|>(desc, x::FilterNode) = _filter(exec_query(x.expr, desc), desc)
-
-|>(x::FilterNode, f::Function) = FilterNode(Expr(:call, f, x.expr))

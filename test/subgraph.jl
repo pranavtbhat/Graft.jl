@@ -4,78 +4,90 @@
 
 ############################################################################################################################
 
-for AM in subtypes(AdjacencyModule)
-   for PM in subtypes(PropertyModule)
-      for typ in [Any, TestType]
-         gtype = Graph{AM,PM{typ,typ}}
-         @testset "Subgraph test for Graph{$AM,$(PM{typ,typ})}" begin
+@testset "Subgraph" begin
+   gtype = completegraph(10)
 
-            g = completegraph(gtype, 10)
-            vlist = 3:8
-            elist = 11:20
-            es = edges(g)[elist]
-            es1 = edges(g)[1:45]
+   g = Graph(completeindxs(10))
+   eit = edges(g)
 
-            vf1 = collect(1:10)
-            vf2 = 1.0 * collect(1:10)
-            vf3 = ["$i" for i in 1:10]
+   # Set Labels
+   ls = map(string, 1:10)
+   setlabel!(g, ls)
 
-            ef1 = collect(1:90)
-            ef2 = 1.0 * collect(1:90)
-            ef3 = ["$i" for i in 1:90]
+   # Set vertex properties
+   setvprop!(g, :, 1:10, :p1)
+   setvprop!(g, :, 1:10, :p2)
+   setvprop!(g, :, 1:10, :p3)
+   setvprop!(g, :, 1:10, :p4)
 
-            # Vertex Properties
-            setvprop!(g, :, vf1, "f1")
-            setvprop!(g, :, vf2, "f2")
-            setvprop!(g, :, vf3, "f3")
+   # Set edge properties
+   seteprop!(g, :, 1:90, :p1)
+   seteprop!(g, :, 1:90, :p2)
+   seteprop!(g, :, 1:90, :p3)
+   seteprop!(g, :, 1:90, :p4)
 
-            # Edge Properties
-            seteprop!(g, :, ef1, "f1")
-            seteprop!(g, :, ef2, "f2")
-            seteprop!(g, :, ef3, "f3")
+   # Copy
+   g1 = subgraph(g)
+   @test isequal(g1, g)
 
-            # Labels
-            setlabel!(g, "f1")
+   # VS
+   g2 = subgraph(g, 1:5)
+   @test nv(g2) == 5
+   @test ne(g2) == 20
+   @test size(vdata(g2)) == (5, 4)
+   @test size(edata(g2)) == (20, 4)
+   @test encode(g2) == ls[1:5]
 
-            # Vertex Subgraphing
-            h = subgraph(g, vlist)
-            @test size(h) == (6, 30)
-            @test getvprop(h, :, "f1") == vf1[vlist]
-            @test resolve(h, 3) == 1
-            @test resolve(h, 8) == 6
+   # VPROPS
+   g3 = subgraph(g, :, [:p1, :p3])
+   @test nv(g3) == 10
+   @test names(vdata(g3)) == [:p1, :p3]
+   @test size(vdata(g3)) == (10, 2)
 
-            # Vertex and Property Subgraphing
-            h = subgraph(g, vlist, ["f1", "f3"])
-            @test size(h) == (6, 30)
-            @test getvprop(h, :, "f1") == vf1[vlist]
-            @test getvprop(h, :, "f3") == vf3[vlist]
-            try getvprop(h, :, "f2"); @test false catch @test true end
+   # VS & VPROPS
+   g4 = subgraph(g, 1:7, [:p2, :p4])
+   @test nv(g4) == 7
+   @test ne(g4) == 42
+   @test names(vdata(g4)) == [:p2, :p4]
+   @test size(vdata(g4)) == (7,2)
+   @test size(edata(g4)) == (42,4)
+   @test encode(g4) == ls[1:7]
 
+   # ES
+   es = eit[1:45]
+   g5 = subgraph(g, es)
+   @test nv(g5) == 10
+   @test ne(g5) == 45
+   @test size(edata(g5)) == (45,4)
 
-            # Edge Subgraphing
-            h = subgraph(g, es)
-            @test size(h) == (10, 10)
-            @test getvprop(h, :, "f2") == vf2
-            @test geteprop(h, :, "f1") == ef1[elist]
-            @test geteprop(h, :, "f3") == ef3[elist]
+   # EPROPS
+   g6 = subgraph(g, :, :, [:p1,:p4])
+   @test ne(g6) == 90
+   @test names(edata(g6)) == [:p1,:p4]
+   @test size(edata(g6)) == (90,2)
 
-            # Edge and Property Subgraphing
-            h = subgraph(g, es, ["f1", "f2"])
-            @test size(h) == (10, 10)
-            @test geteprop(h, :, "f1") == ef1[elist]
-            @test geteprop(h, :, "f2") == ef2[elist]
-            try geteprop(h, :, "f3"); @test false catch @test true end
+   # ES & EPROPS
+   es = eit[35:70]
+   g7 = subgraph(g, es, [:p1])
+   @test nv(g7) == 10
+   @test ne(g7) == 36
+   @test names(edata(g7)) == [:p1]
+   @test size(edata(g7)) == (36,1)
 
-            # Vertex and Edge Subgraphing
-            h = subgraph(g, vlist, es1)
-            @test size(h) == (6, 15)
+   # VS & ES
+   es = [1=>2, 2=>3, 3=>1]
+   g8 = subgraph(g, 1:3, es)
+   @test nv(g8) == 3
+   @test ne(g8) == 3
+   @test encode(g8) == ls[1:3]
 
-            # All Subgraphing
-            h = subgraph(g, vlist, es1, ["f2", "f3"], ["f2", "f3"])
-            @test size(h) == (6, 15)
-            try getvprop(h, :, "f1"); @test false catch @test true end
-            try geteprop(h, :, "f1"); @test false catch @test true end
-         end
-      end
-   end
+   es = [1=>2, 2=>3, 3=>4, 4=>5, 5=>1]
+   g9 = subgraph(g, 1:5, es, [:p1], [:p2])
+   @test nv(g9) == 5
+   @test ne(g9) == 5
+   @test names(vdata(g9)) == [:p1]
+   @test size(vdata(g9)) == (5,1)
+   @test names(edata(g9)) == [:p2]
+   @test size(edata(g9)) == (5,1)
+   @test encode(g9) == ls[1:5]
 end

@@ -1,16 +1,16 @@
-# ParallelGraphs
+# Graft
 
-[![Build Status](https://travis-ci.org/pranavtbhat/ParallelGraphs.jl.svg?branch=master)](https://travis-ci.org/pranavtbhat/ParallelGraphs.jl)
-[![codecov.io](http://codecov.io/github/pranavtbhat/ParallelGraphs.jl/coverage.svg?branch=master)](http://codecov.io/github/pranavtbhat/ParallelGraphs.jl)
-[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/pranavtbhat/ParallelGraphs.jl/master/LICENSE.md)
+[![Build Status](https://travis-ci.org/pranavtbhat/Graft.jl.svg?branch=master)](https://travis-ci.org/pranavtbhat/Graft.jl)
+[![codecov.io](http://codecov.io/github/pranavtbhat/Graft.jl/coverage.svg?branch=master)](http://codecov.io/github/pranavtbhat/Graft.jl)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/pranavtbhat/Graft.jl/master/LICENSE.md)
 
-ParallelGraphs is a general purpose graph processing framework, and can be thought of as a *DataFrames.jl* for Graphs. ParallelGraphs supports
+Graft is a general purpose graph processing framework, and can be thought of as a *DataFrames.jl* for Graphs. Graft supports
 vertex and edge metadata, vertex labelling and SQL-like queries.
 
 Two separate views of a graph are presented:
 
-# Graph Datastructure
-ParallelGraphs provides a generic graph interface that can have multiple implementations:
+## Graph Datastructure
+Graft provides a generic graph interface that can have multiple implementations:
 ```julia
 # Create a (10,90) directed graph with a LightGraphs backend. Use this interface if you want to
 # apply sequential algorithms on smallish graphs
@@ -45,7 +45,7 @@ g["v1"]
 By default vertices have the internally assigned integer indices. Labels can be when adding new vertices,
 or by calling the `setlabel!` method.
 
-# Vertex and Edge Descriptors
+## Vertex and Edge Descriptors
 Descriptors behave like table-views of graphs:
 
 ```julia

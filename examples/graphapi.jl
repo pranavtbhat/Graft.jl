@@ -7,7 +7,7 @@
 ## the strength of the relationship, and color the edges accordingly.
 ##
 ######
-using ParallelGraphs
+using Graft
 srand(101)
 
 # Construct a small random graph with approximately 500k edges
