@@ -10,6 +10,6 @@ notifications:
 # TODO: Remove checkout for WeakRefStrings, once issue is resolved.
 script:
  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
- - julia --color=yes -e 'Pkg.clone(pwd()); Pkg.build("ParallelGraphs"); Pkg.test("ParallelGraphs"; coverage=true)'
+ - julia --color=yes -e 'Pkg.clone(pwd()); Pkg.build("Graft"); Pkg.test("Graft"; coverage=true)'
 after_success:
-- julia -e 'cd(Pkg.dir("ParallelGraphs")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+- julia -e 'cd(Pkg.dir("Graft")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'

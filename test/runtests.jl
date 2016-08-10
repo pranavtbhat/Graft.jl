@@ -1,8 +1,8 @@
 using Base.Test
 
-using ParallelGraphs
+using Graft
 
-import ParallelGraphs: randindxs, completeindxs
+import Graft: randindxs, completeindxs
 
 ###
 # TEST FILES

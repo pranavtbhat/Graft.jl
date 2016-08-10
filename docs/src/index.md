@@ -1,4 +1,4 @@
-# ParallelGraphs Documentation
+# Graft Documentation
 
 ```@contents
 ```
@@ -116,7 +116,7 @@ vcat(::EdgeIter, ::EdgeIter)
 
 ### Usage
 ```@example
-using ParallelGraphs
+using Graft
 
 g = completegraph(3)
 
@@ -208,7 +208,7 @@ For example, `@query g |> select(v.p1, v.p3, e.p1)` preserves only vertex proper
 The abstractions can be chained together using the pipe notation, so that the output of one stage becomes the input to the next.
 
 ```@example
-using ParallelGraphs
+using Graft
 g = randgraph(10, [:p1, :p2], [:p1, :p2])
 
 # Run a filter using vertex properties
@@ -216,7 +216,7 @@ g = randgraph(10, [:p1, :p2], [:p1, :p2])
 ```
 
 ```@example
-using ParallelGraphs
+using Graft
 g = randgraph(10, [:p1, :p2], [:p1, :p2])
 
 # Run a filter using source and target properties
@@ -224,7 +224,7 @@ g = randgraph(10, [:p1, :p2], [:p1, :p2])
 ```
 
 ```@example
-using ParallelGraphs
+using Graft
 g = randgraph(10, [:p1, :p2], [:p1, :p2])
 
 # Run filter using edge properties
@@ -232,7 +232,7 @@ g = randgraph(10, [:p1, :p2], [:p1, :p2])
 ```
 
 ```@example
-using ParallelGraphs
+using Graft
 g = randgraph(10, [:p1, :p2], [:p1, :p2])
 
 # Chain filter expressions
@@ -240,7 +240,7 @@ g = randgraph(10, [:p1, :p2], [:p1, :p2])
 ```
 
 ```@example
-using ParallelGraphs
+using Graft
 g = randgraph(10, [:p1, :p2], [:p1, :p2])
 
 # Select properties
@@ -248,7 +248,7 @@ g = randgraph(10, [:p1, :p2], [:p1, :p2])
 ```
 
 ```@example
-using ParallelGraphs
+using Graft
 g = randgraph(10, [:p1, :p2], [:p1, :p2])
 
 # Run an expression on each vertex
@@ -256,7 +256,7 @@ g = randgraph(10, [:p1, :p2], [:p1, :p2])
 ```
 
 ```@example
-using ParallelGraphs
+using Graft
 g = randgraph(10, [:p1, :p2], [:p1, :p2])
 
 # Run an expression on each edge

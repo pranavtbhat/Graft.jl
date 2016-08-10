@@ -4,7 +4,7 @@
 
 ############################################################################################################################
 
-import ParallelGraphs: eltypes
+import Graft: eltypes
 
 @testset "Edge DataFrame" begin
    g = completegraph(10)

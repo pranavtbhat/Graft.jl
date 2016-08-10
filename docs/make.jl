@@ -1,6 +1,6 @@
-using Documenter, ParallelGraphs
+using Documenter, Graft
 
 makedocs(
    # Options
-   modules=[ParallelGraphs]
+   modules=[Graft]
 )

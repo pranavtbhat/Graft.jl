@@ -1,4 +1,4 @@
-module ParallelGraphs
+module Graft
 
 using DataFrames
 

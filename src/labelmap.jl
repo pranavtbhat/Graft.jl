@@ -1,6 +1,6 @@
 ################################################# FILE DESCRIPTION #########################################################
 
-# ParallelGraphs allows users to refer to vertices externally, through arbitrary Julia types. The LabelMap is responsible
+# Graft allows users to refer to vertices externally, through arbitrary Julia types. The LabelMap is responsible
 # for the resolution of these arbitrary objects into the internally used Integer indices.
 
 # The label map is the datastructure that is used to realize two separate labelling schemes:

@@ -1,6 +1,6 @@
 ################################################# FILE DESCRIPTION #########################################################
 
-# ParallelGraphs will eventually support several file formats for reading and writing graphs.
+# Graft will eventually support several file formats for reading and writing graphs.
 # However currently, only a GraphCSV supported. The format is described below
 #
 # The input file should contain data in the following format:

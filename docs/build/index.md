@@ -1,9 +1,9 @@
 
-<a id='ParallelGraphs-Documentation-1'></a>
+<a id='Graft-Documentation-1'></a>
 
-# ParallelGraphs Documentation
+# Graft Documentation
 
-- [ParallelGraphs Documentation](index.md#ParallelGraphs-Documentation-1)
+- [Graft Documentation](index.md#Graft-Documentation-1)
     - [Type Aliases](index.md#Type-Aliases-1)
     - [The Graph datastructure](index.md#The-Graph-datastructure-1)
     - [EdgeIteration](index.md#EdgeIteration-1)
@@ -15,8 +15,8 @@
 
 ## Type Aliases
 
-<a id='ParallelGraphs.VertexID' href='#ParallelGraphs.VertexID'>#</a>
-**`ParallelGraphs.VertexID`** &mdash; *Type*.
+<a id='Graft.VertexID' href='#Graft.VertexID'>#</a>
+**`Graft.VertexID`** &mdash; *Type*.
 
 
 
@@ -28,8 +28,8 @@ This function has no methods to display.
 
 _Hiding 1 method defined outside of this package._
 
-<a id='ParallelGraphs.EdgeID' href='#ParallelGraphs.EdgeID'>#</a>
-**`ParallelGraphs.EdgeID`** &mdash; *Type*.
+<a id='Graft.EdgeID' href='#Graft.EdgeID'>#</a>
+**`Graft.EdgeID`** &mdash; *Type*.
 
 
 
@@ -41,15 +41,15 @@ This function has no methods to display.
 
 _Hiding 2 methods defined outside of this package._
 
-<a id='ParallelGraphs.VertexList' href='#ParallelGraphs.VertexList'>#</a>
-**`ParallelGraphs.VertexList`** &mdash; *Type*.
+<a id='Graft.VertexList' href='#Graft.VertexList'>#</a>
+**`Graft.VertexList`** &mdash; *Type*.
 
 
 
 A list of Vertex IDs 
 
-<a id='ParallelGraphs.EdgeList' href='#ParallelGraphs.EdgeList'>#</a>
-**`ParallelGraphs.EdgeList`** &mdash; *Type*.
+<a id='Graft.EdgeList' href='#Graft.EdgeList'>#</a>
+**`Graft.EdgeList`** &mdash; *Type*.
 
 
 
@@ -71,8 +71,8 @@ The Graph datatype is the core datastructure used in Graft.jl. The Graph datatyp
 
 ### Accessors
 
-<a id='ParallelGraphs.nv' href='#ParallelGraphs.nv'>#</a>
-**`ParallelGraphs.nv`** &mdash; *Function*.
+<a id='Graft.nv' href='#Graft.nv'>#</a>
+**`Graft.nv`** &mdash; *Function*.
 
 
 
@@ -85,12 +85,12 @@ The number of vertices in the graph
 
 <ul class="documenter-methodtable">
 <li>
-    <pre class="documenter-inline"><span class="nf">nv</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">)</span></pre>
+    <pre class="documenter-inline"><span class="nf">nv</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">)</span></pre>
     defined at
     <a target="_blank" href="">src/graph.jl:39</a>
 </li>
 <li>
-    <pre class="documenter-inline"><span class="nf">nv</span><span class="p">(</span><span class="n">x</span><span class="p">::</span><span class="n">ParallelGraphs.IdentityLM</span><span class="p">)</span></pre>
+    <pre class="documenter-inline"><span class="nf">nv</span><span class="p">(</span><span class="n">x</span><span class="p">::</span><span class="n">Graft.IdentityLM</span><span class="p">)</span></pre>
     defined at
     <a target="_blank" href="">src/labelmap.jl:55</a>
 </li>
@@ -100,14 +100,14 @@ The number of vertices in the graph
     <a target="_blank" href="">src/sparsematrix.jl:17</a>
 </li>
 <li>
-    <pre class="documenter-inline"><span class="nf">nv</span><span class="p">(</span><span class="n">x</span><span class="p">::</span><span class="n">ParallelGraphs.DictLM</span><span class="p">)</span></pre>
+    <pre class="documenter-inline"><span class="nf">nv</span><span class="p">(</span><span class="n">x</span><span class="p">::</span><span class="n">Graft.DictLM</span><span class="p">)</span></pre>
     defined at
     <a target="_blank" href="">src/labelmap.jl:86</a>
 </li>
 </ul>
 
-<a id='ParallelGraphs.ne' href='#ParallelGraphs.ne'>#</a>
-**`ParallelGraphs.ne`** &mdash; *Function*.
+<a id='Graft.ne' href='#Graft.ne'>#</a>
+**`Graft.ne`** &mdash; *Function*.
 
 
 
@@ -120,7 +120,7 @@ The number of edges in the graph
 
 <ul class="documenter-methodtable">
 <li>
-    <pre class="documenter-inline"><span class="nf">ne</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">)</span></pre>
+    <pre class="documenter-inline"><span class="nf">ne</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">)</span></pre>
     defined at
     <a target="_blank" href="">src/graph.jl:42</a>
 </li>
@@ -131,8 +131,8 @@ The number of edges in the graph
 </li>
 </ul>
 
-<a id='ParallelGraphs.indxs' href='#ParallelGraphs.indxs'>#</a>
-**`ParallelGraphs.indxs`** &mdash; *Function*.
+<a id='Graft.indxs' href='#Graft.indxs'>#</a>
+**`Graft.indxs`** &mdash; *Function*.
 
 
 
@@ -142,14 +142,14 @@ Retrieve the adjacency matrix / edge index table
 
 <ul class="documenter-methodtable">
 <li>
-    <pre class="documenter-inline"><span class="nf">indxs</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">)</span></pre>
+    <pre class="documenter-inline"><span class="nf">indxs</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">)</span></pre>
     defined at
     <a target="_blank" href="">src/graph.jl:45</a>
 </li>
 </ul>
 
-<a id='ParallelGraphs.vdata' href='#ParallelGraphs.vdata'>#</a>
-**`ParallelGraphs.vdata`** &mdash; *Function*.
+<a id='Graft.vdata' href='#Graft.vdata'>#</a>
+**`Graft.vdata`** &mdash; *Function*.
 
 
 
@@ -159,14 +159,14 @@ Retrieve the vertex dataframe
 
 <ul class="documenter-methodtable">
 <li>
-    <pre class="documenter-inline"><span class="nf">vdata</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">)</span></pre>
+    <pre class="documenter-inline"><span class="nf">vdata</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">)</span></pre>
     defined at
     <a target="_blank" href="">src/graph.jl:48</a>
 </li>
 </ul>
 
-<a id='ParallelGraphs.edata' href='#ParallelGraphs.edata'>#</a>
-**`ParallelGraphs.edata`** &mdash; *Function*.
+<a id='Graft.edata' href='#Graft.edata'>#</a>
+**`Graft.edata`** &mdash; *Function*.
 
 
 
@@ -176,14 +176,14 @@ Retrieve the edge dataframe
 
 <ul class="documenter-methodtable">
 <li>
-    <pre class="documenter-inline"><span class="nf">edata</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">)</span></pre>
+    <pre class="documenter-inline"><span class="nf">edata</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">)</span></pre>
     defined at
     <a target="_blank" href="">src/graph.jl:51</a>
 </li>
 </ul>
 
-<a id='ParallelGraphs.lmap' href='#ParallelGraphs.lmap'>#</a>
-**`ParallelGraphs.lmap`** &mdash; *Function*.
+<a id='Graft.lmap' href='#Graft.lmap'>#</a>
+**`Graft.lmap`** &mdash; *Function*.
 
 
 
@@ -193,7 +193,7 @@ Retrieve the label map
 
 <ul class="documenter-methodtable">
 <li>
-    <pre class="documenter-inline"><span class="nf">lmap</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">)</span></pre>
+    <pre class="documenter-inline"><span class="nf">lmap</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">)</span></pre>
     defined at
     <a target="_blank" href="">src/graph.jl:54</a>
 </li>
@@ -207,8 +207,8 @@ Retrieve the label map
 
 The following methods can be used to construct unlabelled graphs:
 
-<a id='ParallelGraphs.emptygraph' href='#ParallelGraphs.emptygraph'>#</a>
-**`ParallelGraphs.emptygraph`** &mdash; *Function*.
+<a id='Graft.emptygraph' href='#Graft.emptygraph'>#</a>
+**`Graft.emptygraph`** &mdash; *Function*.
 
 
 <strong>Methods</strong>
@@ -221,8 +221,8 @@ The following methods can be used to construct unlabelled graphs:
 </li>
 </ul>
 
-<a id='ParallelGraphs.randgraph' href='#ParallelGraphs.randgraph'>#</a>
-**`ParallelGraphs.randgraph`** &mdash; *Function*.
+<a id='Graft.randgraph' href='#Graft.randgraph'>#</a>
+**`Graft.randgraph`** &mdash; *Function*.
 
 
 
@@ -252,8 +252,8 @@ Returns a small completegraph with properties(for doc examples)
 </li>
 </ul>
 
-<a id='ParallelGraphs.completegraph' href='#ParallelGraphs.completegraph'>#</a>
-**`ParallelGraphs.completegraph`** &mdash; *Function*.
+<a id='Graft.completegraph' href='#Graft.completegraph'>#</a>
+**`Graft.completegraph`** &mdash; *Function*.
 
 
 <strong>Methods</strong>
@@ -269,12 +269,12 @@ Returns a small completegraph with properties(for doc examples)
 
 Labelled graphs can be build using the constructors:
 
-<a id='ParallelGraphs.Graph-Tuple{Int64,Array{T,1}}' href='#ParallelGraphs.Graph-Tuple{Int64,Array{T,1}}'>#</a>
-**`ParallelGraphs.Graph`** &mdash; *Method*.
+<a id='Graft.Graph-Tuple{Int64,Array{T,1}}' href='#Graft.Graph-Tuple{Int64,Array{T,1}}'>#</a>
+**`Graft.Graph`** &mdash; *Method*.
 
 
-<a id='ParallelGraphs.Graph-Tuple{Int64,Array{T,1},Int64}' href='#ParallelGraphs.Graph-Tuple{Int64,Array{T,1},Int64}'>#</a>
-**`ParallelGraphs.Graph`** &mdash; *Method*.
+<a id='Graft.Graph-Tuple{Int64,Array{T,1},Int64}' href='#Graft.Graph-Tuple{Int64,Array{T,1},Int64}'>#</a>
+**`Graft.Graph`** &mdash; *Method*.
 
 
 
@@ -285,8 +285,8 @@ Labelled graphs can be build using the constructors:
 
 Basic methods on graph structure:
 
-<a id='ParallelGraphs.vertices' href='#ParallelGraphs.vertices'>#</a>
-**`ParallelGraphs.vertices`** &mdash; *Function*.
+<a id='Graft.vertices' href='#Graft.vertices'>#</a>
+**`Graft.vertices`** &mdash; *Function*.
 
 
 
@@ -296,14 +296,14 @@ The list of the vertices in the graph
 
 <ul class="documenter-methodtable">
 <li>
-    <pre class="documenter-inline"><span class="nf">vertices</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">)</span></pre>
+    <pre class="documenter-inline"><span class="nf">vertices</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">)</span></pre>
     defined at
     <a target="_blank" href="">src/combinatorial.jl:16</a>
 </li>
 </ul>
 
-<a id='ParallelGraphs.edges' href='#ParallelGraphs.edges'>#</a>
-**`ParallelGraphs.edges`** &mdash; *Function*.
+<a id='Graft.edges' href='#Graft.edges'>#</a>
+**`Graft.edges`** &mdash; *Function*.
 
 
 
@@ -313,14 +313,14 @@ Returns an edge iterator containing all edges in the graph
 
 <ul class="documenter-methodtable">
 <li>
-    <pre class="documenter-inline"><span class="nf">edges</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">)</span></pre>
+    <pre class="documenter-inline"><span class="nf">edges</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">)</span></pre>
     defined at
     <a target="_blank" href="">src/combinatorial.jl:20</a>
 </li>
 </ul>
 
-<a id='ParallelGraphs.hasvertex' href='#ParallelGraphs.hasvertex'>#</a>
-**`ParallelGraphs.hasvertex`** &mdash; *Function*.
+<a id='Graft.hasvertex' href='#Graft.hasvertex'>#</a>
+**`Graft.hasvertex`** &mdash; *Function*.
 
 
 
@@ -331,7 +331,7 @@ Check if the vertex(s) exists
 <ul class="documenter-methodtable">
 <li>
     <pre><span class="nf">hasvertex</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n">v</span><span class="p">::</span><span class="n">Int64</span>
 <span class="p">)</span></pre>
     defined at
@@ -339,7 +339,7 @@ Check if the vertex(s) exists
 </li>
 <li>
     <pre><span class="nf">hasvertex</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n">vs</span><span class="p">::</span><span class="n">AbstractArray{Int64,1}</span>
 <span class="p">)</span></pre>
     defined at
@@ -347,8 +347,8 @@ Check if the vertex(s) exists
 </li>
 </ul>
 
-<a id='ParallelGraphs.hasedge' href='#ParallelGraphs.hasedge'>#</a>
-**`ParallelGraphs.hasedge`** &mdash; *Function*.
+<a id='Graft.hasedge' href='#Graft.hasedge'>#</a>
+**`Graft.hasedge`** &mdash; *Function*.
 
 
 
@@ -359,7 +359,7 @@ Check if the edge(s) exists
 <ul class="documenter-methodtable">
 <li>
     <pre><span class="nf">hasedge</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n">e</span><span class="p">::</span><span class="n">Pair{Int64,Int64}</span>
 <span class="p">)</span></pre>
     defined at
@@ -367,7 +367,7 @@ Check if the edge(s) exists
 </li>
 <li>
     <pre><span class="nf">hasedge</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n">es</span><span class="p">::</span><span class="n">AbstractArray{Pair{Int64,Int64},1}</span>
 <span class="p">)</span></pre>
     defined at
@@ -378,8 +378,8 @@ Check if the edge(s) exists
 
 Adjacency queries:
 
-<a id='ParallelGraphs.fadj' href='#ParallelGraphs.fadj'>#</a>
-**`ParallelGraphs.fadj`** &mdash; *Function*.
+<a id='Graft.fadj' href='#Graft.fadj'>#</a>
+**`Graft.fadj`** &mdash; *Function*.
 
 
 
@@ -395,7 +395,7 @@ Vertex v's out-neighbors in the graph
 <ul class="documenter-methodtable">
 <li>
     <pre><span class="nf">fadj</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n">v</span><span class="p">::</span><span class="n">Int64</span>
 <span class="p">)</span></pre>
     defined at
@@ -411,8 +411,8 @@ Vertex v's out-neighbors in the graph
 </li>
 </ul>
 
-<a id='ParallelGraphs.fadj!' href='#ParallelGraphs.fadj!'>#</a>
-**`ParallelGraphs.fadj!`** &mdash; *Function*.
+<a id='Graft.fadj!' href='#Graft.fadj!'>#</a>
+**`Graft.fadj!`** &mdash; *Function*.
 
 
 
@@ -430,7 +430,7 @@ This method copies the adjacencies onto the input array, and is comparitively fa
 <ul class="documenter-methodtable">
 <li>
     <pre><span class="nf">fadj!</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n">v</span><span class="p">::</span><span class="n">Int64</span><span class="p">,
 </span>    <span class="n">adj</span><span class="p">::</span><span class="n">Array{Int64,1}</span>
 <span class="p">)</span></pre>
@@ -448,8 +448,8 @@ This method copies the adjacencies onto the input array, and is comparitively fa
 </li>
 </ul>
 
-<a id='ParallelGraphs.outdegree' href='#ParallelGraphs.outdegree'>#</a>
-**`ParallelGraphs.outdegree`** &mdash; *Function*.
+<a id='Graft.outdegree' href='#Graft.outdegree'>#</a>
+**`Graft.outdegree`** &mdash; *Function*.
 
 
 
@@ -463,7 +463,7 @@ Vertex v's outdegree in the graph
 <ul class="documenter-methodtable">
 <li>
     <pre><span class="nf">outdegree</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n">v</span><span class="p">::</span><span class="n">Int64</span>
 <span class="p">)</span></pre>
     defined at
@@ -479,8 +479,8 @@ Vertex v's outdegree in the graph
 </li>
 </ul>
 
-<a id='ParallelGraphs.indegree' href='#ParallelGraphs.indegree'>#</a>
-**`ParallelGraphs.indegree`** &mdash; *Function*.
+<a id='Graft.indegree' href='#Graft.indegree'>#</a>
+**`Graft.indegree`** &mdash; *Function*.
 
 
 
@@ -494,7 +494,7 @@ Vertex v's indegree in the graph
 <ul class="documenter-methodtable">
 <li>
     <pre><span class="nf">indegree</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n">v</span><span class="p">::</span><span class="n">Int64</span>
 <span class="p">)</span></pre>
     defined at
@@ -518,40 +518,40 @@ Vertex v's indegree in the graph
 
 Graphs can be modified using the following methods:
 
-<a id='ParallelGraphs.addvertex!-Tuple{ParallelGraphs.Graph}' href='#ParallelGraphs.addvertex!-Tuple{ParallelGraphs.Graph}'>#</a>
-**`ParallelGraphs.addvertex!`** &mdash; *Method*.
+<a id='Graft.addvertex!-Tuple{Graft.Graph}' href='#Graft.addvertex!-Tuple{Graft.Graph}'>#</a>
+**`Graft.addvertex!`** &mdash; *Method*.
 
 
 
 Add a vertex to the graph. Returns the label of the new vertex 
 
-<a id='ParallelGraphs.addvertex!-Tuple{ParallelGraphs.Graph,Any}' href='#ParallelGraphs.addvertex!-Tuple{ParallelGraphs.Graph,Any}'>#</a>
-**`ParallelGraphs.addvertex!`** &mdash; *Method*.
+<a id='Graft.addvertex!-Tuple{Graft.Graph,Any}' href='#Graft.addvertex!-Tuple{Graft.Graph,Any}'>#</a>
+**`Graft.addvertex!`** &mdash; *Method*.
 
 
-<a id='ParallelGraphs.addedge!-Tuple{ParallelGraphs.Graph,Pair{Int64,Int64}}' href='#ParallelGraphs.addedge!-Tuple{ParallelGraphs.Graph,Pair{Int64,Int64}}'>#</a>
-**`ParallelGraphs.addedge!`** &mdash; *Method*.
+<a id='Graft.addedge!-Tuple{Graft.Graph,Pair{Int64,Int64}}' href='#Graft.addedge!-Tuple{Graft.Graph,Pair{Int64,Int64}}'>#</a>
+**`Graft.addedge!`** &mdash; *Method*.
 
 
 
 Add an edge to the graph. Returns true if successfull 
 
-<a id='ParallelGraphs.rmvertex!-Tuple{ParallelGraphs.Graph,Int64}' href='#ParallelGraphs.rmvertex!-Tuple{ParallelGraphs.Graph,Int64}'>#</a>
-**`ParallelGraphs.rmvertex!`** &mdash; *Method*.
+<a id='Graft.rmvertex!-Tuple{Graft.Graph,Int64}' href='#Graft.rmvertex!-Tuple{Graft.Graph,Int64}'>#</a>
+**`Graft.rmvertex!`** &mdash; *Method*.
 
 
 
 Remove a vertex from the graph 
 
-<a id='ParallelGraphs.rmvertex!-Tuple{ParallelGraphs.Graph,AbstractArray{Int64,1}}' href='#ParallelGraphs.rmvertex!-Tuple{ParallelGraphs.Graph,AbstractArray{Int64,1}}'>#</a>
-**`ParallelGraphs.rmvertex!`** &mdash; *Method*.
+<a id='Graft.rmvertex!-Tuple{Graft.Graph,AbstractArray{Int64,1}}' href='#Graft.rmvertex!-Tuple{Graft.Graph,AbstractArray{Int64,1}}'>#</a>
+**`Graft.rmvertex!`** &mdash; *Method*.
 
 
 
 Remove a list of vertices from the graph 
 
-<a id='ParallelGraphs.rmedge!-Tuple{ParallelGraphs.Graph,Pair{Int64,Int64}}' href='#ParallelGraphs.rmedge!-Tuple{ParallelGraphs.Graph,Pair{Int64,Int64}}'>#</a>
-**`ParallelGraphs.rmedge!`** &mdash; *Method*.
+<a id='Graft.rmedge!-Tuple{Graft.Graph,Pair{Int64,Int64}}' href='#Graft.rmedge!-Tuple{Graft.Graph,Pair{Int64,Int64}}'>#</a>
+**`Graft.rmedge!`** &mdash; *Method*.
 
 
 
@@ -565,22 +565,22 @@ Remove an edge from the graph
 
 New labels can be added or removed through the following methods:
 
-<a id='ParallelGraphs.setlabel!-Tuple{ParallelGraphs.Graph,Array{T,1}}' href='#ParallelGraphs.setlabel!-Tuple{ParallelGraphs.Graph,Array{T,1}}'>#</a>
-**`ParallelGraphs.setlabel!`** &mdash; *Method*.
+<a id='Graft.setlabel!-Tuple{Graft.Graph,Array{T,1}}' href='#Graft.setlabel!-Tuple{Graft.Graph,Array{T,1}}'>#</a>
+**`Graft.setlabel!`** &mdash; *Method*.
 
 
 
 Set labels for all vertices in the graph 
 
-<a id='ParallelGraphs.setlabel!-Tuple{ParallelGraphs.Graph,Symbol}' href='#ParallelGraphs.setlabel!-Tuple{ParallelGraphs.Graph,Symbol}'>#</a>
-**`ParallelGraphs.setlabel!`** &mdash; *Method*.
+<a id='Graft.setlabel!-Tuple{Graft.Graph,Symbol}' href='#Graft.setlabel!-Tuple{Graft.Graph,Symbol}'>#</a>
+**`Graft.setlabel!`** &mdash; *Method*.
 
 
 
 Use a vertex property as the vertex label 
 
-<a id='ParallelGraphs.setlabel!-Tuple{ParallelGraphs.Graph}' href='#ParallelGraphs.setlabel!-Tuple{ParallelGraphs.Graph}'>#</a>
-**`ParallelGraphs.setlabel!`** &mdash; *Method*.
+<a id='Graft.setlabel!-Tuple{Graft.Graph}' href='#Graft.setlabel!-Tuple{Graft.Graph}'>#</a>
+**`Graft.setlabel!`** &mdash; *Method*.
 
 
 
@@ -589,15 +589,15 @@ Remove all vertex labels
 
 Labels can be modified through the following methods:
 
-<a id='ParallelGraphs.relabel!-Tuple{ParallelGraphs.Graph,Int64,Any}' href='#ParallelGraphs.relabel!-Tuple{ParallelGraphs.Graph,Int64,Any}'>#</a>
-**`ParallelGraphs.relabel!`** &mdash; *Method*.
+<a id='Graft.relabel!-Tuple{Graft.Graph,Int64,Any}' href='#Graft.relabel!-Tuple{Graft.Graph,Int64,Any}'>#</a>
+**`Graft.relabel!`** &mdash; *Method*.
 
 
 
 Relabel a single vertex in the graph 
 
-<a id='ParallelGraphs.relabel!-Tuple{ParallelGraphs.Graph,AbstractArray{Int64,1},Array{T,1}}' href='#ParallelGraphs.relabel!-Tuple{ParallelGraphs.Graph,AbstractArray{Int64,1},Array{T,1}}'>#</a>
-**`ParallelGraphs.relabel!`** &mdash; *Method*.
+<a id='Graft.relabel!-Tuple{Graft.Graph,AbstractArray{Int64,1},Array{T,1}}' href='#Graft.relabel!-Tuple{Graft.Graph,AbstractArray{Int64,1},Array{T,1}}'>#</a>
+**`Graft.relabel!`** &mdash; *Method*.
 
 
 
@@ -619,8 +619,8 @@ The EdgeIter type provides alloc-free and fast edge iteration.
 
 ### Construction
 
-<a id='ParallelGraphs.edges-Tuple{ParallelGraphs.Graph}' href='#ParallelGraphs.edges-Tuple{ParallelGraphs.Graph}'>#</a>
-**`ParallelGraphs.edges`** &mdash; *Method*.
+<a id='Graft.edges-Tuple{Graft.Graph}' href='#Graft.edges-Tuple{Graft.Graph}'>#</a>
+**`Graft.edges`** &mdash; *Method*.
 
 
 
@@ -631,21 +631,21 @@ Returns an edge iterator containing all edges in the graph
 
 ### Getindex
 
-<a id='Base.getindex-Tuple{ParallelGraphs.EdgeIter,Int64}' href='#Base.getindex-Tuple{ParallelGraphs.EdgeIter,Int64}'>#</a>
+<a id='Base.getindex-Tuple{Graft.EdgeIter,Int64}' href='#Base.getindex-Tuple{Graft.EdgeIter,Int64}'>#</a>
 **`Base.getindex`** &mdash; *Method*.
 
 
 
 Get the ith edge in the iterator 
 
-<a id='Base.getindex-Tuple{ParallelGraphs.EdgeIter,AbstractArray{Int64,1}}' href='#Base.getindex-Tuple{ParallelGraphs.EdgeIter,AbstractArray{Int64,1}}'>#</a>
+<a id='Base.getindex-Tuple{Graft.EdgeIter,AbstractArray{Int64,1}}' href='#Base.getindex-Tuple{Graft.EdgeIter,AbstractArray{Int64,1}}'>#</a>
 **`Base.getindex`** &mdash; *Method*.
 
 
 
 Get a new iterator containing a subset of the edges 
 
-<a id='Base.getindex-Tuple{ParallelGraphs.EdgeIter,Colon}' href='#Base.getindex-Tuple{ParallelGraphs.EdgeIter,Colon}'>#</a>
+<a id='Base.getindex-Tuple{Graft.EdgeIter,Colon}' href='#Base.getindex-Tuple{Graft.EdgeIter,Colon}'>#</a>
 **`Base.getindex`** &mdash; *Method*.
 
 
@@ -657,7 +657,7 @@ Get a copy of the iterator
 
 ### Concatenation
 
-<a id='Base.vcat-Tuple{ParallelGraphs.EdgeIter,ParallelGraphs.EdgeIter}' href='#Base.vcat-Tuple{ParallelGraphs.EdgeIter,ParallelGraphs.EdgeIter}'>#</a>
+<a id='Base.vcat-Tuple{Graft.EdgeIter,Graft.EdgeIter}' href='#Base.vcat-Tuple{Graft.EdgeIter,Graft.EdgeIter}'>#</a>
 **`Base.vcat`** &mdash; *Method*.
 
 
@@ -671,7 +671,7 @@ Concatenate two iterators
 
 
 ```julia
-using ParallelGraphs
+using Graft
 
 g = completegraph(3)
 
@@ -710,8 +710,8 @@ end
 
 ### Setting vertex metadata
 
-<a id='ParallelGraphs.setvprop!' href='#ParallelGraphs.setvprop!'>#</a>
-**`ParallelGraphs.setvprop!`** &mdash; *Function*.
+<a id='Graft.setvprop!' href='#Graft.setvprop!'>#</a>
+**`Graft.setvprop!`** &mdash; *Function*.
 
 
 
@@ -730,7 +730,7 @@ setvprop!(g::Graph, ::Colon, val(s), vprop::Symbol) -> Set a property for all ve
 <ul class="documenter-methodtable">
 <li>
     <pre><span class="nf">setvprop!</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n">v</span><span class="p">::</span><span class="n">Int64</span><span class="p">,
 </span>    <span class="n">val</span><span class="p">,
 </span>    <span class="n">vprop</span><span class="p">::</span><span class="n">Symbol</span>
@@ -740,7 +740,7 @@ setvprop!(g::Graph, ::Colon, val(s), vprop::Symbol) -> Set a property for all ve
 </li>
 <li>
     <pre><span class="nf">setvprop!</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n">vs</span><span class="p">::</span><span class="n">AbstractArray{Int64,1}</span><span class="p">,
 </span>    <span class="n">val</span><span class="p">,
 </span>    <span class="n">vprop</span><span class="p">::</span><span class="n">Symbol</span>
@@ -750,7 +750,7 @@ setvprop!(g::Graph, ::Colon, val(s), vprop::Symbol) -> Set a property for all ve
 </li>
 <li>
     <pre><span class="nf">setvprop!</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n"></span><span class="p">::</span><span class="n">Colon</span><span class="p">,
 </span>    <span class="n">vals</span><span class="p">::</span><span class="n">AbstractArray{T<:Any,1}</span><span class="p">,
 </span>    <span class="n">vprop</span><span class="p">::</span><span class="n">Symbol</span>
@@ -760,7 +760,7 @@ setvprop!(g::Graph, ::Colon, val(s), vprop::Symbol) -> Set a property for all ve
 </li>
 <li>
     <pre><span class="nf">setvprop!</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n"></span><span class="p">::</span><span class="n">Colon</span><span class="p">,
 </span>    <span class="n">val</span><span class="p">,
 </span>    <span class="n">vprop</span><span class="p">::</span><span class="n">Symbol</span>
@@ -775,8 +775,8 @@ setvprop!(g::Graph, ::Colon, val(s), vprop::Symbol) -> Set a property for all ve
 
 ### Retrieving vertex metadata
 
-<a id='ParallelGraphs.getvprop' href='#ParallelGraphs.getvprop'>#</a>
-**`ParallelGraphs.getvprop`** &mdash; *Function*.
+<a id='Graft.getvprop' href='#Graft.getvprop'>#</a>
+**`Graft.getvprop`** &mdash; *Function*.
 
 
 
@@ -795,7 +795,7 @@ getvprop(g::Graph, ::Colon, vprop::Symbol) -> Fetch the value of a property for 
 <ul class="documenter-methodtable">
 <li>
     <pre><span class="nf">getvprop</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n"></span><span class="p">::</span><span class="n">Colon</span><span class="p">,
 </span>    <span class="n">vprop</span><span class="p">::</span><span class="n">Symbol</span>
 <span class="p">)</span></pre>
@@ -804,7 +804,7 @@ getvprop(g::Graph, ::Colon, vprop::Symbol) -> Fetch the value of a property for 
 </li>
 <li>
     <pre><span class="nf">getvprop</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n">v</span><span class="p">::</span><span class="n">Int64</span><span class="p">,
 </span>    <span class="n">vprop</span><span class="p">::</span><span class="n">Symbol</span>
 <span class="p">)</span></pre>
@@ -813,7 +813,7 @@ getvprop(g::Graph, ::Colon, vprop::Symbol) -> Fetch the value of a property for 
 </li>
 <li>
     <pre><span class="nf">getvprop</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n">vs</span><span class="p">::</span><span class="n">AbstractArray{Int64,1}</span><span class="p">,
 </span>    <span class="n">vprop</span><span class="p">::</span><span class="n">Symbol</span>
 <span class="p">)</span></pre>
@@ -827,8 +827,8 @@ getvprop(g::Graph, ::Colon, vprop::Symbol) -> Fetch the value of a property for 
 
 ### Setting edge metadata
 
-<a id='ParallelGraphs.seteprop!' href='#ParallelGraphs.seteprop!'>#</a>
-**`ParallelGraphs.seteprop!`** &mdash; *Function*.
+<a id='Graft.seteprop!' href='#Graft.seteprop!'>#</a>
+**`Graft.seteprop!`** &mdash; *Function*.
 
 
 
@@ -847,7 +847,7 @@ seteprop!(g::Graph, ::Colon, val(s), eprop::Symbol)
 <ul class="documenter-methodtable">
 <li>
     <pre><span class="nf">seteprop!</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n">e</span><span class="p">::</span><span class="n">Pair{Int64,Int64}</span><span class="p">,
 </span>    <span class="n">val</span><span class="p">,
 </span>    <span class="n">eprop</span><span class="p">::</span><span class="n">Symbol</span>
@@ -857,7 +857,7 @@ seteprop!(g::Graph, ::Colon, val(s), eprop::Symbol)
 </li>
 <li>
     <pre><span class="nf">seteprop!</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n">es</span><span class="p">::</span><span class="n">AbstractArray{Pair{Int64,Int64},1}</span><span class="p">,
 </span>    <span class="n">val</span><span class="p">,
 </span>    <span class="n">eprop</span><span class="p">::</span><span class="n">Symbol</span>
@@ -867,7 +867,7 @@ seteprop!(g::Graph, ::Colon, val(s), eprop::Symbol)
 </li>
 <li>
     <pre><span class="nf">seteprop!</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n"></span><span class="p">::</span><span class="n">Colon</span><span class="p">,
 </span>    <span class="n">vals</span><span class="p">::</span><span class="n">AbstractArray{T<:Any,1}</span><span class="p">,
 </span>    <span class="n">eprop</span><span class="p">::</span><span class="n">Symbol</span>
@@ -877,7 +877,7 @@ seteprop!(g::Graph, ::Colon, val(s), eprop::Symbol)
 </li>
 <li>
     <pre><span class="nf">seteprop!</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n"></span><span class="p">::</span><span class="n">Colon</span><span class="p">,
 </span>    <span class="n">val</span><span class="p">,
 </span>    <span class="n">eprop</span><span class="p">::</span><span class="n">Symbol</span>
@@ -892,8 +892,8 @@ seteprop!(g::Graph, ::Colon, val(s), eprop::Symbol)
 
 ### Retrieving edge metadata
 
-<a id='ParallelGraphs.geteprop' href='#ParallelGraphs.geteprop'>#</a>
-**`ParallelGraphs.geteprop`** &mdash; *Function*.
+<a id='Graft.geteprop' href='#Graft.geteprop'>#</a>
+**`Graft.geteprop`** &mdash; *Function*.
 
 
 
@@ -912,7 +912,7 @@ geteprop(g::Graph, ::Colon, eprop::Symbol) -> Fetch the value of a property for 
 <ul class="documenter-methodtable">
 <li>
     <pre><span class="nf">geteprop</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n"></span><span class="p">::</span><span class="n">Colon</span><span class="p">,
 </span>    <span class="n">eprop</span><span class="p">::</span><span class="n">Symbol</span>
 <span class="p">)</span></pre>
@@ -921,7 +921,7 @@ geteprop(g::Graph, ::Colon, eprop::Symbol) -> Fetch the value of a property for 
 </li>
 <li>
     <pre><span class="nf">geteprop</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n">e</span><span class="p">::</span><span class="n">Pair{Int64,Int64}</span><span class="p">,
 </span>    <span class="n">eprop</span><span class="p">::</span><span class="n">Symbol</span>
 <span class="p">)</span></pre>
@@ -930,7 +930,7 @@ geteprop(g::Graph, ::Colon, eprop::Symbol) -> Fetch the value of a property for 
 </li>
 <li>
     <pre><span class="nf">geteprop</span><span class="p">(</span>
-    <span class="n">g</span><span class="p">::</span><span class="n">ParallelGraphs.Graph</span><span class="p">,
+    <span class="n">g</span><span class="p">::</span><span class="n">Graft.Graph</span><span class="p">,
 </span>    <span class="n">es</span><span class="p">::</span><span class="n">AbstractArray{Pair{Int64,Int64},1}</span><span class="p">,
 </span>    <span class="n">eprop</span><span class="p">::</span><span class="n">Symbol</span>
 <span class="p">)</span></pre>
@@ -1007,7 +1007,7 @@ The abstractions can be chained together using the pipe notation, so that the ou
 
 
 ```julia
-using ParallelGraphs
+using Graft
 g = randgraph(10, [:p1, :p2], [:p1, :p2])
 
 # Run a filter using vertex properties
@@ -1020,7 +1020,7 @@ Graph(1 vertices, 0 edges, Symbol[:p1,:p2] vertex properties, Symbol[:p1,:p2] ed
 
 
 ```julia
-using ParallelGraphs
+using Graft
 g = randgraph(10, [:p1, :p2], [:p1, :p2])
 
 # Run a filter using source and target properties
@@ -1033,7 +1033,7 @@ Graph(10 vertices, 26 edges, Symbol[:p1,:p2] vertex properties, Symbol[:p1,:p2] 
 
 
 ```julia
-using ParallelGraphs
+using Graft
 g = randgraph(10, [:p1, :p2], [:p1, :p2])
 
 # Run filter using edge properties
@@ -1046,7 +1046,7 @@ Graph(10 vertices, 61 edges, Symbol[:p1,:p2] vertex properties, Symbol[:p1,:p2] 
 
 
 ```julia
-using ParallelGraphs
+using Graft
 g = randgraph(10, [:p1, :p2], [:p1, :p2])
 
 # Chain filter expressions
@@ -1059,7 +1059,7 @@ Graph(6 vertices, 0 edges, Symbol[:p1,:p2] vertex properties, Symbol[:p1,:p2] ed
 
 
 ```julia
-using ParallelGraphs
+using Graft
 g = randgraph(10, [:p1, :p2], [:p1, :p2])
 
 # Select properties
@@ -1072,7 +1072,7 @@ Graph(7 vertices, 42 edges, Symbol[:p2] vertex properties, Symbol[:p1] edge prop
 
 
 ```julia
-using ParallelGraphs
+using Graft
 g = randgraph(10, [:p1, :p2], [:p1, :p2])
 
 # Run an expression on each vertex
@@ -1095,7 +1095,7 @@ g = randgraph(10, [:p1, :p2], [:p1, :p2])
 
 
 ```@example
-using ParallelGraphs
+using Graft
 g = randgraph(10, [:p1, :p2], [:p1, :p2])
 
 # Run an expression on each edge
