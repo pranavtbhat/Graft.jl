@@ -162,7 +162,8 @@ haslabel(x::DictLM, l) = haskey(fmap(x), l)
 
 ################################################# DECODE VERTEX #######################################################
 """ Translate a vertex label into the internally used vertex identifier """
-decode(x::IdentityLM, v::VertexID) = v
+decode(x::IdentityLM, v::VertexID) = 1 <= v <= nv(x) ? v : error("Couldn't decode vertex label $v")
+
 decode(x::IdentityLM, l) = error("Couldn't decode vertex label $l")
 
 function decode(x::DictLM, l)

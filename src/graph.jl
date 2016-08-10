@@ -53,15 +53,6 @@ edata(g::Graph) = g.edata
 """ Retrieve the label map """
 lmap(g::Graph)  = g.lmap
 
-# Make the graph type iterable
-Base.start(g::Graph) = 1
-Base.done(g::Graph, i) = i == 3
-
-function Base.next(g::Graph, i)
-   i == 1 && return vdata(g), 2
-   i == 2 && return edata(g), 3
-end
-
 #################################################  BASICS ###################################################################
 
 (==)(g1::Graph, g2::Graph) = nv(g1) == nv(g2) && edges(g1) == edges(g2) && lmap(g1) == lmap(g2)
@@ -147,6 +138,4 @@ encode(g::Graph, x) = encode(lmap(g), x)
 
 ################################################# DISPLAY ##################################################################
 
-function Base.show(io::IO, g::Graph)
-   write(io, "Graph($(nv(g)) vertices, $(ne(g)) edges, $(listvprops(g)) vertex properties, $(listeprops(g)) edge properties)")
-end
+include("display.jl")
