@@ -17,7 +17,7 @@ include("util.jl")
 include("edgeiter.jl")
 
 # SparseMatrixCSC compatibilty
-include("SparseMatrixCSC.jl")
+include("sparsematrix.jl")
 
 # Vertex Labelling
 include("labelmap.jl")

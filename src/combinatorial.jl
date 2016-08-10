@@ -8,15 +8,15 @@ export nv, ne, vertices, edges, hasvertex, hasedge, fadj, fadj!, outdegree, inde
 
 ################################################# COMBINATORIAL BASICS ######################################################
 
-""" Return V x E """
+""" Return nv(g) x ne(g) """
 Base.size(g::Graph) = (g.nv,g.ne)
 
 
-""" Return a list of the vertices in the graph """
+""" The list of the vertices in the graph """
 vertices(g::Graph) = 1 : nv(g)
 
 
-""" A list of edges in the graph """
+""" Returns an edge iterator containing all edges in the graph """
 edges(g::Graph) = EdgeIter(indxs(g))
 
 
@@ -33,6 +33,13 @@ hasedge(g::Graph, es::EdgeList) = indxs(g)[es] .> 0
 
 """ Vertex v's out-neighbors in the graph """
 fadj(g::Graph, v::VertexID) = fadj(indxs(g), v)
+
+"""
+Retrieve a list of vertices connect to vertex v.
+
+This method copies the adjacencies onto the input array,
+and is comparitively faster, and causes no mallocs.
+"""
 fadj!(g::Graph, v::VertexID, adj::Vector{Int}) = fadj!(indxs(g), v, adj)
 
 
@@ -43,9 +50,8 @@ outdegree(g::Graph, v::VertexID) = outdegree(indxs(g), v)
 """ Vertex v's indegree in the graph """
 indegree(g::Graph, v::VertexID) = indegree(indxs(g), v)
 
-###
-# GRAPH GETINDEX FOR ADJ
-###
+
+""" Shorcut to vertex v's out-neighbors in the graph """
 function Base.getindex(g::Graph, v)
    encode(g, fadj(g, decode(g, v)))
 end

@@ -9,7 +9,7 @@ import ParallelGraphs: randindxs, completeindxs
 ###
 include("util.jl")
 
-include("SparseMatrixCSC.jl")
+include("sparsematrix.jl")
 
 include("edgeiter.jl")
 

@@ -107,6 +107,9 @@ bfs_list(g::Graph, seed::Int, hopstart::Int=1, hopend::Number=Inf) = bfs_list(g,
 
 ################################################# BFSTREE ###############################################################
 
+"""
+Returns a BFS tree, containing explored vertices and only tree edges.
+"""
 function bfs_tree(g::Graph, seed::Int, hopend::Number=Inf)
    parvec = bfs(g, seed, hopend)
 
@@ -127,7 +130,10 @@ function bfs_tree(g::Graph, seed::Int, hopend::Number=Inf)
 end
 
 ################################################# BFSSUBGRAPH #############################################################
-
+"""
+Returns a BFS subgraph, containing explored vertices and all edges between
+them.
+"""
 function bfs_subgraph(g::Graph, seed::Int, hopend::Number)
    vs = unshift!(bfs_list(g, seed, 1, hopend), seed)
    subgraph(g, vs)

@@ -95,6 +95,7 @@ function rmvertex!(g::Graph, v::VertexID)
    end
 end
 
+""" Remove a list of vertices from the graph """
 function rmvertex!(g::Graph, vs::VertexList)
    if all(hasvertex(g, vs))
       g.nv -= length(vs)
@@ -122,23 +123,18 @@ function rmvertex!(g::Graph, vs::VertexList)
    end
 end
 
-###
-# - for RMVERTEX
-###
+
+""" Remove a labelled vertex from the graph """
 (-)(g::Graph, x) = rmvertex!(g, decode(g, x))
 
+""" Remove a list of labelled vertices from the graph """
 function (-)(g::Graph, xs::Vector)
-   if isa(lmap(g), IdentityLM)
-      error("Unsafe removal of multiple unlabelled vertices!")
-   else
-      for x in xs
-         g - x
-      end
-   end
+   rmvertex!(g, decode(g, xs))
 end
 
 ################################################# RMEDGE! ####################################################################
 
+""" Remove an edge from the graph """
 function rmedge!(g::Graph, e::EdgeID)
    if hasedge(g, e)
       g.ne -= 1

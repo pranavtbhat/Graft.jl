@@ -1,6 +1,15 @@
 ################################################# FILE DESCRIPTION #########################################################
 
-# This file contains the core graph definitions.
+# The Graph datatype is the core datastructure used in Graft.jl. The Graph datatype has the following fields:
+# 1. nv     : The number of vertices in the graph.
+# 2. ne     : The number of edges int he graph.
+# 3. indxs  : The adjacency matrix for the graph. The SparseMatrixCSC type is used here, both
+#             as an adjacency matrix and as an index table, that maps edges onto their entries in the
+#             edge dataframe.
+# 4. vdata  : A dataframe used to store vertex data. This dataframe is indexed by the internally used
+#             vertex identifiers.
+# 5. edata  : An edge dataframe used to store edge data. This dataframe is indexed by indxs datastructure.
+# 6. lmap   : A label map that maps externally used labels onto the internally used vertex identifiers and vice versa.
 
 ################################################# IMPORT/EXPORT ############################################################
 export
@@ -9,7 +18,7 @@ Graph,
 # Subgraph
 subgraph,
 # Methods
-indxs, vdata, edata
+indxs, vdata, edata, lmap
 
 type Graph
    nv::Int
@@ -32,9 +41,16 @@ nv(g::Graph) = g.nv
 """ The number of edges in the graph """
 ne(g::Graph) = g.ne
 
+""" Retrieve the adjacency matrix / edge index table """
 indxs(g::Graph) = g.indxs
+
+""" Retrieve the vertex dataframe """
 vdata(g::Graph) = g.vdata
+
+""" Retrieve the edge dataframe """
 edata(g::Graph) = g.edata
+
+""" Retrieve the label map """
 lmap(g::Graph)  = g.lmap
 
 # Make the graph type iterable
@@ -79,9 +95,7 @@ include("edata.jl")
 
 ################################################# LABELLING ################################################################
 
-###
-# SETLABEL
-###
+""" Set labels for all vertices in the graph """
 function setlabel!(g::Graph, ls::Vector)
    if length(ls) == nv(g)
       g.lmap = setlabel!(lmap(g), ls)
@@ -91,53 +105,48 @@ function setlabel!(g::Graph, ls::Vector)
    end
 end
 
+""" Use a vertex property as the vertex label """
 function setlabel!(g::Graph, propname::Symbol)
    ls = getvprop(g, :, propname)
    g.lmap = setlabel!(lmap(g), ls)
    return
 end
 
+""" Remove all vertex labels """
 function setlabel!(g::Graph)
    g.lmap = setlabel!(lmap(g))
    return
 end
 
 
-###
-# RELABEL
-###
+""" Relabel a single vertex in the graph """
 function relabel!(g::Graph, v::VertexID, l)
    g.lmap = relabel!(lmap(g), v, l)
    return
 end
 
+""" Relabel a list of vertices in the graph """
 function relabel!(g::Graph, vs::VertexList, ls::AbstractVector)
    g.lmap = relabel!(lmap(g), vs, ls)
    return
 end
 
 
-###
-# HALABEL
-###
+""" Check if the input label is valid """
 haslabel(g::Graph, x) = haslabel(lmap(g), x)
 
 
-###
-# DECODE
-###
+""" Translate the input label into the internally used vertex identifier """
 decode(g::Graph, x) = decode(lmap(g), x)
 
 
 
-###
-# ENCODE
-###
+""" Translate the input vertex identifier into its externally used label """
 encode(g::Graph) = encode(lmap(g))
 encode(g::Graph, x) = encode(lmap(g), x)
 
 ################################################# DISPLAY ##################################################################
 
 function Base.show(io::IO, g::Graph)
-   write(io, "Graph with $(nv(g)) vertices and $(ne(g)) edges")
+   write(io, "Graph($(nv(g)) vertices, $(ne(g)) edges, $(listvprops(g)) vertex properties, $(listeprops(g)) edge properties)")
 end

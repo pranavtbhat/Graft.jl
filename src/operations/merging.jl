@@ -5,10 +5,11 @@
 ################################################# IMPORT/EXPORT ############################################################
 
 ################################################# ADJACENCY ################################################################
-###
-# TODO: Merge edge vertex properties, edge properties and labels
-###
-function Base.merge(g1::Graph, g2::Graph)
+"""
+Merge two graphs into one. Currently this method assumes that both graphs have the
+same vertices, and doesn't combine their data, but does a union on their edges.
+"""
+function Base.merge(g1::Graph, g2::Graph) # TODO: Merge edge vertex properties, edge properties and labels
    if nv(g1) != nv(g2)
       error("Both graphs must have the same vertices")
    end
@@ -19,6 +20,6 @@ function Base.merge(g1::Graph, g2::Graph)
    reorder!(sv)
 
    Ne = nnz(sv)
-   
+
    Graph(Nv, Ne, sv, DataFrame(), DataFrame(), IdentityLM(Nv))
 end

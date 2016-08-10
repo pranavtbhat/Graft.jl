@@ -8,11 +8,13 @@ export listvprops, hasvprop, getvprop, setvprop!
 
 ################################################# MUTATION #################################################################
 
+""" Add a row to the vertex dataframe """
 function addvertex!(x::AbstractDataFrame)
    push!(x, @data fill(NA, ncol(x)))
    return
 end
 
+""" Remove a row from the vertex dataframe """
 function rmvertex!(x::AbstractDataFrame, vs)
    if !isempty(x)
       deleterows!(x, vs)
@@ -21,8 +23,10 @@ end
 
 ################################################# PROPERTY ACCESSORS #######################################################
 
+""" List the column headers in the vertex dataframe """
 listvprops(g::Graph) = names(vdata(g))
 
+""" Check if the vertex dataframe has the input column """
 hasvprop(g::Graph, prop::Symbol) = haskey(vdata(g), prop)
 
 ################################################# GETVPROP #################################################################
@@ -80,6 +84,9 @@ setvprop!(g::Graph, ::Colon, val, vprop::Symbol) = setvprop!(g, :, fill(val, nv(
 
 ################################################# SUBGRAPHING ##############################################################
 
-subgraph(x::AbstractDataFrame, vs::VertexList) = x[vs,:]
+""" Return a sub-dataframe for a list of vertices """
+subgraph(x::AbstractDataFrame, vs::VertexList) = x[vs,:] # TODO: Do this with 1D indexing
 
-subgraph(x::AbstractDataFrame, vs::VertexList, vprops::Vector{Symbol}) = x[vs,vprops]
+
+""" Return a sub-dataframe for a list of vertices, containing a subset of properties """
+subgraph(x::AbstractDataFrame, vs::VertexList, vprops::Vector{Symbol}) = x[vs,vprops] # TODO: Do this with 1D indexing

@@ -1,3 +1,6 @@
 using Documenter, ParallelGraphs
 
-makedocs()
+makedocs(
+   # Options
+   modules=[ParallelGraphs]
+)

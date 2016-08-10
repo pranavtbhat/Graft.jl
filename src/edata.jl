@@ -8,25 +8,28 @@ export listeprops, haseprop, geteprop, seteprop!
 
 ################################################# MUTATION #################################################################
 
-# Use this to reorder the rows Edge DataFrame, so that they align perfectly with the index table.
+""" Reorder the edge dataframe to match the order of edges in the index table """
 function reorder!(x::AbstractDataFrame, indxs::Vector{Int})
    for eprop in names(x)
       x[eprop] = x[eprop][indxs]
    end
 end
 
+""" Add a new row to the edge dataframe """
 function addedge!(x::AbstractDataFrame)
    if !isempty(x)
       push!(x, @data fill(NA, ncol(x)))
    end
 end
 
+""" Remove a row from the edge dataframe """
 function rmedge!(x::AbstractDataFrame, erow::Int)
    if !isempty(x)
       deleterows!(x, erow)
    end
 end
 
+""" Remove a row from the edge dataframe """
 function rmedge!(x::AbstractDataFrame, erows::AbstractVector{Int})
    erows = unique(sort(erows))
    for prop in names(x)
@@ -36,8 +39,10 @@ end
 
 ################################################# EPROPS ACCESSORS ##########################################################
 
+""" List the column headers of the edge dataframe """
 listeprops(g::Graph) = names(edata(g))
 
+""" Check if the edge dataframe has the input edge property """
 haseprop(g::Graph, eprop::Symbol) = haskey(edata(g), eprop)
 
 ################################################# GETEPROP ##################################################################
@@ -97,6 +102,11 @@ seteprop!(g::Graph, ::Colon, val, eprop::Symbol) = seteprop!(g, :, fill(val, ne(
 
 ################################################# SUBGRAPH #################################################################
 
+""" Retrieve a subset of the edge dataframe for the input edges """
 subgraph(x::AbstractDataFrame, es::EdgeList) = edata(g)[indxs(g)[es],:]
 
+"""
+Retrieve a subset of the edge dataframe for the input edges, containing a
+subset of the edge properties
+"""
 subgraph(x::AbstractDataFrame, es::EdgeList, eprops::Vector{Symbol}) = edata(g)[indxs(g)[es], eprops]

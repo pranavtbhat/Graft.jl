@@ -55,6 +55,21 @@ emptygraph(nv::Int) = Graph(nv)
 randgraph(nv::Int, ne::Int) = Graph(nv, ne)
 randgraph(nv::Int) = Graph(nv, rand(1 : (nv * (nv-1))))
 
+""" Returns a small completegraph with properties(for doc examples) """
+function randgraph(nv::Int, vprops::Vector{Symbol}, eprops::Vector{Symbol})
+   g = completegraph(nv)
+
+   for prop in vprops
+      setvprop!(g, :, rand(nv), prop)
+   end
+
+   for prop in eprops
+      seteprop!(g, :, rand(ne(g)), prop)
+   end
+
+   return g
+end
+
 ###
 # TODO: MORE RANDOM GENERATORS
 ###

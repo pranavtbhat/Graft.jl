@@ -5,10 +5,6 @@
 ################################################# IMPORT/EXPORT ############################################################
 
 export
-# Types
-Node,
-# Methods
-parsequery, queryexec,
 # Macros
 @query
 
@@ -32,7 +28,6 @@ include("query/exec.jl")
 
 ################################################# MACROS ####################################################################
 
-# Macro for Pipe schematics
 macro query(x)
    cache = Dict()
    dag = parsequery(cache, x)

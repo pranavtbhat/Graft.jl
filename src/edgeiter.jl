@@ -6,7 +6,9 @@
 
 export EdgeIter
 
-""" An abstraction for alloc-free, fast edge iteration """
+"""
+An abstraction for alloc-free, fast edge iteration
+"""
 type EdgeIter <: EdgeList
    m::Int
    us::Vector{Int}
@@ -15,25 +17,25 @@ end
 
 ################################################# CONSTRUCTORS #############################################################
 
-# Return an iterator with all edges in x
+""" An iterator containing all edges in an adjacency matrix """
 function EdgeIter(x::SparseMatrixCSC{Int})
    vs, us = findn(x)
    EdgeIter(nnz(x), us, vs)
 end
 
-# Return an iterator containing edge from v
+""" An iterator containing all edges starting from a vertex """
 function EdgeIter(x::SparseMatrixCSC{Int}, v::Int)
    adj = fadj(x, v)
    m = length(adj)
    EdgeIter(m, fill(v, m), adj)
 end
 
-# Return an iterator containing edges to v
+""" An iterator containing all edges ending at a vertex """
 function EdgeIter(x::SparseMatrixCSC{Int}, ::Colon, v::VertexID)
    EdgeIter(x.', v).'
 end
 
-# Return an iterator containing edges starting from v in vs
+""" An iterator containing all edges starting at a list of vertices """
 function EdgeIter(x::SparseMatrixCSC{Int}, vlist::VertexList)
    Nerows = sum([outdegree(x, v) for v in vlist])
    us = Vector{Int}(Nerows)
@@ -52,13 +54,12 @@ function EdgeIter(x::SparseMatrixCSC{Int}, vlist::VertexList)
    EdgeIter(Nerows, us, vs)
 end
 
-# Return an iterator containing edges to v in vs
-# TODO: OPTIMZE
+""" An iterator containing all edges ending at a list of vertices """
 function EdgeIter(x::SparseMatrixCSC{Int}, ::Colon, vlist::VertexList)
    EdgeIter(x.', vlist).'
 end
 
-# Split a list of edges into its constituent indexes.
+""" Split an input edge list into an iterator """
 function EdgeIter(es::EdgeList)
    m = length(es)
    us = sizehint!(Vector{Int}(), m)
@@ -112,12 +113,15 @@ end
 
 ################################################# GETINDEX ##################################################################
 
+""" Get the ith edge in the iterator """
 Base.getindex(x::EdgeIter, i::Int) = EdgeID(x.us[i], x.vs[i])
 
+""" Get a new iterator containing a subset of the edges """
 function Base.getindex(x::EdgeIter, indxs::AbstractVector{Int})
    EdgeIter(length(indxs), x.us[indxs], x.vs[indxs])
 end
 
+""" Get a copy of the iterator """
 Base.getindex(x::EdgeIter, ::Colon) = copy(x)
 
 ################################################# SHOW ######################################################################
@@ -130,6 +134,7 @@ end
 
 ################################################# CONCATENATION #############################################################
 
+""" Concatenate two iterators """
 function Base.vcat(eit1::EdgeIter, eit2::EdgeIter)
    EdgeIter(eit1.m + eit2.m, vcat(eit1.us, eit2.us), vcat(eit1.vs, eit2.vs))
 end
