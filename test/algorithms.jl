@@ -31,4 +31,18 @@
    g4 = bfs_subgraph(g, 1, 4)
    @test nv(g4) == 10
    @test ne(g4) == 28
+
+   ###
+   # External interface
+   ###
+   setlabel!(g, map(string, 1:10))
+   @test hoplist(g, "1", 1, 2) == ["2","3","4"]
+
+   g5 = hoptree(g, "1", 2)
+   @test nv(g5) == 4
+   @test ne(g5) == 3
+
+   g6 = hopgraph(g, "1", 2)
+   @test nv(g6) == 4
+   @test ne(g6) == 8
 end

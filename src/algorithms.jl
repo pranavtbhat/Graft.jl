@@ -5,8 +5,9 @@
 ################################################# IMPORT/EXPORT ############################################################
 export
 # Traversals
-bfs, bfs_list, bfs_tree, bfs_subgraph
-
+bfs, bfs_list, bfs_tree, bfs_subgraph,
+# External interfaces
+hoplist, hoptree, hopgraph
 ################################################# BFSLIST ##################################################################
 
 """ Standard BFS implementation that returns a parent vector """
@@ -104,6 +105,12 @@ end
 bfs_list(g::Graph, seed::AbstractVector, hopstart::Int=1, hopend::Number=Inf) = bfs_list(g, collect(seed), hopstart, hopend)
 bfs_list(g::Graph, seed::Int, hopstart::Int=1, hopend::Number=Inf) = bfs_list(g, [seed], hopstart, hopend)
 
+"""
+Get a list of vertices at a certain hop distance from a labelled vertex
+"""
+function hoplist(g::Graph, x, hopstart::Int, hopend::Number=Inf)
+   encode(g, bfs_list(g, decode(g, x), hopstart, hopend))
+end
 
 ################################################# BFSTREE ###############################################################
 
@@ -129,12 +136,28 @@ function bfs_tree(g::Graph, seed::Int, hopend::Number=Inf)
    subgraph(g, vlist, eit)
 end
 
+"""
+Get the bfs tree starting from the input labelled vertex, and ending at a certain hop distance
+"""
+function hoptree(g::Graph, x, hopend::Number=Inf)
+   bfs_tree(g, decode(g, x), hopend)
+end
+
 ################################################# BFSSUBGRAPH #############################################################
+
 """
 Returns a BFS subgraph, containing explored vertices and all edges between
-them.
+them
 """
-function bfs_subgraph(g::Graph, seed::Int, hopend::Number)
+function bfs_subgraph(g::Graph, seed::Int, hopend::Number=Inf)
    vs = unshift!(bfs_list(g, seed, 1, hopend), seed)
    subgraph(g, vs)
+end
+
+"""
+Get a subgraph containing vertices and edges within a certain hop distance from the input labelled
+vertex
+"""
+function hopgraph(g::Graph, x, hopend::Number=Inf)
+   bfs_subgraph(g, decode(g, x), hopend)
 end
