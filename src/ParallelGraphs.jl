@@ -1,8 +1,6 @@
 module ParallelGraphs
 
-using StatsBase
 using DataFrames
-using CSV
 
 import Base: deepcopy, ==, +, -, |>
 

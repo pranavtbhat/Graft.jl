@@ -38,6 +38,14 @@ parsetypes(x::SubString) = eval(parse(x))
 parsetypes(props::Vector) = map(parsetypes, props)
 parsetypes(x) = error("Invalid Property type $x")
 
+# SubString Hack to Char, Bool
+Base.Char(x::SubString{String}) = x[1]
+Base.Bool(x::SubString{String}) = parse(x)
+
+promote_vector(x::DataType, y::Vector) = collect(x, y)
+promote_vector(::Type{Char}, x::Vector) = map(Char, x)
+promote_vector(::Type{Bool}, y::Vector) = map(Bool, y)
+
 function printif(cond, s::String)
    if cond
       println(s)
@@ -70,39 +78,35 @@ function loadgraph(io::IO, verbose=false)
    printif(verbose, "Fetching Graph Header")
    Nv, Ne, ltype, vprops, vtypes, eprops, etypes = loadheader(io)
 
-   # Prepend label type to vtypes
-   vtypes = vcat(ltype, vtypes)
+   printif(verbose, "Reading File")
+   dims = (Nv + Ne, max(1 + length(vprops), 2 + length(eprops)))
+   arr = readcsv(io; dims=dims)
 
-   # Prepend two integer columns to etypes
-   etypes = vcat(Int, Int, etypes)
+   printif(verbose, "Fetching Vertex Labels")
+   Lm = LabelMap(promote_vector(ltype, arr[1:Nv, 1]))
 
    printif(verbose, "Fetching Vertex Data")
-   vdata = CSV.read(io; header=false, datarow=6, rows=(Nv+5), types=vtypes)
+   Vdata = DataFrame()
+   for (i,prop) in enumerate(vprops)
+      vals = promote_vector(vtypes[i], arr[1:Nv,i+1])
+      insert!(Vdata, i, vals, Symbol(prop))
+   end
 
-   # Strip first column into labels
-   printif(verbose, "Fetching Vertex Labels")
-   lm = LabelMap(vdata[1].values)              # Hack to avoid nullables
-
-   # Process Vertex DataFrame
-   delete!(vdata, 1)
-   names!(vdata, vprops)
+   printif(verbose, "Fetching Edges")
+   us = decode(Lm, arr[(Nv+1):(Nv+Ne),1])
+   vs = decode(Lm, arr[(Nv+1):(Nv+Ne),2])
+   Sv = SparseMatrixCSC(Nv, EdgeIter(Ne, us, vs))
+   reorder!(Sv)
 
    printif(verbose, "Fetching Edge Data")
-   edata = CSV.read(io; header=false, datarow=(Nv+6), rows=(Nv+Ne+5), types=etypes)
-
-   # Strip edge columns
-   us = decode(lm, edata[1].values)            # Hack to avoid nullable
-   vs = decode(lm, edata[2].values)            # Hack to avoid nullable
-   eit = EdgeIter(Ne, us, vs)
-   sv = SparseMatrixCSC(Nv, eit)
-   reorder!(sv)
-
-   # Process Edge DataFrame
-   delete!(edata, [1,2])
-   names!(edata, eprops)
+   Edata = DataFrame()
+   for (i,prop) in enumerate(eprops)
+      vals = promote_vector(etypes[i], arr[(Nv+1):(Nv+Ne),i+2])
+      insert!(Edata, i, vals, Symbol(prop))
+   end
 
    printif(verbose, "Constructing Graph")
-   Graph(Nv, Ne, SparseMatrixCSC(Nv, eit), vdata, edata, lm)
+   Graph(Nv, Ne, Sv, Vdata, Edata, Lm)
 end
 
 """ Parse a text file GraphCSV format"""
@@ -112,48 +116,44 @@ function loadgraph(filename::String; verbose=false)
    close(file)
    g
 end
+
 ################################################# WRITE GRAPHS ##############################################################
 
-###
-# TODO: Figure out how to write multiple Dataframes to the same file, using CSV.jl
-###
+""" Write a graph to file """
+function storegraph(g::Graph, io::IO)
+   Nv,Ne = size(g)
 
-# """ Write a graph to file """
-# function storegraph(g::Graph, io::IO)
-#    Nv,Ne = size(g)
-#    Ltype = eltype(lmap(g))
-#
-#    Vprops = listvprops(g)
-#    Vtypes = eltypes(vdata(g))
-#
-#    Eprops = listeprops(g)
-#    Etypes = eltypes(edata(g))
-#
-#    ls = encode(g)
-#    Vdata = copy(vdata(g))
-#    insert!(Vdata, 1, ls, :dc)
-#
-#    eit = edges(g)
-#    uls = encode(g, eit.us)
-#    vls = encode(g, eit.vs)
-#
-#    Edata = copy(edata(g))
-#    insert!(Edata, 1, uls, :dc)
-#    insert!(Edata, 2, vls, :dc)
-#
-#    println(io, "$Nv,$Ne,$Ltype")
-#    println(io, join(Vprops, ','))
-#    println(io, join(Vtypes, ','))
-#    println(io, join(Eprops, ','))
-#    println(io, join(Etypes, ','))
-#
-#    Data
-#    writedlm(io, Edata, ',')
-#    nothing
-# end
-#
-# function storegraph(g::Graph, filename::String)
-#    file = open(filename, "w")
-#    storegraph(g, file)
-#    close(file)
-# end
+   Ltype = eltype(lmap(g))
+
+   Vprops = listvprops(g)
+   Vtypes = eltypes(vdata(g))
+
+   Eprops = listeprops(g)
+   Etypes = eltypes(edata(g))
+
+
+   ls = encode(g)
+   Vdata = hcat(ls, [collect(getvprop(g, :, prop)) for prop in Vprops]...)
+
+   eit = edges(g)
+   uls = encode(g, eit.us)
+   vls = encode(g, eit.vs)
+
+   Edata = hcat(uls, vls, [collect(geteprop(g, :, prop)) for prop in Eprops]...)
+
+   println(io, "$Nv,$Ne,$Ltype")
+   println(io, join(Vprops, ','))
+   println(io, join(Vtypes, ','))
+   println(io, join(Eprops, ','))
+   println(io, join(Etypes, ','))
+
+   writedlm(io, Vdata, ',')
+   writedlm(io, Edata, ',')
+   nothing
+end
+
+function storegraph(g::Graph, filename::String)
+   file = open(filename, "w")
+   storegraph(g, file)
+   close(file)
+end

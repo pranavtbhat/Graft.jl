@@ -3,14 +3,11 @@
 ```@contents
 ```
 
-## Type Aliases
-```@docs
-VertexID
-EdgeID
-VertexList
-EdgeList
-```
-<!-- #################################################################################################################### -->
+
+
+
+
+
 
 ## The Graph datastructure
 
@@ -95,7 +92,7 @@ relabel!(::Graph, ::AbstractVector{Int}, ::Vector)
 
 
 
-<!-- #################################################################################################################### -->
+
 
 ## EdgeIteration
 The EdgeIter type provides alloc-free and fast edge iteration.
@@ -135,7 +132,12 @@ end
 [e for e in eit]
 ```
 
-<!-- #################################################################################################################### -->
+
+
+
+
+
+
 ## Metadata
 
 ### Setting vertex metadata
@@ -158,7 +160,11 @@ seteprop!
 geteprop
 ```
 
-<!-- #################################################################################################################### -->
+
+
+
+
+
 
 ## Queries
 
@@ -254,7 +260,7 @@ using ParallelGraphs
 g = randgraph(10, [:p1, :p2], [:p1, :p2])
 
 # Run an expression on each edge
-@query g |> filter(e.p1 < e.p2) | eachedge(e.p1 + e.p2)
+@query g |> filter(e.p1 < e.p2) |> eachedge(e.p1 + e.p2)
 ```
 
 The entire query is parsed into a DAG, using a recursive descent parser, and then executed in a bottom up manner. The results of intermediate
