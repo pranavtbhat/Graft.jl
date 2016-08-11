@@ -3,5 +3,8 @@
 *.jl.mem
 *.jld
 
+.DS_Store
 docs/build/
 docs/site/
+
+graph.txt

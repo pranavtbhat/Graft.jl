@@ -1,97 +1,110 @@
-######
-##
-## This file demonstrates the Graph API for generating graph data. Here we generate a sort of social network
-## of 1000 people, with each person begin assigned a name, age and weight. An edge in this social network
-## denotes a like-friendship. So we can calculate the number of people a person likes, as well as the number
-## of people that like him. We can also find the number of mutual friends in a relationship, and therefore
-## the strength of the relationship, and color the edges accordingly.
-##
-######
+###
+# This file contains a detailed example, demonstrating the typical workflow
+# Graft aims to support.
+# The dataset used here was constructed by splicing together two separate datasets:
+#
+# 1. `SOCR Data MLB HeightsWeights`: Heights, ages and weights of Baseball players (Vertex Data). References:
+#   * Jarron M. Saint Onge, Patrick M. Krueger, Richard G. Rogers. (2008) Historical trends in height,
+#   weight, and body mass: Data from U.S. Major League Baseball players, 1869-1983, Economics & Human
+#   Biology, Volume 6, Issue 3, Symposium on the Economics of Obesity, December 2008, Pages 482-488,
+#   ISSN 1570-677X, DOI: 10.1016/j.ehb.2008.06.008.
+#   * Jarron M. Saint Onge, Richard G. Rogers, Patrick M. Krueger. (2008) Major League Baseball Players'
+#   Life Expectancies, Southwestern Social Science Association, Volume 89, Issue 3, pages 817–830,
+#   DOI: 10.1111/j.1540-6237.2008.00562.x.
+# 2. Advogato Trust Network : Edge weights between 0 and 1. References:
+#   * Advogato network dataset -- KONECT, July 2016. [http](http://konect.uni-koblenz.de/networks/advogato)
+#   * Paolo Massa, Martino Salvetti, and Danilo Tomasoni. Bowling alone and trust decline in social network
+#   sites. In Proc. Int. Conf. Dependable, Autonomic and Secure Computing, pages 658--663, 2009.
+#
+# The dataset has 6541 vertices, 51127 edges.
+# Vertex properties: Age, Height(cm), Weight(kg)
+# Edge properties  : Trust(float)
+###
+
 using Graft
-srand(101)
+using StatsBase
+import LightGraphs
 
-# Construct a small random graph with approximately 500k edges
-g = randgraph(10^3, 10^5)
+## Load and summarize the graph.
 
-# Get a range of vertices in g
-vertices(g)
+# Load the graph
+download(
+ "https://raw.githubusercontent.com/pranavtbhat/Graft.jl/gh-pages/Datasets/graph.txt",
+ joinpath(Pkg.dir("Graft"), "examples/graph.txt")
+)
+g = loadgraph(joinpath(Pkg.dir("Graft"), "examples/graph.txt"))
+
+# Get the graph's size
+size(g)
 
 # Get an edge iterator for g
 edges(g)
 
-# Examine vertex 1's neighbors
-g[1]
+# List vertex labels
+encode(g)
 
 # Split the graph into vertex and edge descriptors
-V,E = g
+V,E = g;
 
-# Assign a (hopefully unique) name to each vertex in g
-V |> @query v.name = randstring()
+# Display the vertex table
+V
 
-# Assign an age to each vertex in g
-V |> @query v.age = rand(1:100)
+# Display the edge table
+E
 
-# Assign a weight to each vertex in g
-V |> @query v.weight = rand(30:100)
+## Run some metadata queries
 
-# See how many vertices "like" every vertex in g
-V |> @query v.likedby = indegree(g, v)
+# Find the average BMI of baseball players
+@query(g |> eachvertex(v.Weight / (v.Height / 100) ^ 2)) |> mean
 
-# See how many vertices every vertex in g likes
-V |> @query v.likes = outdegree(g, v)
+# Find the median height of baseball players in their 20s
+@query(g |> filter(v.Age < 30,v.Age >= 20) |> eachvertex(v.Height * 0.0328084)) |> median
 
-# Count the number of mutual likes for each edge
-E |> @query e.mutual_likes = length(intersect(g[u], g[v]))
+# Find the mean age difference in strong relationships
+@query(g |> filter(e.Trust > 0.8) |> eachedge(s.Age - t.Age)) |> abs |> mean
 
-# Calculate the minimum and maximum mutual likes
-min_likes = E |> @query(e.mutual_likes) |> minimum
-max_likes = E |> @query(e.mutual_likes) |> maximum
+# Find fred's 3 hop neighborhood (friends and friends-of-friends and so on)
+fred_nhood = hopgraph(g, "fred", 3)
 
-# Assign a normalized strength to each edge
-E |> @query e.strength = (e.mutual_likes - $min_likes) / $max_likes
+# See how well younger players in fred's neighborhood trust each other
+@query(fred_nhood |> filter(v.Age > 30) |> eachedge(e.Trust)) |> mean
 
-# Now to color these edges, based on strength
-function color_edge(s)
-   s < 0.1 && return "red"
-   s < 0.3 && return "orange"
-   s < 0.5 && return "yellow"
-   s < 0.8 && return "blue"
-   s <= 1 && return "green"
-end
-E |> @query e.color = $color_edge(e.strength)
 
-# Label the vertices
-setlabel!(g, ["v$v" for v in vertices(g)])
+## Export data to LightGraphs.jl
 
-# Store the Graph in a file
-storegraph(g, "graph.txt")
+# Find the 2 hop neighborhood of 2 separate vertices (multi seed traversal)
+sg = hopgraph(g, ["nikolay", "jbert"], 3)
 
-# Display the Vertex Descriptor
-println(V)
+# Generate an edge distance property on the inverse of normalized-trust
+dists = @query(sg |> eachedge(1 / e.Trust ));
+seteprop!(sg, :, dists, :Dist);
 
-# Display the Edge Descriptor
-println(E)
+# Trim edges of very high distance
+sg = @query(sg |> filter(e.Dist < 10))
 
-# Obtain vertex data relevant to only the first 10 vertices
-V[1:10]
+# Export the graph's adjacency matrix
+M = export_adjacency(sg)
+lg = LightGraphs.DiGraph(M)
 
-# Find the senior citizens in the graph
-senior_citizens = V |> @filter 65 <= v.age
+# Export the edge distance property
+D = export_edge_property(sg, :Dist)
 
-# Find people with abnormal weights
-abnormal_weights = V |> @filter v.weight < 40 && v.weight > 90
+# Compute betweenness centrailty
+centrality = LightGraphs.betweenness_centrality(lg)
 
-# Find all strong associations
-strong_edges = E |> @filter(e.strength > 0.5)
+# Set the centrality as a vertex property
+setvprop!(sg, :, centrality, :Centrality)
 
-# Isolate a subgraph with only senior citizens and strong associations
-h = Graph(senior_citizens, strong_edges)
+# Apply all pair shortest paths on the graph
+apsp = LightGraphs.floyd_warshall_shortest_paths(lg, D).dists;
 
-# Run a bfs to get the set of all vertices reachable from the first vertex
-@bfs V "v1"
+# Add the new shortest paths as a property to the graph
+eit = edges(sg);
+seteprop!(sg, :, [apsp[e.second,e.first] for e in eit], :Shortest_Dists);
 
-# See only the names of the people in the subgraph
-println(select(V, "weight"))
+# Show new vertex descriptor
+VertexDescriptor(sg)
 
-# See only the colors of the edges in the subgraph
-println(select(E, "color"))
+
+# Show the new edge descriptor
+EdgeDescriptor(sg)

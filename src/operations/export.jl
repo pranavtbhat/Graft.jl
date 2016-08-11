@@ -44,5 +44,5 @@ containing all values for an edge property
 function export_edge_property(g::Graph, eprop::Symbol)
    eit = edges(g)
    arr = process_array(geteprop(g, :, eprop))
-   sparse(eit.vs, eit.us, arr)
+   sparse(eit.vs, eit.us, arr, nv(g), nv(g))
 end

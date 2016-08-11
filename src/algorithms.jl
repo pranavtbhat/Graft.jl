@@ -144,8 +144,8 @@ end
 Returns a BFS subgraph, containing explored vertices and all edges between
 them
 """
-function bfs_subgraph(g::Graph, seed::Int, hopend::Number=Inf)
-   vs = unshift!(bfs_list(g, seed, 1, hopend), seed)
+function bfs_subgraph(g::Graph, seed, hopend::Number=Inf)
+   vs = append!(bfs_list(g, seed, 1, hopend), seed)
    subgraph(g, vs)
 end
 
