@@ -21,10 +21,6 @@
 
 export
 # Types
-LabelMap,
-# LabelMaps
-IdentityLM, DictLM,
-# Implementation
 setlabel!, relabel!, haslabel, decode, encode
 
 """

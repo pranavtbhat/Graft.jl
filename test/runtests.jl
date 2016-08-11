@@ -2,7 +2,8 @@ using Base.Test
 
 using Graft
 
-import Graft: randindxs, completeindxs
+import Graft: randindxs, completeindxs, LabelMap, IdentityLM, DictLM,
+bfs, bfs_list, bfs_tree, bfs_subgraph
 
 ###
 # TEST FILES

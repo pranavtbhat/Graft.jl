@@ -8,7 +8,7 @@ export addvertex!, addedge!, rmvertex!, rmedge!
 
 ################################################# ADDVERTEX! ###############################################################
 
-""" Add a vertex to the graph. Returns the label of the new vertex """
+""" Add a vertex to the graph. Returns the internal identifier of the new vertex """
 function addvertex!(g::Graph)
    g.nv += 1
    g.indxs = addvertex!(indxs(g))
@@ -17,6 +17,7 @@ function addvertex!(g::Graph)
    return nv(g)
 end
 
+""" Add a labelled vertex to the graph """
 function addvertex!(g::Graph, l)
    if !haslabel(g, l)
       g.nv += 1
@@ -30,10 +31,12 @@ end
 ###
 # + FOR ADDVERTEX
 ###
+""" Shorthand notation for adding a labelled vertex to the graph """
 function (+)(g::Graph, x)
    addvertex!(g, x)
 end
 
+""" Shorthand notation for adding multiple lablled vertices """
 (+)(g::Graph, xs::AbstractVector) = [g + x for x in xs]
 
 ################################################# ADDEDGE! ################################################################
@@ -53,10 +56,12 @@ end
 ###
 # SETINDEX FOR ADDEDGE
 ###
+""" Shorthand notation for adding an edge between labelled vertices """
 function Base.setindex!(g::Graph, y, x)
    addedge!(g, (g + x)=>(g + y))
 end
 
+""" Shorthand notation for adding multiple edges between labelled vertices """
 function Base.setindex!(g::Graph, ys::Vector, x)
    for y in ys
       addedge!(g, (g + x)=>(g + y))

@@ -26,3 +26,15 @@ docs_dir: 'build'
 
 pages:
 - [index.md, Introduction]
+- [generator.md, Generation, Graph API]
+- [combinatorial.md, Combinatorial, Graph API]
+- [mutation.md, Mutation, Graph API]
+- [labelling.md, Labelling, Graph API]
+- [vdata.md, Vertex Metadata, Metadata]
+- [edata.md, Edge Metadata, Metadata]
+- [queries.md, Query Macro, Query API]
+- [hopgraph.md, Hop Subgraphs, Query API]
+- [graphio.md, File IO, Graph IO]
+- [export.md, Export, Graph IO]
+- [edgeiter.md, Edge Iteration, Internal]
+- [internal.md, Internal Docs, Internal]

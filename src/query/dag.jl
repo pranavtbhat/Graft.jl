@@ -4,8 +4,6 @@
 
 ################################################# IMPORT/EXPORT ############################################################
 
-export Node, LiteralNode
-
 ###
 # A Part of the DAG. The execution of a node returns
 # a value which may be used higher up in the dag

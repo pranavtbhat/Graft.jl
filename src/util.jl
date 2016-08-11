@@ -5,8 +5,6 @@
 ################################################# IMPORT/EXPORT ############################################################
 
 export
-# Types
-FakeVector,
 # Type Aliases
 VertexID, EdgeID, VertexList, EdgeList
 

@@ -5,8 +5,6 @@
 
 ################################################# IMPORT/EXPORT ############################################################
 
-export exec
-
 ################################################# LEAF NODES ###############################################################
 
 ###
@@ -70,7 +68,7 @@ end
 function exec(cache::Dict, x::GraphNode, y::EdgeTargetProperty)
    g = exec(cache, x)
    prop = exec(cache, y)
-   
+
    if haskey(cache[x]["EDATA"], y)
       cache[x]["EDATA"][y]
    else
