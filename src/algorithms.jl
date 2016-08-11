@@ -19,7 +19,7 @@ function bfs(g::Graph, seed::Vector{Int}, hopend::Number=Inf)
 
    Q = sizehint!(copy(seed), N)
    Q_ = size
-   adj = sizehint!(Int[], N)
+   adj = sizehint!(Vector{Int}(N), N)
 
    nhops = 1
 
@@ -29,10 +29,7 @@ function bfs(g::Graph, seed::Vector{Int}, hopend::Number=Inf)
    while !isempty(Q) && nhops <= hopend
       u = shift!(Q)
 
-      # Visit u's adjacencies
       for v in fadj!(g, u, adj)
-
-         # If v hasn't been visited, visit it
          if parvec[v] == -1
             parvec[v] = u
             push!(Q, v)

@@ -144,7 +144,7 @@ This method copies the adjacencies onto the input array,
 and is comparitively faster, and causes no mallocs.
 """
 # TODO: Replace this functionaly with subarrays, once that gets out.
-function fadj!(x::SparseMatrixCSC{Int}, v::VertexID, adj::Vector{Int})
+function fadj!(x::SparseMatrixCSC{Int,Int}, v::VertexID, adj::Vector{Int})
    @inbounds p1 = x.colptr[v]
    @inbounds p2 = x.colptr[v+1]
    resize!(adj, p2 - p1)

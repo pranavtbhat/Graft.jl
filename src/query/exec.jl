@@ -53,11 +53,12 @@ end
 # Fetch edge source property
 ###
 function exec(cache::Dict, x::GraphNode, y::EdgeSourceProperty)
+   g = exec(cache, x)
+   prop = exec(cache, y)
+
    if haskey(cache[x]["EDATA"], y)
       cache[x]["EDATA"][y]
    else
-      g = exec(cache, x)
-      prop = exec(cache, y)
       eit = get!(cache[x], "EIT", edges(g))
       cache[x]["EDATA"][y] = getvprop(g, eit.us, prop)
    end
@@ -67,11 +68,12 @@ end
 # Fetch edge source property
 ###
 function exec(cache::Dict, x::GraphNode, y::EdgeTargetProperty)
+   g = exec(cache, x)
+   prop = exec(cache, y)
+   
    if haskey(cache[x]["EDATA"], y)
       cache[x]["EDATA"][y]
    else
-      g = exec(cache, x)
-      prop = exec(cache, y)
       eit = get!(cache[x], "EIT", edges(g))
       cache[x]["EDATA"][y] = getvprop(g, eit.vs, prop)
    end

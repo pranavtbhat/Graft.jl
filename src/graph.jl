@@ -23,7 +23,7 @@ indxs, vdata, edata, lmap
 type Graph
    nv::Int
    ne::Int
-   indxs::AbstractArray{Int,2}
+   indxs::SparseMatrixCSC{Int,Int}
    vdata::AbstractDataFrame
    edata::AbstractDataFrame
    lmap::LabelMap
