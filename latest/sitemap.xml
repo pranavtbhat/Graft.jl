@@ -9,4 +9,96 @@
     </url>
     
 
+    
+        
+    <url>
+     <loc>None/generator/</loc>
+     <lastmod>2016-08-11</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/combinatorial/</loc>
+     <lastmod>2016-08-11</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/mutation/</loc>
+     <lastmod>2016-08-11</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/labelling/</loc>
+     <lastmod>2016-08-11</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>None/vdata/</loc>
+     <lastmod>2016-08-11</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/edata/</loc>
+     <lastmod>2016-08-11</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>None/queries/</loc>
+     <lastmod>2016-08-11</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/hopgraph/</loc>
+     <lastmod>2016-08-11</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>None/graphio/</loc>
+     <lastmod>2016-08-11</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/export/</loc>
+     <lastmod>2016-08-11</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>None/edgeiter/</loc>
+     <lastmod>2016-08-11</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/internal/</loc>
+     <lastmod>2016-08-11</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
 </urlset>

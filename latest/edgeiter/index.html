@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="no-js ie6"><![endif]-->
+<!--[if IE 7 ]><html class="no-js ie7"><![endif]-->
+<!--[if IE 8 ]><html class="no-js ie8"><![endif]-->
+<!--[if IE 9 ]><html class="no-js ie9"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
+    
+      
+        <title>Edge Iteration - Graft.jl</title>
+      
+      
+      
+      
+    
+    <meta property="og:url" content="None">
+    <meta property="og:title" content="Graft.jl">
+    <meta property="og:image" content="None/../">
+    <meta name="apple-mobile-web-app-title" content="Graft.jl">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../assets/images/favicon-e565ddfa3b.ico">
+    <link rel="icon" type="image/x-icon" href="../assets/images/favicon-e565ddfa3b.ico">
+    <style>
+      @font-face {
+      	font-family: 'Icon';
+      	src: url('../assets/fonts/icon.eot?52m981');
+      	src: url('../assets/fonts/icon.eot?#iefix52m981')
+               format('embedded-opentype'),
+      		   url('../assets/fonts/icon.woff?52m981')
+               format('woff'),
+      		   url('../assets/fonts/icon.ttf?52m981')
+               format('truetype'),
+      		   url('../assets/fonts/icon.svg?52m981#icon')
+               format('svg');
+      	font-weight: normal;
+      	font-style: normal;
+      }
+    </style>
+    <link rel="stylesheet" href="../assets/stylesheets/application-a422ff04cc.css">
+    
+      <link rel="stylesheet" href="../assets/stylesheets/palettes-05ab2406df.css">
+    
+    
+      
+      
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,700|Ubuntu+Mono">
+      <style>
+        body, input {
+          font-family: 'Ubuntu', Helvetica, Arial, sans-serif;
+        }
+        pre, code {
+          font-family: 'Ubuntu Mono', 'Courier New', 'Courier', monospace;
+        }
+      </style>
+    
+    
+      <link rel="stylesheet" href="../assets/Documenter.css">
+    
+    <script src="../assets/javascripts/modernizr-4ab42b99fd.js"></script>
+    
+  </head>
+  
+  
+  
+  <body class="palette-primary-indigo palette-accent-blue">
+    
+      
+      
+    
+    <div class="backdrop">
+      <div class="backdrop-paper"></div>
+    </div>
+    <input class="toggle" type="checkbox" id="toggle-drawer">
+    <input class="toggle" type="checkbox" id="toggle-search">
+    <label class="toggle-button overlay" for="toggle-drawer"></label>
+    <header class="header">
+      <nav aria-label="Header">
+  <div class="bar default">
+    <div class="button button-menu" role="button" aria-label="Menu">
+      <label class="toggle-button icon icon-menu" for="toggle-drawer">
+        <span></span>
+      </label>
+    </div>
+    <div class="stretch">
+      <div class="title">
+        
+          <span class="path">
+            
+              
+                Internal <i class="icon icon-link"></i>
+              
+            
+          </span>
+        
+        Edge Iteration
+      </div>
+    </div>
+    
+    
+    <div class="button button-search" role="button" aria-label="Search">
+      <label class="toggle-button icon icon-search" title="Search" for="toggle-search"></label>
+    </div>
+  </div>
+  <div class="bar search">
+    <div class="button button-close" role="button" aria-label="Close">
+      <label class="toggle-button icon icon-back" for="toggle-search"></label>
+    </div>
+    <div class="stretch">
+      <div class="field">
+        <input class="query" type="text" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck>
+      </div>
+    </div>
+    <div class="button button-reset" role="button" aria-label="Search">
+      <button class="toggle-button icon icon-close" id="reset-search"></button>
+    </div>
+  </div>
+</nav>
+    </header>
+    <main class="main">
+      
+      <div class="drawer">
+        <nav aria-label="Navigation">
+  
+  <a href="https://github.com/pranavtbhat/Graft.jl" class="project">
+    <div class="banner">
+      
+      <div class="name">
+        <strong>
+          Graft.jl
+          <span class="version">
+            
+          </span>
+        </strong>
+        
+          <br>
+          pranavtbhat/Graft.jl
+        
+      </div>
+    </div>
+  </a>
+  <div class="scrollable">
+    <div class="wrapper">
+      
+        <ul class="repo">
+          <li class="repo-download">
+            
+            <a href="https://github.com/pranavtbhat/Graft.jl/archive/master.zip" target="_blank" title="Download" data-action="download">
+              <i class="icon icon-download"></i> Download
+            </a>
+          </li>
+          <li class="repo-stars">
+            <a href="https://github.com/pranavtbhat/Graft.jl/stargazers" target="_blank" title="Stargazers" data-action="star">
+              <i class="icon icon-star"></i> Stars
+              <span class="count">&ndash;</span>
+            </a>
+          </li>
+        </ul>
+        <hr>
+      
+      <div class="toc">
+        <ul>
+          
+            
+  <li>
+    <a class="" title="Introduction" href="..">
+      Introduction
+    </a>
+    
+  </li>
+
+          
+            
+  <li>
+    <span class="section">Graph API</span>
+    <ul>
+      
+        
+  <li>
+    <a class="" title="Generation" href="../generator/">
+      Generation
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Combinatorial" href="../combinatorial/">
+      Combinatorial
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Mutation" href="../mutation/">
+      Mutation
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Labelling" href="../labelling/">
+      Labelling
+    </a>
+    
+  </li>
+
+      
+    </ul>
+  </li>
+
+          
+            
+  <li>
+    <span class="section">Metadata</span>
+    <ul>
+      
+        
+  <li>
+    <a class="" title="Vertex Metadata" href="../vdata/">
+      Vertex Metadata
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Edge Metadata" href="../edata/">
+      Edge Metadata
+    </a>
+    
+  </li>
+
+      
+    </ul>
+  </li>
+
+          
+            
+  <li>
+    <span class="section">Query API</span>
+    <ul>
+      
+        
+  <li>
+    <a class="" title="Query Macro" href="../queries/">
+      Query Macro
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Hop Subgraphs" href="../hopgraph/">
+      Hop Subgraphs
+    </a>
+    
+  </li>
+
+      
+    </ul>
+  </li>
+
+          
+            
+  <li>
+    <span class="section">Graph IO</span>
+    <ul>
+      
+        
+  <li>
+    <a class="" title="File IO" href="../graphio/">
+      File IO
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Export" href="../export/">
+      Export
+    </a>
+    
+  </li>
+
+      
+    </ul>
+  </li>
+
+          
+            
+  <li>
+    <span class="section">Internal</span>
+    <ul>
+      
+        
+  <li>
+    <a class="current" title="Edge Iteration" href="./">
+      Edge Iteration
+    </a>
+    
+      
+        
+      
+      
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Internal Docs" href="../internal/">
+      Internal Docs
+    </a>
+    
+  </li>
+
+      
+    </ul>
+  </li>
+
+          
+        </ul>
+        
+      </div>
+    </div>
+  </div>
+</nav>
+      </div>
+      <article class="article">
+        <div class="wrapper">
+          
+          <p><a id='EdgeIteration-1'></a></p>
+<h1 id="edgeiteration">EdgeIteration</h1>
+<p>Graft provides the <code>EdgeIter</code> type for fast, alloc-free edge iteration. This type simplifies the indexing and construction of sparse matrices.</p>
+<p>The following example demonstrates the usage of <code>EdgeIter</code>:</p>
+<div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="k">using</span> <span class="n">Graft</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">g</span> <span class="o">=</span> <span class="n">completegraph</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">Graph</span><span class="p">(</span><span class="mi">3</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">6</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Build an iterator for all edges in the graph</span>
+       <span class="n">eit</span> <span class="o">=</span> <span class="n">edges</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="mi">6</span><span class="o">-</span><span class="n">element</span> <span class="n">Graft</span><span class="o">.</span><span class="n">EdgeIter</span><span class="p">:</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">2</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">1</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">3</span><span class="o">=&gt;</span><span class="mi">1</span>
+ <span class="mi">3</span><span class="o">=&gt;</span><span class="mi">2</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Iterate through edges</span>
+       <span class="k">for</span> <span class="n">e</span> <span class="k">in</span> <span class="n">eit</span>
+          <span class="c"># Do something here</span>
+       <span class="k">end</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Use in list comprehensions</span>
+       <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="k">in</span> <span class="n">eit</span><span class="p">]</span>
+<span class="mi">6</span><span class="o">-</span><span class="n">element</span> <span class="n">Array</span><span class="p">{</span><span class="n">Pair</span><span class="p">{</span><span class="kt">Int64</span><span class="p">,</span><span class="kt">Int64</span><span class="p">},</span><span class="mi">1</span><span class="p">}:</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">2</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">1</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">3</span><span class="o">=&gt;</span><span class="mi">1</span>
+ <span class="mi">3</span><span class="o">=&gt;</span><span class="mi">2</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Get the third edge in the graph</span>
+       <span class="n">eit</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+<span class="mi">2</span><span class="o">=&gt;</span><span class="mi">1</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Get a subset of the edges in the graph (returns a new iterator)</span>
+       <span class="n">eit</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+<span class="mi">3</span><span class="o">-</span><span class="n">element</span> <span class="n">Graft</span><span class="o">.</span><span class="n">EdgeIter</span><span class="p">:</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">2</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">1</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Concatenate two iterators</span>
+       <span class="n">vcat</span><span class="p">(</span><span class="n">eit</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">],</span> <span class="n">eit</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+<span class="mi">6</span><span class="o">-</span><span class="n">element</span> <span class="n">Graft</span><span class="o">.</span><span class="n">EdgeIter</span><span class="p">:</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">3</span><span class="o">=&gt;</span><span class="mi">1</span>
+ <span class="mi">3</span><span class="o">=&gt;</span><span class="mi">2</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">2</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">1</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Edge iterator implements the AbstractVector{Pair{Int,Int}} interface</span>
+       <span class="n">sort</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+<span class="mi">6</span><span class="o">-</span><span class="n">element</span> <span class="n">Array</span><span class="p">{</span><span class="n">Pair</span><span class="p">{</span><span class="kt">Int64</span><span class="p">,</span><span class="kt">Int64</span><span class="p">},</span><span class="mi">1</span><span class="p">}:</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">2</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">1</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">3</span><span class="o">=&gt;</span><span class="mi">1</span>
+ <span class="mi">3</span><span class="o">=&gt;</span><span class="mi">2</span>
+</pre></div>
+
+
+<p>Detailed documentation:</p>
+<p><a id='Graft.EdgeIter' href='#Graft.EdgeIter'>#</a>
+<strong><code>Graft.EdgeIter</code></strong> &mdash; <em>Type</em>.</p>
+<p>An abstraction for alloc-free, fast edge iteration</p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/edgeiter.jl#L9-L11' class='documenter-source'>source</a><br></p>
+<p><a id='Base.getindex-Tuple{Graft.EdgeIter,Int64}' href='#Base.getindex-Tuple{Graft.EdgeIter,Int64}'>#</a>
+<strong><code>Base.getindex</code></strong> &mdash; <em>Method</em>.</p>
+<p>Get the ith edge in the iterator </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/edgeiter.jl#L116' class='documenter-source'>source</a><br></p>
+<p><a id='Base.getindex-Tuple{Graft.EdgeIter,AbstractArray{Int64,1}}' href='#Base.getindex-Tuple{Graft.EdgeIter,AbstractArray{Int64,1}}'>#</a>
+<strong><code>Base.getindex</code></strong> &mdash; <em>Method</em>.</p>
+<p>Get a new iterator containing a subset of the edges </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/edgeiter.jl#L119' class='documenter-source'>source</a><br></p>
+<p><a id='Base.getindex-Tuple{Graft.EdgeIter,Colon}' href='#Base.getindex-Tuple{Graft.EdgeIter,Colon}'>#</a>
+<strong><code>Base.getindex</code></strong> &mdash; <em>Method</em>.</p>
+<p>Get a copy of the iterator </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/edgeiter.jl#L124' class='documenter-source'>source</a><br></p>
+<p><a id='Base.vcat-Tuple{Graft.EdgeIter,Graft.EdgeIter}' href='#Base.vcat-Tuple{Graft.EdgeIter,Graft.EdgeIter}'>#</a>
+<strong><code>Base.vcat</code></strong> &mdash; <em>Method</em>.</p>
+<p>Concatenate two iterators </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/edgeiter.jl#L137' class='documenter-source'>source</a><br></p>
+          <aside class="copyright" role="note">
+            
+            Documentation built with
+            <a href="http://www.mkdocs.org" target="_blank">MkDocs</a>
+            using the
+            <a href="http://squidfunk.github.io/mkdocs-material/" target="_blank">
+              Material
+            </a>
+            theme.
+          </aside>
+          
+            <footer class="footer">
+              
+  <nav class="pagination" aria-label="Footer">
+    <div class="previous">
+      
+        <a href="../export/" title="Export">
+          <span class="direction">
+            Previous
+          </span>
+          <div class="page">
+            <div class="button button-previous" role="button" aria-label="Previous">
+              <i class="icon icon-back"></i>
+            </div>
+            <div class="stretch">
+              <div class="title">
+                Export
+              </div>
+            </div>
+          </div>
+        </a>
+      
+    </div>
+    <div class="next">
+      
+        <a href="../internal/" title="Internal Docs">
+          <span class="direction">
+            Next
+          </span>
+          <div class="page">
+            <div class="stretch">
+              <div class="title">
+                Internal Docs
+              </div>
+            </div>
+            <div class="button button-next" role="button" aria-label="Next">
+              <i class="icon icon-forward"></i>
+            </div>
+          </div>
+        </a>
+      
+    </div>
+  </nav>
+
+            </footer>
+          
+        </div>
+      </article>
+      <div class="results" role="status" aria-live="polite">
+        <div class="scrollable">
+          <div class="wrapper">
+            <div class="meta"></div>
+            <div class="list"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script>
+      var base_url = '..';
+      var repo_id  = 'pranavtbhat/Graft.jl';
+    </script>
+    <script src="../assets/javascripts/application-997097ee0c.js"></script>
+    
+      <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    
+      <script src="../assets/mathjaxhelper.js"></script>
+    
+    
+  </body>
+</html>

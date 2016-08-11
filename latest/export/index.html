@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="no-js ie6"><![endif]-->
+<!--[if IE 7 ]><html class="no-js ie7"><![endif]-->
+<!--[if IE 8 ]><html class="no-js ie8"><![endif]-->
+<!--[if IE 9 ]><html class="no-js ie9"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
+    
+      
+        <title>Export - Graft.jl</title>
+      
+      
+      
+      
+    
+    <meta property="og:url" content="None">
+    <meta property="og:title" content="Graft.jl">
+    <meta property="og:image" content="None/../">
+    <meta name="apple-mobile-web-app-title" content="Graft.jl">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../assets/images/favicon-e565ddfa3b.ico">
+    <link rel="icon" type="image/x-icon" href="../assets/images/favicon-e565ddfa3b.ico">
+    <style>
+      @font-face {
+      	font-family: 'Icon';
+      	src: url('../assets/fonts/icon.eot?52m981');
+      	src: url('../assets/fonts/icon.eot?#iefix52m981')
+               format('embedded-opentype'),
+      		   url('../assets/fonts/icon.woff?52m981')
+               format('woff'),
+      		   url('../assets/fonts/icon.ttf?52m981')
+               format('truetype'),
+      		   url('../assets/fonts/icon.svg?52m981#icon')
+               format('svg');
+      	font-weight: normal;
+      	font-style: normal;
+      }
+    </style>
+    <link rel="stylesheet" href="../assets/stylesheets/application-a422ff04cc.css">
+    
+      <link rel="stylesheet" href="../assets/stylesheets/palettes-05ab2406df.css">
+    
+    
+      
+      
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,700|Ubuntu+Mono">
+      <style>
+        body, input {
+          font-family: 'Ubuntu', Helvetica, Arial, sans-serif;
+        }
+        pre, code {
+          font-family: 'Ubuntu Mono', 'Courier New', 'Courier', monospace;
+        }
+      </style>
+    
+    
+      <link rel="stylesheet" href="../assets/Documenter.css">
+    
+    <script src="../assets/javascripts/modernizr-4ab42b99fd.js"></script>
+    
+  </head>
+  
+  
+  
+  <body class="palette-primary-indigo palette-accent-blue">
+    
+      
+      
+    
+    <div class="backdrop">
+      <div class="backdrop-paper"></div>
+    </div>
+    <input class="toggle" type="checkbox" id="toggle-drawer">
+    <input class="toggle" type="checkbox" id="toggle-search">
+    <label class="toggle-button overlay" for="toggle-drawer"></label>
+    <header class="header">
+      <nav aria-label="Header">
+  <div class="bar default">
+    <div class="button button-menu" role="button" aria-label="Menu">
+      <label class="toggle-button icon icon-menu" for="toggle-drawer">
+        <span></span>
+      </label>
+    </div>
+    <div class="stretch">
+      <div class="title">
+        
+          <span class="path">
+            
+              
+                Graph IO <i class="icon icon-link"></i>
+              
+            
+          </span>
+        
+        Export
+      </div>
+    </div>
+    
+    
+    <div class="button button-search" role="button" aria-label="Search">
+      <label class="toggle-button icon icon-search" title="Search" for="toggle-search"></label>
+    </div>
+  </div>
+  <div class="bar search">
+    <div class="button button-close" role="button" aria-label="Close">
+      <label class="toggle-button icon icon-back" for="toggle-search"></label>
+    </div>
+    <div class="stretch">
+      <div class="field">
+        <input class="query" type="text" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck>
+      </div>
+    </div>
+    <div class="button button-reset" role="button" aria-label="Search">
+      <button class="toggle-button icon icon-close" id="reset-search"></button>
+    </div>
+  </div>
+</nav>
+    </header>
+    <main class="main">
+      
+      <div class="drawer">
+        <nav aria-label="Navigation">
+  
+  <a href="https://github.com/pranavtbhat/Graft.jl" class="project">
+    <div class="banner">
+      
+      <div class="name">
+        <strong>
+          Graft.jl
+          <span class="version">
+            
+          </span>
+        </strong>
+        
+          <br>
+          pranavtbhat/Graft.jl
+        
+      </div>
+    </div>
+  </a>
+  <div class="scrollable">
+    <div class="wrapper">
+      
+        <ul class="repo">
+          <li class="repo-download">
+            
+            <a href="https://github.com/pranavtbhat/Graft.jl/archive/master.zip" target="_blank" title="Download" data-action="download">
+              <i class="icon icon-download"></i> Download
+            </a>
+          </li>
+          <li class="repo-stars">
+            <a href="https://github.com/pranavtbhat/Graft.jl/stargazers" target="_blank" title="Stargazers" data-action="star">
+              <i class="icon icon-star"></i> Stars
+              <span class="count">&ndash;</span>
+            </a>
+          </li>
+        </ul>
+        <hr>
+      
+      <div class="toc">
+        <ul>
+          
+            
+  <li>
+    <a class="" title="Introduction" href="..">
+      Introduction
+    </a>
+    
+  </li>
+
+          
+            
+  <li>
+    <span class="section">Graph API</span>
+    <ul>
+      
+        
+  <li>
+    <a class="" title="Generation" href="../generator/">
+      Generation
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Combinatorial" href="../combinatorial/">
+      Combinatorial
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Mutation" href="../mutation/">
+      Mutation
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Labelling" href="../labelling/">
+      Labelling
+    </a>
+    
+  </li>
+
+      
+    </ul>
+  </li>
+
+          
+            
+  <li>
+    <span class="section">Metadata</span>
+    <ul>
+      
+        
+  <li>
+    <a class="" title="Vertex Metadata" href="../vdata/">
+      Vertex Metadata
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Edge Metadata" href="../edata/">
+      Edge Metadata
+    </a>
+    
+  </li>
+
+      
+    </ul>
+  </li>
+
+          
+            
+  <li>
+    <span class="section">Query API</span>
+    <ul>
+      
+        
+  <li>
+    <a class="" title="Query Macro" href="../queries/">
+      Query Macro
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Hop Subgraphs" href="../hopgraph/">
+      Hop Subgraphs
+    </a>
+    
+  </li>
+
+      
+    </ul>
+  </li>
+
+          
+            
+  <li>
+    <span class="section">Graph IO</span>
+    <ul>
+      
+        
+  <li>
+    <a class="" title="File IO" href="../graphio/">
+      File IO
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="current" title="Export" href="./">
+      Export
+    </a>
+    
+      
+        
+      
+      
+    
+  </li>
+
+      
+    </ul>
+  </li>
+
+          
+            
+  <li>
+    <span class="section">Internal</span>
+    <ul>
+      
+        
+  <li>
+    <a class="" title="Edge Iteration" href="../edgeiter/">
+      Edge Iteration
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Internal Docs" href="../internal/">
+      Internal Docs
+    </a>
+    
+  </li>
+
+      
+    </ul>
+  </li>
+
+          
+        </ul>
+        
+      </div>
+    </div>
+  </div>
+</nav>
+      </div>
+      <article class="article">
+        <div class="wrapper">
+          
+          <p><a id='Export-API-1'></a></p>
+<h1 id="export-api">Export API</h1>
+<p>Graft supports the export of adjacency matrices and metadata, for use in Graph libraries such as LightGraphs. The example below shows how a workflow involving LightGraphs algorithms may look like.</p>
+<div class="codehilite"><pre><span></span><span class="k">using</span> <span class="n">Graft</span>
+<span class="k">import</span> <span class="n">LightGraphs</span>
+
+<span class="n">g</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">(</span><span class="mi">10</span><span class="o">^</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">10</span><span class="o">^</span><span class="mi">4</span><span class="p">);</span>
+<span class="n">setlabel!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">map</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">10</span><span class="o">^</span><span class="mi">3</span><span class="p">));</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Set edge properties</span>
+       <span class="n">seteprop!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="p">:,</span> <span class="n">rand</span><span class="p">(</span><span class="n">ne</span><span class="p">(</span><span class="n">g</span><span class="p">)),</span> <span class="p">:</span><span class="n">weight</span><span class="p">);</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">seteprop!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="p">:,</span> <span class="n">rand</span><span class="p">(</span><span class="mi">1</span> <span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="n">ne</span><span class="p">(</span><span class="n">g</span><span class="p">)),</span> <span class="p">:</span><span class="n">dist</span><span class="p">);</span>
+
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Discard low weight edges</span>
+       <span class="n">g</span> <span class="o">=</span> <span class="p">@</span><span class="n">query</span><span class="p">(</span><span class="n">g</span> <span class="o">|&gt;</span> <span class="n">filter</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">weight</span> <span class="o">&gt;=</span> <span class="mf">0.5</span><span class="p">))</span>
+<span class="n">Graph</span><span class="p">(</span><span class="mi">1000</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">24939</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">weight</span><span class="p">,:</span><span class="n">dist</span><span class="p">]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Export g&#39;s adjacency matrix</span>
+       <span class="n">M</span> <span class="o">=</span> <span class="n">export_adjacency</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+ <span class="mi">1000</span><span class="n">×1000</span> <span class="n">sparse</span> <span class="n">matrix</span> <span class="n">with</span> <span class="mi">24939</span> <span class="kt">Int64</span> <span class="n">nonzero</span> <span class="n">entries</span><span class="p">:</span>
+    <span class="p">[</span><span class="mi">33</span>  <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">1</span>
+    <span class="p">[</span><span class="mi">63</span>  <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">2</span>
+    <span class="p">[</span><span class="mi">131</span> <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">3</span>
+    <span class="p">[</span><span class="mi">161</span> <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">4</span>
+    <span class="p">[</span><span class="mi">224</span> <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">5</span>
+    <span class="p">[</span><span class="mi">339</span> <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">6</span>
+    <span class="p">[</span><span class="mi">380</span> <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">7</span>
+    <span class="p">[</span><span class="mi">491</span> <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">8</span>
+    <span class="p">[</span><span class="mi">667</span> <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">9</span>
+    <span class="n">⋮</span>
+    <span class="p">[</span><span class="mi">524</span> <span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">24931</span>
+    <span class="p">[</span><span class="mi">615</span> <span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">24932</span>
+    <span class="p">[</span><span class="mi">624</span> <span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">24933</span>
+    <span class="p">[</span><span class="mi">628</span> <span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">24934</span>
+    <span class="p">[</span><span class="mi">638</span> <span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">24935</span>
+    <span class="p">[</span><span class="mi">846</span> <span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">24936</span>
+    <span class="p">[</span><span class="mi">870</span> <span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">24937</span>
+    <span class="p">[</span><span class="mi">871</span> <span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">24938</span>
+    <span class="p">[</span><span class="mi">956</span> <span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">24939</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Export g&#39;s edge dists</span>
+       <span class="n">D</span> <span class="o">=</span> <span class="n">export_edge_property</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="p">:</span><span class="n">dist</span><span class="p">)</span>
+ <span class="mi">1000</span><span class="n">×1000</span> <span class="n">sparse</span> <span class="n">matrix</span> <span class="n">with</span> <span class="mi">24939</span> <span class="kt">Int64</span> <span class="n">nonzero</span> <span class="n">entries</span><span class="p">:</span>
+    <span class="p">[</span><span class="mi">33</span>  <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">4</span>
+    <span class="p">[</span><span class="mi">63</span>  <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">4</span>
+    <span class="p">[</span><span class="mi">131</span> <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">4</span>
+    <span class="p">[</span><span class="mi">161</span> <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">4</span>
+    <span class="p">[</span><span class="mi">224</span> <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">4</span>
+    <span class="p">[</span><span class="mi">339</span> <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">8</span>
+    <span class="p">[</span><span class="mi">380</span> <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">6</span>
+    <span class="p">[</span><span class="mi">491</span> <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">1</span>
+    <span class="p">[</span><span class="mi">667</span> <span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">8</span>
+    <span class="n">⋮</span>
+    <span class="p">[</span><span class="mi">615</span> <span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">5</span>
+    <span class="p">[</span><span class="mi">624</span> <span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">3</span>
+    <span class="p">[</span><span class="mi">628</span> <span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">5</span>
+    <span class="p">[</span><span class="mi">638</span> <span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">2</span>
+    <span class="p">[</span><span class="mi">846</span> <span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">1</span>
+    <span class="p">[</span><span class="mi">870</span> <span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">7</span>
+    <span class="p">[</span><span class="mi">871</span> <span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">5</span>
+    <span class="p">[</span><span class="mi">956</span> <span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>  <span class="o">=</span>  <span class="mi">4</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Construct a LightGraphs graph</span>
+       <span class="n">lg</span> <span class="o">=</span> <span class="n">LightGraphs</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+<span class="p">{</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">24939</span><span class="p">}</span> <span class="n">directed</span> <span class="n">graph</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Calculate all pair shortest paths</span>
+       <span class="n">sdists</span> <span class="o">=</span> <span class="n">LightGraphs</span><span class="o">.</span><span class="n">floyd_warshall_shortest_paths</span><span class="p">(</span><span class="n">lg</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span><span class="o">.</span><span class="n">dists</span>
+<span class="mi">1000</span><span class="n">×1000</span> <span class="n">Array</span><span class="p">{</span><span class="kt">Int64</span><span class="p">,</span><span class="mi">2</span><span class="p">}:</span>
+<span class="mi">5</span>  <span class="mi">5</span>  <span class="mi">4</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">6</span> <span class="n">…</span> <span class="mi">4</span>  <span class="mi">6</span>  <span class="mi">4</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">4</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">3</span>  <span class="mi">6</span>
+<span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">4</span>  <span class="mi">6</span>  <span class="mi">4</span>  <span class="mi">6</span>   <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">2</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">6</span>
+<span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">8</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">5</span>   <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">8</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">7</span>
+<span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">4</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">5</span> <span class="n">…</span> <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">3</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">4</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">5</span>
+<span class="mi">4</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">3</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">2</span>  <span class="mi">4</span>  <span class="mi">6</span>   <span class="mi">4</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">6</span>
+<span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">4</span>  <span class="mi">5</span>   <span class="mi">4</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">8</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">5</span>
+<span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">8</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">8</span>  <span class="mi">8</span>  <span class="mi">6</span> <span class="n">…</span> <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">8</span>  <span class="mi">8</span>  <span class="mi">9</span>  <span class="mi">7</span>  <span class="mi">9</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">5</span>
+<span class="mi">7</span>  <span class="mi">4</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">4</span>  <span class="mi">5</span>  <span class="mi">4</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">8</span>  <span class="mi">6</span>   <span class="mi">4</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">5</span>
+<span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">4</span>  <span class="mi">5</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">9</span>  <span class="mi">6</span>   <span class="mi">7</span>  <span class="mi">4</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">7</span>
+<span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">6</span> <span class="n">…</span> <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">4</span>  <span class="mi">4</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">4</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">5</span>  <span class="mi">3</span>
+<span class="mi">5</span>  <span class="mi">3</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">4</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">6</span>   <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">4</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">5</span>  <span class="mi">4</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">6</span>
+<span class="mi">4</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">5</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">3</span>  <span class="mi">4</span>  <span class="mi">6</span>   <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">3</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">4</span>  <span class="mi">5</span>  <span class="mi">6</span>
+<span class="n">⋮</span>     <span class="n">⋮</span>      <span class="n">⋮</span>     <span class="n">⋮</span>      <span class="n">⋮</span>      <span class="n">⋱</span>    <span class="n">⋮</span>     <span class="n">⋮</span>      <span class="n">⋮</span>     <span class="n">⋮</span>     <span class="n">⋮</span>      <span class="n">⋮</span>
+<span class="mi">8</span>  <span class="mi">8</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">3</span>  <span class="mi">6</span>  <span class="mi">4</span>  <span class="mi">7</span>   <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">4</span>  <span class="mi">5</span>  <span class="mi">3</span>  <span class="mi">8</span>  <span class="mi">3</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">4</span>
+<span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">4</span>  <span class="mi">3</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">5</span>   <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">4</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">4</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">6</span>
+<span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">3</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">7</span> <span class="n">…</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">5</span>
+<span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">3</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">4</span>   <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">5</span>  <span class="mi">3</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">4</span>
+<span class="mi">8</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">5</span>  <span class="mi">4</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">8</span>   <span class="mi">8</span>  <span class="mi">8</span>  <span class="mi">5</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">8</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">4</span>  <span class="mi">7</span>  <span class="mi">8</span>
+<span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">4</span>  <span class="mi">6</span>  <span class="mi">5</span> <span class="n">…</span> <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">3</span>  <span class="mi">8</span>  <span class="mi">5</span>  <span class="mi">8</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">6</span>
+<span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">5</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">5</span>   <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">3</span>  <span class="mi">5</span>  <span class="mi">5</span>  <span class="mi">8</span>  <span class="mi">5</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">6</span>
+<span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">7</span>   <span class="mi">3</span>  <span class="mi">4</span>  <span class="mi">8</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">4</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">4</span>  <span class="mi">5</span>
+<span class="mi">9</span>  <span class="mi">9</span>  <span class="mi">7</span>  <span class="mi">9</span>  <span class="mi">7</span>  <span class="mi">8</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">9</span>  <span class="mi">9</span>  <span class="mi">7</span> <span class="n">…</span> <span class="mi">9</span>  <span class="mi">6</span>  <span class="mi">9</span>  <span class="mi">9</span>  <span class="mi">8</span>  <span class="mi">8</span>  <span class="mi">6</span>  <span class="mi">9</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">0</span>  <span class="mi">7</span>
+<span class="mi">8</span>  <span class="mi">8</span>  <span class="mi">8</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">8</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">8</span>  <span class="mi">7</span>  <span class="mi">8</span>   <span class="mi">8</span>  <span class="mi">8</span>  <span class="mi">4</span>  <span class="mi">6</span>  <span class="mi">8</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">9</span>  <span class="mi">8</span>  <span class="mi">8</span>  <span class="mi">9</span>  <span class="mi">8</span>
+<span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">3</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>   <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">5</span>  <span class="mi">4</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">4</span>  <span class="mi">8</span>
+<span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">4</span>  <span class="mi">6</span>  <span class="mi">6</span>  <span class="mi">4</span>  <span class="mi">5</span>  <span class="mi">7</span>  <span class="mi">7</span>  <span class="mi">6</span> <span class="n">…</span> <span class="mi">7</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">3</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">5</span>  <span class="mi">8</span>  <span class="mi">6</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Find the shortest distances for edge pairs</span>
+       <span class="n">sdists</span> <span class="o">=</span> <span class="p">[</span><span class="n">sdists</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">second</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">first</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="k">in</span> <span class="n">edges</span><span class="p">(</span><span class="n">g</span><span class="p">)];</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Make the shortest distances an edge proeprty</span>
+       <span class="n">seteprop!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="p">:,</span> <span class="n">sdists</span><span class="p">,</span> <span class="p">:</span><span class="n">shortest_distance</span><span class="p">);</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Calculate the graph&#39;s betweenness centrality</span>
+       <span class="n">centrality</span> <span class="o">=</span> <span class="n">LightGraphs</span><span class="o">.</span><span class="n">betweenness_centrality</span><span class="p">(</span><span class="n">lg</span><span class="p">);</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Make the centrality calculate above a vertex property</span>
+       <span class="n">setvprop!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="p">:,</span> <span class="n">centrality</span><span class="p">,</span> <span class="p">:</span><span class="n">centrality</span><span class="p">)</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Display the vertex table</span>
+       <span class="n">VertexDescriptor</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+ <span class="n">│</span> <span class="n">VertexID</span> <span class="n">│</span> <span class="n">Labels</span> <span class="n">│</span> <span class="n">centrality</span>  <span class="n">│</span>
+ <span class="n">├──────────┼────────┼─────────────┤</span>
+ <span class="n">│</span> <span class="mi">1</span>        <span class="n">│</span> <span class="mi">1</span>      <span class="n">│</span> <span class="mf">0.00100559</span>  <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">2</span>        <span class="n">│</span> <span class="mi">2</span>      <span class="n">│</span> <span class="mf">0.00115523</span>  <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">3</span>        <span class="n">│</span> <span class="mi">3</span>      <span class="n">│</span> <span class="mf">0.00139773</span>  <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">4</span>        <span class="n">│</span> <span class="mi">4</span>      <span class="n">│</span> <span class="mf">0.00161647</span>  <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">5</span>        <span class="n">│</span> <span class="mi">5</span>      <span class="n">│</span> <span class="mf">0.00184465</span>  <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">6</span>        <span class="n">│</span> <span class="mi">6</span>      <span class="n">│</span> <span class="mf">0.00152136</span>  <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">7</span>        <span class="n">│</span> <span class="mi">7</span>      <span class="n">│</span> <span class="mf">0.00113189</span>  <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">8</span>        <span class="n">│</span> <span class="mi">8</span>      <span class="n">│</span> <span class="mf">0.00147083</span>  <span class="n">│</span>
+ <span class="n">⋮</span>
+ <span class="n">│</span> <span class="mi">990</span>      <span class="n">│</span> <span class="mi">990</span>    <span class="n">│</span> <span class="mf">0.00233637</span>  <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">991</span>      <span class="n">│</span> <span class="mi">991</span>    <span class="n">│</span> <span class="mf">0.00101592</span>  <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">992</span>      <span class="n">│</span> <span class="mi">992</span>    <span class="n">│</span> <span class="mf">0.00152453</span>  <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">993</span>      <span class="n">│</span> <span class="mi">993</span>    <span class="n">│</span> <span class="mf">0.00124928</span>  <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">994</span>      <span class="n">│</span> <span class="mi">994</span>    <span class="n">│</span> <span class="mf">0.000931563</span> <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">995</span>      <span class="n">│</span> <span class="mi">995</span>    <span class="n">│</span> <span class="mf">0.00144064</span>  <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">996</span>      <span class="n">│</span> <span class="mi">996</span>    <span class="n">│</span> <span class="mf">0.0008423</span>   <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">997</span>      <span class="n">│</span> <span class="mi">997</span>    <span class="n">│</span> <span class="mf">0.00114039</span>  <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">998</span>      <span class="n">│</span> <span class="mi">998</span>    <span class="n">│</span> <span class="mf">0.00172091</span>  <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">999</span>      <span class="n">│</span> <span class="mi">999</span>    <span class="n">│</span> <span class="mf">0.00131404</span>  <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">1000</span>     <span class="n">│</span> <span class="mi">1000</span>   <span class="n">│</span> <span class="mf">0.00128859</span>  <span class="n">│</span>
+
+<span class="n">juila</span><span class="o">&gt;</span> <span class="c"># Display the edge table for edges where a shorter distance was found</span>
+       <span class="n">EdgeDescriptor</span><span class="p">(@</span><span class="n">query</span><span class="p">(</span><span class="n">g</span> <span class="o">|&gt;</span> <span class="n">filter</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">dist</span> <span class="o">!=</span> <span class="n">e</span><span class="o">.</span><span class="n">shortest_distance</span><span class="p">)))</span>
+ <span class="n">│</span> <span class="n">Index</span> <span class="n">│</span> <span class="n">Source</span> <span class="n">│</span> <span class="n">Target</span> <span class="n">│</span> <span class="n">weight</span>   <span class="n">│</span> <span class="n">dist</span> <span class="n">│</span> <span class="n">shortest_distance</span> <span class="n">│</span>
+ <span class="n">├───────┼────────┼────────┼──────────┼──────┼───────────────────┤</span>
+ <span class="n">│</span> <span class="mi">1</span>     <span class="n">│</span> <span class="mi">1</span>      <span class="n">│</span> <span class="mi">339</span>    <span class="n">│</span> <span class="mf">0.544382</span> <span class="n">│</span> <span class="mi">8</span>    <span class="n">│</span> <span class="mi">5</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">2</span>     <span class="n">│</span> <span class="mi">1</span>      <span class="n">│</span> <span class="mi">667</span>    <span class="n">│</span> <span class="mf">0.983177</span> <span class="n">│</span> <span class="mi">8</span>    <span class="n">│</span> <span class="mi">7</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">3</span>     <span class="n">│</span> <span class="mi">1</span>      <span class="n">│</span> <span class="mi">701</span>    <span class="n">│</span> <span class="mf">0.510004</span> <span class="n">│</span> <span class="mi">7</span>    <span class="n">│</span> <span class="mi">6</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">4</span>     <span class="n">│</span> <span class="mi">1</span>      <span class="n">│</span> <span class="mi">744</span>    <span class="n">│</span> <span class="mf">0.678528</span> <span class="n">│</span> <span class="mi">10</span>   <span class="n">│</span> <span class="mi">3</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">5</span>     <span class="n">│</span> <span class="mi">1</span>      <span class="n">│</span> <span class="mi">772</span>    <span class="n">│</span> <span class="mf">0.89435</span>  <span class="n">│</span> <span class="mi">10</span>   <span class="n">│</span> <span class="mi">8</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">6</span>     <span class="n">│</span> <span class="mi">2</span>      <span class="n">│</span> <span class="mi">98</span>     <span class="n">│</span> <span class="mf">0.999188</span> <span class="n">│</span> <span class="mi">9</span>    <span class="n">│</span> <span class="mi">8</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">7</span>     <span class="n">│</span> <span class="mi">2</span>      <span class="n">│</span> <span class="mi">237</span>    <span class="n">│</span> <span class="mf">0.578166</span> <span class="n">│</span> <span class="mi">10</span>   <span class="n">│</span> <span class="mi">7</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">8</span>     <span class="n">│</span> <span class="mi">2</span>      <span class="n">│</span> <span class="mi">301</span>    <span class="n">│</span> <span class="mf">0.560192</span> <span class="n">│</span> <span class="mi">9</span>    <span class="n">│</span> <span class="mi">6</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">9</span>     <span class="n">│</span> <span class="mi">2</span>      <span class="n">│</span> <span class="mi">476</span>    <span class="n">│</span> <span class="mf">0.602794</span> <span class="n">│</span> <span class="mi">8</span>    <span class="n">│</span> <span class="mi">7</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">10</span>    <span class="n">│</span> <span class="mi">2</span>      <span class="n">│</span> <span class="mi">525</span>    <span class="n">│</span> <span class="mf">0.973554</span> <span class="n">│</span> <span class="mi">9</span>    <span class="n">│</span> <span class="mi">5</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">11</span>    <span class="n">│</span> <span class="mi">2</span>      <span class="n">│</span> <span class="mi">736</span>    <span class="n">│</span> <span class="mf">0.828569</span> <span class="n">│</span> <span class="mi">8</span>    <span class="n">│</span> <span class="mi">5</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">12</span>    <span class="n">│</span> <span class="mi">2</span>      <span class="n">│</span> <span class="mi">877</span>    <span class="n">│</span> <span class="mf">0.620037</span> <span class="n">│</span> <span class="mi">8</span>    <span class="n">│</span> <span class="mi">5</span>                 <span class="n">│</span>
+ <span class="n">⋮</span>
+ <span class="n">│</span> <span class="mi">10367</span> <span class="n">│</span> <span class="mi">998</span>    <span class="n">│</span> <span class="mi">840</span>    <span class="n">│</span> <span class="mf">0.941186</span> <span class="n">│</span> <span class="mi">8</span>    <span class="n">│</span> <span class="mi">4</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">10368</span> <span class="n">│</span> <span class="mi">999</span>    <span class="n">│</span> <span class="mi">78</span>     <span class="n">│</span> <span class="mf">0.665393</span> <span class="n">│</span> <span class="mi">5</span>    <span class="n">│</span> <span class="mi">3</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">10369</span> <span class="n">│</span> <span class="mi">999</span>    <span class="n">│</span> <span class="mi">281</span>    <span class="n">│</span> <span class="mf">0.878904</span> <span class="n">│</span> <span class="mi">9</span>    <span class="n">│</span> <span class="mi">6</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">10370</span> <span class="n">│</span> <span class="mi">999</span>    <span class="n">│</span> <span class="mi">350</span>    <span class="n">│</span> <span class="mf">0.628088</span> <span class="n">│</span> <span class="mi">6</span>    <span class="n">│</span> <span class="mi">5</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">10371</span> <span class="n">│</span> <span class="mi">999</span>    <span class="n">│</span> <span class="mi">528</span>    <span class="n">│</span> <span class="mf">0.699302</span> <span class="n">│</span> <span class="mi">10</span>   <span class="n">│</span> <span class="mi">6</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">10372</span> <span class="n">│</span> <span class="mi">999</span>    <span class="n">│</span> <span class="mi">653</span>    <span class="n">│</span> <span class="mf">0.860554</span> <span class="n">│</span> <span class="mi">9</span>    <span class="n">│</span> <span class="mi">5</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">10373</span> <span class="n">│</span> <span class="mi">999</span>    <span class="n">│</span> <span class="mi">715</span>    <span class="n">│</span> <span class="mf">0.74898</span>  <span class="n">│</span> <span class="mi">9</span>    <span class="n">│</span> <span class="mi">7</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">10374</span> <span class="n">│</span> <span class="mi">999</span>    <span class="n">│</span> <span class="mi">726</span>    <span class="n">│</span> <span class="mf">0.772087</span> <span class="n">│</span> <span class="mi">9</span>    <span class="n">│</span> <span class="mi">5</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">10375</span> <span class="n">│</span> <span class="mi">999</span>    <span class="n">│</span> <span class="mi">862</span>    <span class="n">│</span> <span class="mf">0.852327</span> <span class="n">│</span> <span class="mi">7</span>    <span class="n">│</span> <span class="mi">5</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">10376</span> <span class="n">│</span> <span class="mi">999</span>    <span class="n">│</span> <span class="mi">947</span>    <span class="n">│</span> <span class="mf">0.907081</span> <span class="n">│</span> <span class="mi">7</span>    <span class="n">│</span> <span class="mi">5</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">10377</span> <span class="n">│</span> <span class="mi">1000</span>   <span class="n">│</span> <span class="mi">370</span>    <span class="n">│</span> <span class="mf">0.916611</span> <span class="n">│</span> <span class="mi">9</span>    <span class="n">│</span> <span class="mi">6</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">10378</span> <span class="n">│</span> <span class="mi">1000</span>   <span class="n">│</span> <span class="mi">375</span>    <span class="n">│</span> <span class="mf">0.902912</span> <span class="n">│</span> <span class="mi">8</span>    <span class="n">│</span> <span class="mi">4</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">10379</span> <span class="n">│</span> <span class="mi">1000</span>   <span class="n">│</span> <span class="mi">390</span>    <span class="n">│</span> <span class="mf">0.523391</span> <span class="n">│</span> <span class="mi">7</span>    <span class="n">│</span> <span class="mi">5</span>                 <span class="n">│</span>
+ <span class="n">│</span> <span class="mi">10380</span> <span class="n">│</span> <span class="mi">1000</span>   <span class="n">│</span> <span class="mi">421</span>    <span class="n">│</span> <span class="mf">0.673928</span> <span class="n">│</span> <span class="mi">9</span>    <span class="n">│</span> <span class="mi">5</span>                 <span class="n">│</span>
+</pre></div>
+
+
+<p>Detailed Documentation:</p>
+<p><a id='Graft.export_adjacency' href='#Graft.export_adjacency'>#</a>
+<strong><code>Graft.export_adjacency</code></strong> &mdash; <em>Function</em>.</p>
+<p>This method provides compatibilty with LightGraphs.jl, by returning the graph's adjacency matrix.</p>
+<div class="codehilite"><pre><span></span><span class="k">import</span> <span class="n">LightGraphs</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">(</span><span class="mi">10</span><span class="o">^</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="o">^</span><span class="mi">6</span><span class="p">)</span>
+
+<span class="c"># Construct a LightGraphs DiGraph from the exported adjacency matrix</span>
+<span class="n">LightGraphs</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">(</span><span class="n">export_adjacency</span><span class="p">(</span><span class="n">g</span><span class="p">))</span>
+</pre></div>
+
+
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/operations/export.jl#L18-L29' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.export_vertex_property' href='#Graft.export_vertex_property'>#</a>
+<strong><code>Graft.export_vertex_property</code></strong> &mdash; <em>Function</em>.</p>
+<p>This method provides compatibilty with LightGraphs.jl, by returning an array containing all values for a vertex property</p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/operations/export.jl#L32-L35' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.export_edge_property' href='#Graft.export_edge_property'>#</a>
+<strong><code>Graft.export_edge_property</code></strong> &mdash; <em>Function</em>.</p>
+<p>This method provides compatibilty with LightGraphs.jl, by returning a SparseMatrixCSC containing all values for an edge property</p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/operations/export.jl#L40-L43' class='documenter-source'>source</a><br></p>
+          <aside class="copyright" role="note">
+            
+            Documentation built with
+            <a href="http://www.mkdocs.org" target="_blank">MkDocs</a>
+            using the
+            <a href="http://squidfunk.github.io/mkdocs-material/" target="_blank">
+              Material
+            </a>
+            theme.
+          </aside>
+          
+            <footer class="footer">
+              
+  <nav class="pagination" aria-label="Footer">
+    <div class="previous">
+      
+        <a href="../graphio/" title="File IO">
+          <span class="direction">
+            Previous
+          </span>
+          <div class="page">
+            <div class="button button-previous" role="button" aria-label="Previous">
+              <i class="icon icon-back"></i>
+            </div>
+            <div class="stretch">
+              <div class="title">
+                File IO
+              </div>
+            </div>
+          </div>
+        </a>
+      
+    </div>
+    <div class="next">
+      
+        <a href="../edgeiter/" title="Edge Iteration">
+          <span class="direction">
+            Next
+          </span>
+          <div class="page">
+            <div class="stretch">
+              <div class="title">
+                Edge Iteration
+              </div>
+            </div>
+            <div class="button button-next" role="button" aria-label="Next">
+              <i class="icon icon-forward"></i>
+            </div>
+          </div>
+        </a>
+      
+    </div>
+  </nav>
+
+            </footer>
+          
+        </div>
+      </article>
+      <div class="results" role="status" aria-live="polite">
+        <div class="scrollable">
+          <div class="wrapper">
+            <div class="meta"></div>
+            <div class="list"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script>
+      var base_url = '..';
+      var repo_id  = 'pranavtbhat/Graft.jl';
+    </script>
+    <script src="../assets/javascripts/application-997097ee0c.js"></script>
+    
+      <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    
+      <script src="../assets/mathjaxhelper.js"></script>
+    
+    
+  </body>
+</html>

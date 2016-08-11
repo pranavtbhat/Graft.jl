@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="no-js ie6"><![endif]-->
+<!--[if IE 7 ]><html class="no-js ie7"><![endif]-->
+<!--[if IE 8 ]><html class="no-js ie8"><![endif]-->
+<!--[if IE 9 ]><html class="no-js ie9"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
+    
+      
+        <title>Edge Metadata - Graft.jl</title>
+      
+      
+      
+      
+    
+    <meta property="og:url" content="None">
+    <meta property="og:title" content="Graft.jl">
+    <meta property="og:image" content="None/../">
+    <meta name="apple-mobile-web-app-title" content="Graft.jl">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../assets/images/favicon-e565ddfa3b.ico">
+    <link rel="icon" type="image/x-icon" href="../assets/images/favicon-e565ddfa3b.ico">
+    <style>
+      @font-face {
+      	font-family: 'Icon';
+      	src: url('../assets/fonts/icon.eot?52m981');
+      	src: url('../assets/fonts/icon.eot?#iefix52m981')
+               format('embedded-opentype'),
+      		   url('../assets/fonts/icon.woff?52m981')
+               format('woff'),
+      		   url('../assets/fonts/icon.ttf?52m981')
+               format('truetype'),
+      		   url('../assets/fonts/icon.svg?52m981#icon')
+               format('svg');
+      	font-weight: normal;
+      	font-style: normal;
+      }
+    </style>
+    <link rel="stylesheet" href="../assets/stylesheets/application-a422ff04cc.css">
+    
+      <link rel="stylesheet" href="../assets/stylesheets/palettes-05ab2406df.css">
+    
+    
+      
+      
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,700|Ubuntu+Mono">
+      <style>
+        body, input {
+          font-family: 'Ubuntu', Helvetica, Arial, sans-serif;
+        }
+        pre, code {
+          font-family: 'Ubuntu Mono', 'Courier New', 'Courier', monospace;
+        }
+      </style>
+    
+    
+      <link rel="stylesheet" href="../assets/Documenter.css">
+    
+    <script src="../assets/javascripts/modernizr-4ab42b99fd.js"></script>
+    
+  </head>
+  
+  
+  
+  <body class="palette-primary-indigo palette-accent-blue">
+    
+      
+      
+    
+    <div class="backdrop">
+      <div class="backdrop-paper"></div>
+    </div>
+    <input class="toggle" type="checkbox" id="toggle-drawer">
+    <input class="toggle" type="checkbox" id="toggle-search">
+    <label class="toggle-button overlay" for="toggle-drawer"></label>
+    <header class="header">
+      <nav aria-label="Header">
+  <div class="bar default">
+    <div class="button button-menu" role="button" aria-label="Menu">
+      <label class="toggle-button icon icon-menu" for="toggle-drawer">
+        <span></span>
+      </label>
+    </div>
+    <div class="stretch">
+      <div class="title">
+        
+          <span class="path">
+            
+              
+                Metadata <i class="icon icon-link"></i>
+              
+            
+          </span>
+        
+        Edge Metadata
+      </div>
+    </div>
+    
+    
+    <div class="button button-search" role="button" aria-label="Search">
+      <label class="toggle-button icon icon-search" title="Search" for="toggle-search"></label>
+    </div>
+  </div>
+  <div class="bar search">
+    <div class="button button-close" role="button" aria-label="Close">
+      <label class="toggle-button icon icon-back" for="toggle-search"></label>
+    </div>
+    <div class="stretch">
+      <div class="field">
+        <input class="query" type="text" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck>
+      </div>
+    </div>
+    <div class="button button-reset" role="button" aria-label="Search">
+      <button class="toggle-button icon icon-close" id="reset-search"></button>
+    </div>
+  </div>
+</nav>
+    </header>
+    <main class="main">
+      
+      <div class="drawer">
+        <nav aria-label="Navigation">
+  
+  <a href="https://github.com/pranavtbhat/Graft.jl" class="project">
+    <div class="banner">
+      
+      <div class="name">
+        <strong>
+          Graft.jl
+          <span class="version">
+            
+          </span>
+        </strong>
+        
+          <br>
+          pranavtbhat/Graft.jl
+        
+      </div>
+    </div>
+  </a>
+  <div class="scrollable">
+    <div class="wrapper">
+      
+        <ul class="repo">
+          <li class="repo-download">
+            
+            <a href="https://github.com/pranavtbhat/Graft.jl/archive/master.zip" target="_blank" title="Download" data-action="download">
+              <i class="icon icon-download"></i> Download
+            </a>
+          </li>
+          <li class="repo-stars">
+            <a href="https://github.com/pranavtbhat/Graft.jl/stargazers" target="_blank" title="Stargazers" data-action="star">
+              <i class="icon icon-star"></i> Stars
+              <span class="count">&ndash;</span>
+            </a>
+          </li>
+        </ul>
+        <hr>
+      
+      <div class="toc">
+        <ul>
+          
+            
+  <li>
+    <a class="" title="Introduction" href="..">
+      Introduction
+    </a>
+    
+  </li>
+
+          
+            
+  <li>
+    <span class="section">Graph API</span>
+    <ul>
+      
+        
+  <li>
+    <a class="" title="Generation" href="../generator/">
+      Generation
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Combinatorial" href="../combinatorial/">
+      Combinatorial
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Mutation" href="../mutation/">
+      Mutation
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Labelling" href="../labelling/">
+      Labelling
+    </a>
+    
+  </li>
+
+      
+    </ul>
+  </li>
+
+          
+            
+  <li>
+    <span class="section">Metadata</span>
+    <ul>
+      
+        
+  <li>
+    <a class="" title="Vertex Metadata" href="../vdata/">
+      Vertex Metadata
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="current" title="Edge Metadata" href="./">
+      Edge Metadata
+    </a>
+    
+      
+      
+        <ul>
+          
+            <li class="anchor">
+              <a title="Edge Metadata" href="#edge-metadata">
+                Edge Metadata
+              </a>
+            </li>
+          
+        </ul>
+      
+    
+  </li>
+
+      
+    </ul>
+  </li>
+
+          
+            
+  <li>
+    <span class="section">Query API</span>
+    <ul>
+      
+        
+  <li>
+    <a class="" title="Query Macro" href="../queries/">
+      Query Macro
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Hop Subgraphs" href="../hopgraph/">
+      Hop Subgraphs
+    </a>
+    
+  </li>
+
+      
+    </ul>
+  </li>
+
+          
+            
+  <li>
+    <span class="section">Graph IO</span>
+    <ul>
+      
+        
+  <li>
+    <a class="" title="File IO" href="../graphio/">
+      File IO
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Export" href="../export/">
+      Export
+    </a>
+    
+  </li>
+
+      
+    </ul>
+  </li>
+
+          
+            
+  <li>
+    <span class="section">Internal</span>
+    <ul>
+      
+        
+  <li>
+    <a class="" title="Edge Iteration" href="../edgeiter/">
+      Edge Iteration
+    </a>
+    
+  </li>
+
+      
+        
+  <li>
+    <a class="" title="Internal Docs" href="../internal/">
+      Internal Docs
+    </a>
+    
+  </li>
+
+      
+    </ul>
+  </li>
+
+          
+        </ul>
+        
+      </div>
+    </div>
+  </div>
+</nav>
+      </div>
+      <article class="article">
+        <div class="wrapper">
+          
+            <h1>Edge Metadata</h1>
+          
+          <p><a id='Edge-Metadata-1'></a></p>
+<h2 id="edge-metadata">Edge Metadata</h2>
+<p>Graft supports the assignment of metadata to vertices, and adopts a tabular approach to storage. Edge metadata is stored as an <code>AbstractDataFrame</code>. The adjacency matrix stores the row number for each edge, i.e. it serves as an edge to index map, or an index table to the edge metadata table.</p>
+<p>The following example demonstrates edge metadata:</p>
+<div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="k">using</span> <span class="n">Graft</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">g</span> <span class="o">=</span> <span class="n">completegraph</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">setlabel!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">map</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">10</span><span class="p">));</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">eit</span> <span class="o">=</span> <span class="n">edges</span><span class="p">(</span><span class="n">g</span><span class="p">);</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Create a new edge property</span>
+       <span class="n">seteprop!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">90</span><span class="p">,</span> <span class="p">:</span><span class="n">p1</span><span class="p">);</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Fetch an entire column from the vertex table</span>
+       <span class="n">geteprop</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:</span><span class="n">p1</span><span class="p">)</span>
+<span class="mi">90</span><span class="o">-</span><span class="n">element</span> <span class="n">DataArrays</span><span class="o">.</span><span class="n">DataArray</span><span class="p">{</span><span class="kt">Int64</span><span class="p">,</span><span class="mi">1</span><span class="p">}:</span>
+  <span class="mi">1</span>
+  <span class="mi">2</span>
+  <span class="mi">3</span>
+  <span class="mi">4</span>
+  <span class="mi">5</span>
+  <span class="mi">6</span>
+  <span class="mi">7</span>
+  <span class="mi">8</span>
+  <span class="mi">9</span>
+ <span class="mi">10</span>
+  <span class="n">⋮</span>
+ <span class="mi">82</span>
+ <span class="mi">83</span>
+ <span class="mi">84</span>
+ <span class="mi">85</span>
+ <span class="mi">86</span>
+ <span class="mi">87</span>
+ <span class="mi">88</span>
+ <span class="mi">89</span>
+ <span class="mi">90</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Modify the property&#39;s value for a subset of the vertices</span>
+       <span class="n">seteprop!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">eit</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">],</span> <span class="mi">5</span><span class="p">,</span> <span class="p">:</span><span class="n">p1</span><span class="p">)</span>
+<span class="mi">5</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Fetch the property&#39;s value for a subset of the vertices</span>
+       <span class="n">geteprop</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">eit</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">],</span> <span class="p">:</span><span class="n">p1</span><span class="p">)</span>
+<span class="mi">5</span><span class="o">-</span><span class="n">element</span> <span class="n">DataArrays</span><span class="o">.</span><span class="n">DataArray</span><span class="p">{</span><span class="kt">Int64</span><span class="p">,</span><span class="mi">1</span><span class="p">}:</span>
+ <span class="mi">5</span>
+ <span class="mi">5</span>
+ <span class="mi">5</span>
+ <span class="mi">5</span>
+ <span class="mi">5</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Create a new vertex property</span>
+       <span class="n">seteprop!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="n">p2</span><span class="p">);</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># List all vertex properties in the graph</span>
+       <span class="n">listeprops</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="mi">2</span><span class="o">-</span><span class="n">element</span> <span class="n">Array</span><span class="p">{</span><span class="n">Symbol</span><span class="p">,</span><span class="mi">1</span><span class="p">}:</span>
+ <span class="p">:</span><span class="n">p1</span>
+ <span class="p">:</span><span class="n">p2</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Display the edge table</span>
+       <span class="n">E</span> <span class="o">=</span> <span class="n">EdgeDescriptor</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="n">│</span> <span class="n">Index</span> <span class="n">│</span> <span class="n">Source</span> <span class="n">│</span> <span class="n">Target</span> <span class="n">│</span> <span class="n">p1</span> <span class="n">│</span> <span class="n">p2</span> <span class="n">│</span>
+<span class="n">├───────┼────────┼────────┼────┼────┤</span>
+<span class="n">│</span> <span class="mi">1</span>     <span class="n">│</span> <span class="s">&quot;1&quot;</span>    <span class="n">│</span> <span class="s">&quot;2&quot;</span>    <span class="n">│</span> <span class="mi">5</span>  <span class="n">│</span> <span class="mi">1</span>  <span class="n">│</span>
+<span class="n">│</span> <span class="mi">2</span>     <span class="n">│</span> <span class="s">&quot;1&quot;</span>    <span class="n">│</span> <span class="s">&quot;3&quot;</span>    <span class="n">│</span> <span class="mi">5</span>  <span class="n">│</span> <span class="mi">1</span>  <span class="n">│</span>
+<span class="n">│</span> <span class="mi">3</span>     <span class="n">│</span> <span class="s">&quot;1&quot;</span>    <span class="n">│</span> <span class="s">&quot;4&quot;</span>    <span class="n">│</span> <span class="mi">5</span>  <span class="n">│</span> <span class="mi">1</span>  <span class="n">│</span>
+<span class="n">│</span> <span class="mi">4</span>     <span class="n">│</span> <span class="s">&quot;1&quot;</span>    <span class="n">│</span> <span class="s">&quot;5&quot;</span>    <span class="n">│</span> <span class="mi">5</span>  <span class="n">│</span> <span class="mi">1</span>  <span class="n">│</span>
+<span class="n">│</span> <span class="mi">5</span>     <span class="n">│</span> <span class="s">&quot;1&quot;</span>    <span class="n">│</span> <span class="s">&quot;6&quot;</span>    <span class="n">│</span> <span class="mi">5</span>  <span class="n">│</span> <span class="mi">1</span>  <span class="n">│</span>
+<span class="n">│</span> <span class="mi">6</span>     <span class="n">│</span> <span class="s">&quot;1&quot;</span>    <span class="n">│</span> <span class="s">&quot;7&quot;</span>    <span class="n">│</span> <span class="mi">6</span>  <span class="n">│</span> <span class="mi">1</span>  <span class="n">│</span>
+<span class="n">│</span> <span class="mi">7</span>     <span class="n">│</span> <span class="s">&quot;1&quot;</span>    <span class="n">│</span> <span class="s">&quot;8&quot;</span>    <span class="n">│</span> <span class="mi">7</span>  <span class="n">│</span> <span class="mi">1</span>  <span class="n">│</span>
+<span class="n">│</span> <span class="mi">8</span>     <span class="n">│</span> <span class="s">&quot;1&quot;</span>    <span class="n">│</span> <span class="s">&quot;9&quot;</span>    <span class="n">│</span> <span class="mi">8</span>  <span class="n">│</span> <span class="mi">1</span>  <span class="n">│</span>
+<span class="n">⋮</span>
+<span class="n">│</span> <span class="mi">82</span>    <span class="n">│</span> <span class="s">&quot;10&quot;</span>   <span class="n">│</span> <span class="s">&quot;1&quot;</span>    <span class="n">│</span> <span class="mi">82</span> <span class="n">│</span> <span class="mi">1</span>  <span class="n">│</span>
+<span class="n">│</span> <span class="mi">83</span>    <span class="n">│</span> <span class="s">&quot;10&quot;</span>   <span class="n">│</span> <span class="s">&quot;2&quot;</span>    <span class="n">│</span> <span class="mi">83</span> <span class="n">│</span> <span class="mi">1</span>  <span class="n">│</span>
+<span class="n">│</span> <span class="mi">84</span>    <span class="n">│</span> <span class="s">&quot;10&quot;</span>   <span class="n">│</span> <span class="s">&quot;3&quot;</span>    <span class="n">│</span> <span class="mi">84</span> <span class="n">│</span> <span class="mi">1</span>  <span class="n">│</span>
+<span class="n">│</span> <span class="mi">85</span>    <span class="n">│</span> <span class="s">&quot;10&quot;</span>   <span class="n">│</span> <span class="s">&quot;4&quot;</span>    <span class="n">│</span> <span class="mi">85</span> <span class="n">│</span> <span class="mi">1</span>  <span class="n">│</span>
+<span class="n">│</span> <span class="mi">86</span>    <span class="n">│</span> <span class="s">&quot;10&quot;</span>   <span class="n">│</span> <span class="s">&quot;5&quot;</span>    <span class="n">│</span> <span class="mi">86</span> <span class="n">│</span> <span class="mi">1</span>  <span class="n">│</span>
+<span class="n">│</span> <span class="mi">87</span>    <span class="n">│</span> <span class="s">&quot;10&quot;</span>   <span class="n">│</span> <span class="s">&quot;6&quot;</span>    <span class="n">│</span> <span class="mi">87</span> <span class="n">│</span> <span class="mi">1</span>  <span class="n">│</span>
+<span class="n">│</span> <span class="mi">88</span>    <span class="n">│</span> <span class="s">&quot;10&quot;</span>   <span class="n">│</span> <span class="s">&quot;7&quot;</span>    <span class="n">│</span> <span class="mi">88</span> <span class="n">│</span> <span class="mi">1</span>  <span class="n">│</span>
+<span class="n">│</span> <span class="mi">89</span>    <span class="n">│</span> <span class="s">&quot;10&quot;</span>   <span class="n">│</span> <span class="s">&quot;8&quot;</span>    <span class="n">│</span> <span class="mi">89</span> <span class="n">│</span> <span class="mi">1</span>  <span class="n">│</span>
+<span class="n">│</span> <span class="mi">90</span>    <span class="n">│</span> <span class="s">&quot;10&quot;</span>   <span class="n">│</span> <span class="s">&quot;9&quot;</span>    <span class="n">│</span> <span class="mi">90</span> <span class="n">│</span> <span class="mi">1</span>  <span class="n">│</span>
+
+<span class="n">Edge</span> <span class="mi">1</span> <span class="o">=&gt;</span> <span class="mi">5</span>
+<span class="n">p1</span> <span class="o">=&gt;</span> <span class="mi">5</span>
+<span class="n">p2</span> <span class="o">=&gt;</span> <span class="mi">1</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Examine a single labelled edge</span>
+       <span class="n">E</span><span class="p">[</span><span class="s">&quot;1&quot;</span><span class="p">,</span> <span class="s">&quot;5&quot;</span><span class="p">]</span>
+</pre></div>
+
+
+<p>Detailed documentation:</p>
+<p><a id='Graft.listeprops' href='#Graft.listeprops'>#</a>
+<strong><code>Graft.listeprops</code></strong> &mdash; <em>Function</em>.</p>
+<p>List the column headers of the edge dataframe </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/edata.jl#L42' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.haseprop' href='#Graft.haseprop'>#</a>
+<strong><code>Graft.haseprop</code></strong> &mdash; <em>Function</em>.</p>
+<p>Check if the edge dataframe has the input edge property </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/edata.jl#L45' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.geteprop' href='#Graft.geteprop'>#</a>
+<strong><code>Graft.geteprop</code></strong> &mdash; <em>Function</em>.</p>
+<p>Retrieve edge properties.</p>
+<p>geteprop(g::Graph, e::EdgeID, eprop::Symbol) -&gt; Fetch the value of a property for edge e</p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/edata.jl#L50-L54' class='documenter-source'>source</a><br></p>
+<p>geteprop(g::Graph, es::EdgeList, eprop::Symbol) -&gt; Fetch the value of a property for edge e in es </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/edata.jl#L58' class='documenter-source'>source</a><br></p>
+<p>geteprop(g::Graph, ::Colon, eprop::Symbol) -&gt; Fetch the value of a property for all edges </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/edata.jl#L62' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.seteprop!' href='#Graft.seteprop!'>#</a>
+<strong><code>Graft.seteprop!</code></strong> &mdash; <em>Function</em>.</p>
+<p>Set edge properties.</p>
+<p>seteprop!(g::Graph, e::EdgeID, val, eprop::Symbol) -&gt; Set a property for an edge e</p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/edata.jl#L68-L72' class='documenter-source'>source</a><br></p>
+<p>seteprop!(g::Graph, es::EdgeList, val(s), eprop::Symbol) -&gt; Set a property for e in es </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/edata.jl#L82' class='documenter-source'>source</a><br></p>
+<p>seteprop!(g::Graph, ::Colon, val(s), eprop::Symbol) </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/edata.jl#L92' class='documenter-source'>source</a><br></p>
+          <aside class="copyright" role="note">
+            
+            Documentation built with
+            <a href="http://www.mkdocs.org" target="_blank">MkDocs</a>
+            using the
+            <a href="http://squidfunk.github.io/mkdocs-material/" target="_blank">
+              Material
+            </a>
+            theme.
+          </aside>
+          
+            <footer class="footer">
+              
+  <nav class="pagination" aria-label="Footer">
+    <div class="previous">
+      
+        <a href="../vdata/" title="Vertex Metadata">
+          <span class="direction">
+            Previous
+          </span>
+          <div class="page">
+            <div class="button button-previous" role="button" aria-label="Previous">
+              <i class="icon icon-back"></i>
+            </div>
+            <div class="stretch">
+              <div class="title">
+                Vertex Metadata
+              </div>
+            </div>
+          </div>
+        </a>
+      
+    </div>
+    <div class="next">
+      
+        <a href="../queries/" title="Query Macro">
+          <span class="direction">
+            Next
+          </span>
+          <div class="page">
+            <div class="stretch">
+              <div class="title">
+                Query Macro
+              </div>
+            </div>
+            <div class="button button-next" role="button" aria-label="Next">
+              <i class="icon icon-forward"></i>
+            </div>
+          </div>
+        </a>
+      
+    </div>
+  </nav>
+
+            </footer>
+          
+        </div>
+      </article>
+      <div class="results" role="status" aria-live="polite">
+        <div class="scrollable">
+          <div class="wrapper">
+            <div class="meta"></div>
+            <div class="list"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script>
+      var base_url = '..';
+      var repo_id  = 'pranavtbhat/Graft.jl';
+    </script>
+    <script src="../assets/javascripts/application-997097ee0c.js"></script>
+    
+      <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    
+      <script src="../assets/mathjaxhelper.js"></script>
+    
+    
+  </body>
+</html>
