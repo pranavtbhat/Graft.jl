@@ -177,230 +177,32 @@
         <ul>
           
             <li class="anchor">
-              <a title="The Graph Type" href="#the-graph-type">
-                The Graph Type
+              <a title="The Graph datastructure" href="#the-graph-datastructure">
+                The Graph datastructure
+              </a>
+            </li>
+          
+            <li class="anchor">
+              <a title="EdgeIteration" href="#edgeiteration">
+                EdgeIteration
+              </a>
+            </li>
+          
+            <li class="anchor">
+              <a title="Metadata" href="#metadata">
+                Metadata
+              </a>
+            </li>
+          
+            <li class="anchor">
+              <a title="Queries" href="#queries">
+                Queries
               </a>
             </li>
           
         </ul>
       
     
-  </li>
-
-          
-            
-  <li>
-    <span class="section">Generation</span>
-    <ul>
-      
-        
-  <li>
-    <a class="" title="Graph API" href="generator/">
-      Graph API
-    </a>
-    
-  </li>
-
-      
-    </ul>
-  </li>
-
-          
-            
-  <li>
-    <span class="section">Combinatorial</span>
-    <ul>
-      
-        
-  <li>
-    <a class="" title="Graph API" href="combinatorial/">
-      Graph API
-    </a>
-    
-  </li>
-
-      
-    </ul>
-  </li>
-
-          
-            
-  <li>
-    <span class="section">Mutation</span>
-    <ul>
-      
-        
-  <li>
-    <a class="" title="Graph API" href="mutation/">
-      Graph API
-    </a>
-    
-  </li>
-
-      
-    </ul>
-  </li>
-
-          
-            
-  <li>
-    <span class="section">Labelling</span>
-    <ul>
-      
-        
-  <li>
-    <a class="" title="Graph API" href="labelling/">
-      Graph API
-    </a>
-    
-  </li>
-
-      
-    </ul>
-  </li>
-
-          
-            
-  <li>
-    <span class="section">Vertex Metadata</span>
-    <ul>
-      
-        
-  <li>
-    <a class="" title="Metadata" href="vdata/">
-      Metadata
-    </a>
-    
-  </li>
-
-      
-    </ul>
-  </li>
-
-          
-            
-  <li>
-    <span class="section">Edge Metadata</span>
-    <ul>
-      
-        
-  <li>
-    <a class="" title="Metadata" href="edata/">
-      Metadata
-    </a>
-    
-  </li>
-
-      
-    </ul>
-  </li>
-
-          
-            
-  <li>
-    <span class="section">Query Macro</span>
-    <ul>
-      
-        
-  <li>
-    <a class="" title="Query API" href="queries/">
-      Query API
-    </a>
-    
-  </li>
-
-      
-    </ul>
-  </li>
-
-          
-            
-  <li>
-    <span class="section">Hop Subgraphs</span>
-    <ul>
-      
-        
-  <li>
-    <a class="" title="Query API" href="hopgraph/">
-      Query API
-    </a>
-    
-  </li>
-
-      
-    </ul>
-  </li>
-
-          
-            
-  <li>
-    <span class="section">File IO</span>
-    <ul>
-      
-        
-  <li>
-    <a class="" title="Graph IO" href="graphio/">
-      Graph IO
-    </a>
-    
-  </li>
-
-      
-    </ul>
-  </li>
-
-          
-            
-  <li>
-    <span class="section">Export</span>
-    <ul>
-      
-        
-  <li>
-    <a class="" title="Graph IO" href="export/">
-      Graph IO
-    </a>
-    
-  </li>
-
-      
-    </ul>
-  </li>
-
-          
-            
-  <li>
-    <span class="section">Edge Iteration</span>
-    <ul>
-      
-        
-  <li>
-    <a class="" title="Internal" href="edgeiter/">
-      Internal
-    </a>
-    
-  </li>
-
-      
-    </ul>
-  </li>
-
-          
-            
-  <li>
-    <span class="section">Internal Docs</span>
-    <ul>
-      
-        
-  <li>
-    <a class="" title="Internal" href="internal/">
-      Internal
-    </a>
-    
-  </li>
-
-      
-    </ul>
   </li>
 
           
@@ -414,19 +216,390 @@
       <article class="article">
         <div class="wrapper">
           
-          <p><a id='Introduction-1'></a></p>
-<h1 id="introduction">Introduction</h1>
-<p><a id='The-Graph-Type-1'></a></p>
-<h2 id="the-graph-type">The Graph Type</h2>
-<p>The Graph datatype is the core data-structure used in Graft.jl. The Graph datatype has the following fields:</p>
+          <p><a id='Graft-Documentation-1'></a></p>
+<h1 id="graft-documentation">Graft Documentation</h1>
 <ul>
-<li><code>nv</code>     : The number of vertices in the graph.</li>
-<li><code>ne</code>     : The number of edges int he graph.</li>
-<li><code>indxs</code>  : The adjacency matrix for the graph. The SparseMatrixCSC type is used here, both            as an adjacency matrix and as an index table, that maps edges onto their entries in the            edge dataframe.</li>
-<li><code>vdata</code>  : A dataframe used to store vertex data. This dataframe is indexed by the internally used            vertex identifiers.</li>
-<li><code>edata</code>  : An edge dataframe used to store edge data. This dataframe is indexed by indxs datastructure.</li>
-<li><code>lmap</code>   : A label map that maps externally used labels onto the internally used vertex identifiers and vice versa.</li>
+<li><a href=".#Graft-Documentation-1">Graft Documentation</a><ul>
+<li><a href=".#The-Graph-datastructure-1">The Graph datastructure</a></li>
+<li><a href=".#EdgeIteration-1">EdgeIteration</a></li>
+<li><a href=".#Metadata-1">Metadata</a></li>
+<li><a href=".#Queries-1">Queries</a></li>
 </ul>
+</li>
+</ul>
+<p><a id='The-Graph-datastructure-1'></a></p>
+<h2 id="the-graph-datastructure">The Graph datastructure</h2>
+<p>The Graph datatype is the core datastructure used in Graft.jl. The Graph datatype has the following fields: 1. nv     : The number of vertices in the graph. 2. ne     : The number of edges int he graph. 3. indxs  : The adjacency matrix for the graph. The SparseMatrixCSC type is used here, both             as an adjacency matrix and as an index table, that maps edges onto their entries in the             edge dataframe. 4. vdata  : A dataframe used to store vertex data. This dataframe is indexed by the internally used             vertex identifiers. 5. edata  : An edge dataframe used to store edge data. This dataframe is indexed by indxs datastructure. 6. lmap   : A label map that maps externally used labels onto the internally used vertex identifiers and vice versa.</p>
+<p><a id='Accessors-1'></a></p>
+<h3 id="accessors">Accessors</h3>
+<p><a id='Graft.nv' href='#Graft.nv'>#</a>
+<strong><code>Graft.nv</code></strong> &mdash; <em>Function</em>.</p>
+<p>The number of vertices in the adjacency matrix </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/sparsematrix.jl#L16' class='documenter-source'>source</a><br></p>
+<p>The number of vertices in the graph </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/graph.jl#L38' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.ne' href='#Graft.ne'>#</a>
+<strong><code>Graft.ne</code></strong> &mdash; <em>Function</em>.</p>
+<p>The number of edges in the adjacency matrix </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/sparsematrix.jl#L19' class='documenter-source'>source</a><br></p>
+<p>The number of edges in the graph </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/graph.jl#L41' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.indxs' href='#Graft.indxs'>#</a>
+<strong><code>Graft.indxs</code></strong> &mdash; <em>Function</em>.</p>
+<p>Retrieve the adjacency matrix / edge index table </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/graph.jl#L44' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.vdata' href='#Graft.vdata'>#</a>
+<strong><code>Graft.vdata</code></strong> &mdash; <em>Function</em>.</p>
+<p>Retrieve the vertex dataframe </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/graph.jl#L47' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.edata' href='#Graft.edata'>#</a>
+<strong><code>Graft.edata</code></strong> &mdash; <em>Function</em>.</p>
+<p>Retrieve the edge dataframe </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/graph.jl#L50' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.lmap' href='#Graft.lmap'>#</a>
+<strong><code>Graft.lmap</code></strong> &mdash; <em>Function</em>.</p>
+<p>Retrieve the label map </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/graph.jl#L53' class='documenter-source'>source</a><br></p>
+<p><a id='Construction-1'></a></p>
+<h3 id="construction">Construction</h3>
+<p>The following methods can be used to construct unlabelled graphs:</p>
+<div class="codehilite"><pre><span></span>emptygraph
+randgraph
+completegraph
+</pre></div>
+
+
+<p>Labelled graphs can be build using the constructors:</p>
+<div class="codehilite"><pre><span></span>Graph(::Int, ::Vector)
+Graph(::Int, ::Vector, ::Int)
+</pre></div>
+
+
+<p><a id='Combinatorial-stuff-1'></a></p>
+<h3 id="combinatorial-stuff">Combinatorial stuff</h3>
+<p>Basic methods on graph structure:</p>
+<p><a id='Graft.vertices' href='#Graft.vertices'>#</a>
+<strong><code>Graft.vertices</code></strong> &mdash; <em>Function</em>.</p>
+<p>The list of the vertices in the graph </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/combinatorial.jl#L15' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.edges' href='#Graft.edges'>#</a>
+<strong><code>Graft.edges</code></strong> &mdash; <em>Function</em>.</p>
+<p>Returns an edge iterator containing all edges in the graph </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/combinatorial.jl#L19' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.hasvertex' href='#Graft.hasvertex'>#</a>
+<strong><code>Graft.hasvertex</code></strong> &mdash; <em>Function</em>.</p>
+<p>Check if the vertex(s) exists </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/combinatorial.jl#L23' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.hasedge' href='#Graft.hasedge'>#</a>
+<strong><code>Graft.hasedge</code></strong> &mdash; <em>Function</em>.</p>
+<p>Check if the edge(s) exists </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/combinatorial.jl#L28' class='documenter-source'>source</a><br></p>
+<p>Adjacency queries:</p>
+<p><a id='Graft.fadj' href='#Graft.fadj'>#</a>
+<strong><code>Graft.fadj</code></strong> &mdash; <em>Function</em>.</p>
+<p>Retrieve a list of vertices connected to vertex v.</p>
+<p>This method spwans a new array, so is slow and malloc prone.</p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/sparsematrix.jl#L130-L134' class='documenter-source'>source</a><br></p>
+<p>Vertex v's out-neighbors in the graph </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/combinatorial.jl#L34' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.fadj!' href='#Graft.fadj!'>#</a>
+<strong><code>Graft.fadj!</code></strong> &mdash; <em>Function</em>.</p>
+<p>Retrieve a list of vertices connect to vertex v.</p>
+<p>This method copies the adjacencies onto the input array, and is comparitively faster, and causes no mallocs.</p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/sparsematrix.jl#L140-L145' class='documenter-source'>source</a><br></p>
+<p>Retrieve a list of vertices connect to vertex v.</p>
+<p>This method copies the adjacencies onto the input array, and is comparitively faster, and causes no mallocs.</p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/combinatorial.jl#L37-L42' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.outdegree' href='#Graft.outdegree'>#</a>
+<strong><code>Graft.outdegree</code></strong> &mdash; <em>Function</em>.</p>
+<p>Compute the outdegree of a vertex </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/sparsematrix.jl#L155' class='documenter-source'>source</a><br></p>
+<p>Vertex v's outdegree in the graph </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/combinatorial.jl#L46' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.indegree' href='#Graft.indegree'>#</a>
+<strong><code>Graft.indegree</code></strong> &mdash; <em>Function</em>.</p>
+<p>Compute the indegree of a vertex. This method is slow since reverse adjacencies are not stored</p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/sparsematrix.jl#L163-L166' class='documenter-source'>source</a><br></p>
+<p>Vertex v's indegree in the graph </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/combinatorial.jl#L50' class='documenter-source'>source</a><br></p>
+<p><a id='Graph-mutations-1'></a></p>
+<h3 id="graph-mutations">Graph mutations</h3>
+<p>Graphs can be modified using the following methods:</p>
+<div class="codehilite"><pre><span></span>addvertex!(::Graph)
+addvertex!(::Graph, ::Any)
+addedge!(::Graph, ::Pair{Int,Int})
+rmvertex!(::Graph, ::Int)
+rmvertex!(::Graph, ::AbstractVector{Int})
+rmedge!(::Graph, ::Pair{Int,Int})
+</pre></div>
+
+
+<p><a id='Labelling-1'></a></p>
+<h3 id="labelling">Labelling</h3>
+<p>New labels can be added or removed through the following methods:</p>
+<p><a id='Graft.setlabel!-Tuple{Graft.Graph,Array{T,1}}' href='#Graft.setlabel!-Tuple{Graft.Graph,Array{T,1}}'>#</a>
+<strong><code>Graft.setlabel!</code></strong> &mdash; <em>Method</em>.</p>
+<p>Set labels for all vertices in the graph </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/graph.jl#L89' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.setlabel!-Tuple{Graft.Graph,Symbol}' href='#Graft.setlabel!-Tuple{Graft.Graph,Symbol}'>#</a>
+<strong><code>Graft.setlabel!</code></strong> &mdash; <em>Method</em>.</p>
+<p>Use a vertex property as the vertex label </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/graph.jl#L99' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.setlabel!-Tuple{Graft.Graph}' href='#Graft.setlabel!-Tuple{Graft.Graph}'>#</a>
+<strong><code>Graft.setlabel!</code></strong> &mdash; <em>Method</em>.</p>
+<p>Remove all vertex labels </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/graph.jl#L106' class='documenter-source'>source</a><br></p>
+<p>Labels can be modified through the following methods:</p>
+<p><a id='Graft.relabel!-Tuple{Graft.Graph,Int64,Any}' href='#Graft.relabel!-Tuple{Graft.Graph,Int64,Any}'>#</a>
+<strong><code>Graft.relabel!</code></strong> &mdash; <em>Method</em>.</p>
+<p>Relabel a single vertex in the graph </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/graph.jl#L113' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.relabel!-Tuple{Graft.Graph,AbstractArray{Int64,1},Array{T,1}}' href='#Graft.relabel!-Tuple{Graft.Graph,AbstractArray{Int64,1},Array{T,1}}'>#</a>
+<strong><code>Graft.relabel!</code></strong> &mdash; <em>Method</em>.</p>
+<p>Relabel a list of vertices in the graph </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/graph.jl#L119' class='documenter-source'>source</a><br></p>
+<p><a id='EdgeIteration-1'></a></p>
+<h2 id="edgeiteration">EdgeIteration</h2>
+<p>The EdgeIter type provides alloc-free and fast edge iteration.</p>
+<p><a id='Construction-2'></a></p>
+<h3 id="construction_1">Construction</h3>
+<p><a id='Graft.edges-Tuple{Graft.Graph}' href='#Graft.edges-Tuple{Graft.Graph}'>#</a>
+<strong><code>Graft.edges</code></strong> &mdash; <em>Method</em>.</p>
+<p>Returns an edge iterator containing all edges in the graph </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/combinatorial.jl#L19' class='documenter-source'>source</a><br></p>
+<p><a id='Getindex-1'></a></p>
+<h3 id="getindex">Getindex</h3>
+<p><a id='Base.getindex-Tuple{Graft.EdgeIter,Int64}' href='#Base.getindex-Tuple{Graft.EdgeIter,Int64}'>#</a>
+<strong><code>Base.getindex</code></strong> &mdash; <em>Method</em>.</p>
+<p>Get the ith edge in the iterator </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/edgeiter.jl#L116' class='documenter-source'>source</a><br></p>
+<p><a id='Base.getindex-Tuple{Graft.EdgeIter,AbstractArray{Int64,1}}' href='#Base.getindex-Tuple{Graft.EdgeIter,AbstractArray{Int64,1}}'>#</a>
+<strong><code>Base.getindex</code></strong> &mdash; <em>Method</em>.</p>
+<p>Get a new iterator containing a subset of the edges </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/edgeiter.jl#L119' class='documenter-source'>source</a><br></p>
+<p><a id='Base.getindex-Tuple{Graft.EdgeIter,Colon}' href='#Base.getindex-Tuple{Graft.EdgeIter,Colon}'>#</a>
+<strong><code>Base.getindex</code></strong> &mdash; <em>Method</em>.</p>
+<p>Get a copy of the iterator </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/edgeiter.jl#L124' class='documenter-source'>source</a><br></p>
+<p><a id='Concatenation-1'></a></p>
+<h3 id="concatenation">Concatenation</h3>
+<p><a id='Base.vcat-Tuple{Graft.EdgeIter,Graft.EdgeIter}' href='#Base.vcat-Tuple{Graft.EdgeIter,Graft.EdgeIter}'>#</a>
+<strong><code>Base.vcat</code></strong> &mdash; <em>Method</em>.</p>
+<p>Concatenate two iterators </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/edgeiter.jl#L137' class='documenter-source'>source</a><br></p>
+<p><a id='Usage-1'></a></p>
+<h3 id="usage">Usage</h3>
+<div class="codehilite"><pre><span></span><span class="k">using</span> <span class="n">Graft</span>
+
+<span class="n">g</span> <span class="o">=</span> <span class="n">completegraph</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c"># Construct Iterator</span>
+<span class="n">eit</span> <span class="o">=</span> <span class="n">edges</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+<span class="c"># Iterate through edges</span>
+<span class="k">for</span> <span class="n">e</span> <span class="k">in</span> <span class="n">eit</span>
+   <span class="c"># Do something here</span>
+<span class="k">end</span>
+
+<span class="c"># In list comprehensions</span>
+<span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="k">in</span> <span class="n">eit</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span>6-element Array{Pair{Int64,Int64},1}:
+ 1=&gt;2
+ 1=&gt;3
+ 2=&gt;1
+ 2=&gt;3
+ 3=&gt;1
+ 3=&gt;2
+</pre></div>
+
+
+<p><a id='Metadata-1'></a></p>
+<h2 id="metadata">Metadata</h2>
+<p><a id='Setting-vertex-metadata-1'></a></p>
+<h3 id="setting-vertex-metadata">Setting vertex metadata</h3>
+<p><a id='Graft.setvprop!' href='#Graft.setvprop!'>#</a>
+<strong><code>Graft.setvprop!</code></strong> &mdash; <em>Function</em>.</p>
+<p>Set vertex properties.</p>
+<p>setvprop!(g::Graph, v::VertexID, val(s), vprop::Symbol) -&gt; Set a property for v</p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/vdata.jl#L51-L55' class='documenter-source'>source</a><br></p>
+<p>setvprop!(g::Graph, vs::VertexList, val(s), vprop::Symbol) -&gt; Set a property for v in vs </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/vdata.jl#L64' class='documenter-source'>source</a><br></p>
+<p>setvprop!(g::Graph, ::Colon, val(s), vprop::Symbol) -&gt; Set a property for all vertices in g </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/vdata.jl#L74' class='documenter-source'>source</a><br></p>
+<p><a id='Retrieving-vertex-metadata-1'></a></p>
+<h3 id="retrieving-vertex-metadata">Retrieving vertex metadata</h3>
+<p><a id='Graft.getvprop' href='#Graft.getvprop'>#</a>
+<strong><code>Graft.getvprop</code></strong> &mdash; <em>Function</em>.</p>
+<p>Retrieve vertex properties.</p>
+<p>getvprop(g::Graph, v::VertexID, vprop::Symbol) -&gt; Fetch the value of a property for vertex v</p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/vdata.jl#L34-L38' class='documenter-source'>source</a><br></p>
+<p>getvprop(g::Graph, vs::VertexList, vprop::Symbol) -&gt; Fetch the value of a property for v in vs </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/vdata.jl#L42' class='documenter-source'>source</a><br></p>
+<p>getvprop(g::Graph, ::Colon, vprop::Symbol) -&gt; Fetch the value of a property for all verices </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/vdata.jl#L46' class='documenter-source'>source</a><br></p>
+<p><a id='Setting-edge-metadata-1'></a></p>
+<h3 id="setting-edge-metadata">Setting edge metadata</h3>
+<p><a id='Graft.seteprop!' href='#Graft.seteprop!'>#</a>
+<strong><code>Graft.seteprop!</code></strong> &mdash; <em>Function</em>.</p>
+<p>Set edge properties.</p>
+<p>seteprop!(g::Graph, e::EdgeID, val, eprop::Symbol) -&gt; Set a property for an edge e</p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/edata.jl#L68-L72' class='documenter-source'>source</a><br></p>
+<p>seteprop!(g::Graph, es::EdgeList, val(s), eprop::Symbol) -&gt; Set a property for e in es </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/edata.jl#L82' class='documenter-source'>source</a><br></p>
+<p>seteprop!(g::Graph, ::Colon, val(s), eprop::Symbol) </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/edata.jl#L92' class='documenter-source'>source</a><br></p>
+<p><a id='Retrieving-edge-metadata-1'></a></p>
+<h3 id="retrieving-edge-metadata">Retrieving edge metadata</h3>
+<p><a id='Graft.geteprop' href='#Graft.geteprop'>#</a>
+<strong><code>Graft.geteprop</code></strong> &mdash; <em>Function</em>.</p>
+<p>Retrieve edge properties.</p>
+<p>geteprop(g::Graph, e::EdgeID, eprop::Symbol) -&gt; Fetch the value of a property for edge e</p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/edata.jl#L50-L54' class='documenter-source'>source</a><br></p>
+<p>geteprop(g::Graph, es::EdgeList, eprop::Symbol) -&gt; Fetch the value of a property for edge e in es </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/edata.jl#L58' class='documenter-source'>source</a><br></p>
+<p>geteprop(g::Graph, ::Colon, eprop::Symbol) -&gt; Fetch the value of a property for all edges </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/0b76e81761b8bbbf1318cbbfdd466df563319172/src/edata.jl#L62' class='documenter-source'>source</a><br></p>
+<p><a id='Queries-1'></a></p>
+<h2 id="queries">Queries</h2>
+<p>The query macro is used to execute graph queries in a pipelined manner. The pipelining syntax is borrowed from jplyer, though I hope to use jplyer directly at some point, for lazy execution.</p>
+<p>The main functionalities provided by the query macro are:</p>
+<p><a id='eachvertex:-1'></a></p>
+<h3 id="eachvertex">eachvertex:</h3>
+<p>This abstraction is used to run an expression on every vertex in the graph, and retrieve a vector result.</p>
+<p>For example, <code>@query g |&gt; eachvertex(v.p1 + v.p2 * v.p3)</code> executes the expression <code>v.p1 + v.p2 * v.p3</code> on every vertex in the result from the previous pipeline stage. Here, <code>v.p1</code> denotes the value of property <code>p1</code> for every vertex.</p>
+<p><a id='eachedge:-1'></a></p>
+<h3 id="eachedge">eachedge:</h3>
+<p>This abstraction is used to run an expression on every vertex in the graph, and retrieve a vector result.</p>
+<p>For example, <code>@query g |&gt; eachedge(e.p1 + s.p1 + t.p1)</code> executes the expression <code>e.p1 + s.p1 + t.p1</code> on every edge in the graph. Here, 'e.p1' denotes the value of property <code>p1</code> for every edge in the graph. Since each edge has a source vertex <code>s</code> and a target vertex <code>t</code>, the properties of these vertices can be used in the expression as shown by <code>s.p1</code> and <code>t.p1</code>.</p>
+<p><a id='filter-1'></a></p>
+<h3 id="filter">filter</h3>
+<p>This abstraction is used to compute a subgraph of the input from the previous pipeline stage, on the given conditions.</p>
+<p>For example, <code>@query g |&gt; filter(v.p1 &lt; 5, v.p1 &lt; v.p2, e.p1 &gt; 5)</code> uses the three filter conditions provided to compute a subgraph. Currently only binary comparisons are supported, so comparisons like 1 &lt; v.p1 &lt; v.p2 will not work. Instead you can supply multiple conditions as separate arguments.</p>
+<p><a id='select-1'></a></p>
+<h3 id="select">select</h3>
+<p>This abstraction is used to compute a subgraph of the input from the previous pipeline state, for a subset of vertex and or edge properties.</p>
+<p>For example, <code>@query g |&gt; select(v.p1, v.p3, e.p1)</code> preserves only vertex properties <code>p1</code>,<code>p2</code> and edge property <code>p1</code>.</p>
+<p><a id='Examples-1'></a></p>
+<h3 id="examples">Examples</h3>
+<p>The abstractions can be chained together using the pipe notation, so that the output of one stage becomes the input to the next.</p>
+<div class="codehilite"><pre><span></span><span class="k">using</span> <span class="n">Graft</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">randgraph</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">[:</span><span class="n">p1</span><span class="p">,</span> <span class="p">:</span><span class="n">p2</span><span class="p">],</span> <span class="p">[:</span><span class="n">p1</span><span class="p">,</span> <span class="p">:</span><span class="n">p2</span><span class="p">])</span>
+
+<span class="c"># Run a filter using vertex properties</span>
+<span class="p">@</span><span class="n">query</span> <span class="n">g</span> <span class="o">|&gt;</span> <span class="n">filter</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">&lt;=</span> <span class="n">v</span><span class="o">.</span><span class="n">p1</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">p1</span> <span class="o">&lt;</span> <span class="n">v</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span>Graph(1 vertices, 0 edges, Symbol[:p1,:p2] vertex properties, Symbol[:p1,:p2] edge properties)
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="k">using</span> <span class="n">Graft</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">randgraph</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">[:</span><span class="n">p1</span><span class="p">,</span> <span class="p">:</span><span class="n">p2</span><span class="p">],</span> <span class="p">[:</span><span class="n">p1</span><span class="p">,</span> <span class="p">:</span><span class="n">p2</span><span class="p">])</span>
+
+<span class="c"># Run a filter using source and target properties</span>
+<span class="p">@</span><span class="n">query</span> <span class="n">g</span> <span class="o">|&gt;</span> <span class="n">filter</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">p1</span> <span class="o">&lt;</span> <span class="n">t</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span>Graph(10 vertices, 61 edges, Symbol[:p1,:p2] vertex properties, Symbol[:p1,:p2] edge properties)
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="k">using</span> <span class="n">Graft</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">randgraph</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">[:</span><span class="n">p1</span><span class="p">,</span> <span class="p">:</span><span class="n">p2</span><span class="p">],</span> <span class="p">[:</span><span class="n">p1</span><span class="p">,</span> <span class="p">:</span><span class="n">p2</span><span class="p">])</span>
+
+<span class="c"># Run filter using edge properties</span>
+<span class="p">@</span><span class="n">query</span> <span class="n">g</span> <span class="o">|&gt;</span> <span class="n">filter</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">p1</span> <span class="o">&lt;</span> <span class="mf">0.7</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span>Graph(10 vertices, 57 edges, Symbol[:p1,:p2] vertex properties, Symbol[:p1,:p2] edge properties)
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="k">using</span> <span class="n">Graft</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">randgraph</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">[:</span><span class="n">p1</span><span class="p">,</span> <span class="p">:</span><span class="n">p2</span><span class="p">],</span> <span class="p">[:</span><span class="n">p1</span><span class="p">,</span> <span class="p">:</span><span class="n">p2</span><span class="p">])</span>
+
+<span class="c"># Chain filter expressions</span>
+<span class="p">@</span><span class="n">query</span> <span class="n">g</span> <span class="o">|&gt;</span> <span class="n">filter</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">p1</span> <span class="o">&lt;</span> <span class="n">v</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="n">filter</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">p1</span> <span class="o">&lt;</span> <span class="n">e</span><span class="o">.</span><span class="n">p1</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span>Graph(5 vertices, 0 edges, Symbol[:p1,:p2] vertex properties, Symbol[:p1,:p2] edge properties)
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="k">using</span> <span class="n">Graft</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">randgraph</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">[:</span><span class="n">p1</span><span class="p">,</span> <span class="p">:</span><span class="n">p2</span><span class="p">],</span> <span class="p">[:</span><span class="n">p1</span><span class="p">,</span> <span class="p">:</span><span class="n">p2</span><span class="p">])</span>
+
+<span class="c"># Select properties</span>
+<span class="p">@</span><span class="n">query</span> <span class="n">g</span> <span class="o">|&gt;</span> <span class="n">filter</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">p1</span> <span class="o">&lt;</span> <span class="n">v</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="n">select</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">p2</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">p1</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span>Graph(5 vertices, 20 edges, Symbol[:p2] vertex properties, Symbol[:p1] edge properties)
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="k">using</span> <span class="n">Graft</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">randgraph</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">[:</span><span class="n">p1</span><span class="p">,</span> <span class="p">:</span><span class="n">p2</span><span class="p">],</span> <span class="p">[:</span><span class="n">p1</span><span class="p">,</span> <span class="p">:</span><span class="n">p2</span><span class="p">])</span>
+
+<span class="c"># Run an expression on each vertex</span>
+<span class="p">@</span><span class="n">query</span> <span class="n">g</span> <span class="o">|&gt;</span> <span class="n">eachvertex</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">p1</span> <span class="o">+</span> <span class="n">v</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span>10-element DataArrays.DataArray{Float64,1}:
+ 0.906363
+ 1.33634
+ 1.00558
+ 0.965068
+ 0.857214
+ 0.405383
+ 0.637848
+ 0.413947
+ 0.727733
+ 0.942215
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="k">using</span> <span class="n">Graft</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">randgraph</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">[:</span><span class="n">p1</span><span class="p">,</span> <span class="p">:</span><span class="n">p2</span><span class="p">],</span> <span class="p">[:</span><span class="n">p1</span><span class="p">,</span> <span class="p">:</span><span class="n">p2</span><span class="p">])</span>
+
+<span class="c"># Run an expression on each edge</span>
+<span class="p">@</span><span class="n">query</span> <span class="n">g</span> <span class="o">|&gt;</span> <span class="n">filter</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">p1</span> <span class="o">&lt;</span> <span class="n">e</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="n">eachedge</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">p1</span> <span class="o">+</span> <span class="n">e</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span>48-element DataArrays.DataArray{Float64,1}:
+ 0.966906
+ 1.47244
+ 0.365215
+ 1.30364
+ 0.94188
+ 0.732596
+ 0.903553
+ 1.24955
+ 0.955426
+ 0.882751
+ ⋮
+ 0.589588
+ 0.540468
+ 1.22599
+ 1.44737
+ 0.965892
+ 0.936342
+ 1.20991
+ 0.412197
+ 0.346563
+</pre></div>
+
+
+<p>The entire query is parsed into a DAG, using a recursive descent parser, and then executed in a bottom up manner. The results of intermediate nodes, and fetched vertex properties are cached to avoid redundant computations.</p>
           <aside class="copyright" role="note">
             
             Documentation built with
@@ -440,31 +613,6 @@
           
             <footer class="footer">
               
-  <nav class="pagination" aria-label="Footer">
-    <div class="previous">
-      
-    </div>
-    <div class="next">
-      
-        <a href="generator/" title="Graph API">
-          <span class="direction">
-            Next
-          </span>
-          <div class="page">
-            <div class="stretch">
-              <div class="title">
-                Graph API
-              </div>
-            </div>
-            <div class="button button-next" role="button" aria-label="Next">
-              <i class="icon icon-forward"></i>
-            </div>
-          </div>
-        </a>
-      
-    </div>
-  </nav>
-
             </footer>
           
         </div>
