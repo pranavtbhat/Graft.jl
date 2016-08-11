@@ -5,6 +5,10 @@ makedocs(
    modules=[Graft]
 )
 
+custom_deps() = run(`pip install --user pygments mkdocs mkdocs-material`)
+
 deploydocs(
-    repo = "github.com/pranavtbhat/Graft.jl.git"
+   #options
+   deps = custom_deps,
+   repo = "github.com/pranavtbhat/Graft.jl.git"
 )

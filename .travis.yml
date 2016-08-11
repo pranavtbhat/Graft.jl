@@ -4,10 +4,10 @@ os:
   - linux
 julia:
   - 0.5
+  - nightly
 notifications:
   email: false
 # uncomment the following lines to override the default test script
-# TODO: Remove checkout for WeakRefStrings, once issue is resolved.
 script:
  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
  - julia --color=yes -e 'Pkg.clone(pwd()); Pkg.build("Graft"); Pkg.test("Graft"; coverage=true)'

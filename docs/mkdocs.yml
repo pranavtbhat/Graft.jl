@@ -1,24 +1,28 @@
-site_name:        Graft.jl
-repo_url:         https://github.com/pranavtbhat/Graft.jl
-site_description: A graph toolkit for Julia
-site_author:      Pranav Bhat
+site_name: Graft.jl
+site_description: Graph Toolkit for Julia
+repo_url: https://github.com/pranavtbhat/Graft.jl
 
-theme: readthedocs
+theme: material
+
+extra:
+  palette:
+    primary: 'indigo'
+    accent:  'blue'
 
 extra_css:
   - assets/Documenter.css
 
-extra_javascript:
-  - https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML
-  - assets/mathjaxhelper.js
-
 markdown_extensions:
+  - codehilite
   - extra
   - tables
   - fenced_code
-  - mdx_math
+
+extra_javascript:
+  - https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML
+  - assets/mathjaxhelper.js
 
 docs_dir: 'build'
 
 pages:
-  - Home: index.md
+- [index.md, Introduction]
