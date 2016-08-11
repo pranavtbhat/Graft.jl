@@ -364,7 +364,7 @@
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Generate a graph with 10 vertices and (approximately) 50 edges</span>
        <span class="n">Graph</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
-<span class="n">Graph</span><span class="p">(</span><span class="mi">10</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">52</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">Graph</span><span class="p">(</span><span class="mi">10</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">47</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Generate a labelled graph with 10 vertices</span>
        <span class="c"># labelled &quot;1&quot; through &quot;10&quot; and no edges</span>
@@ -374,11 +374,11 @@
 <span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Generate a labelled graph with 10 vertices</span>
        <span class="c"># and (approximately) 50 edges</span>
        <span class="n">Graph</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">map</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">10</span><span class="p">),</span> <span class="mi">50</span><span class="p">)</span>
-<span class="n">Graph</span><span class="p">(</span><span class="mi">10</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">47</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">Graph</span><span class="p">(</span><span class="mi">10</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">35</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Generate graph from an adjacency matrix (may cause self loops)</span>
        <span class="n">Graph</span><span class="p">(</span><span class="n">sprand</span><span class="p">(</span><span class="kt">Int</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">.</span><span class="mi">3</span><span class="p">))</span>
-<span class="n">Graph</span><span class="p">(</span><span class="mi">10</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">35</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">Graph</span><span class="p">(</span><span class="mi">10</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">34</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
 </pre></div>
 
 
@@ -404,37 +404,37 @@
 <p><a id='Graft.Graph-Tuple{Int64}' href='#Graft.Graph-Tuple{Int64}'>#</a>
 <strong><code>Graft.Graph</code></strong> &mdash; <em>Method</em>.</p>
 <p>Build an empty graph with nv vertices </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/generator.jl#L13' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/generator.jl#L13' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.Graph-Tuple{Int64,Int64}' href='#Graft.Graph-Tuple{Int64,Int64}'>#</a>
 <strong><code>Graft.Graph</code></strong> &mdash; <em>Method</em>.</p>
 <p>Build a graph with nv vertices and (approximately)ne edges </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/generator.jl#L19' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/generator.jl#L19' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.Graph-Tuple{Int64,Array{T,1}}' href='#Graft.Graph-Tuple{Int64,Array{T,1}}'>#</a>
 <strong><code>Graft.Graph</code></strong> &mdash; <em>Method</em>.</p>
 <p>Build an empty graph with nv labelled vertices </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/generator.jl#L26' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/generator.jl#L26' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.Graph-Tuple{Int64,Array{T,1},Int64}' href='#Graft.Graph-Tuple{Int64,Array{T,1},Int64}'>#</a>
 <strong><code>Graft.Graph</code></strong> &mdash; <em>Method</em>.</p>
 <p>Build a graph with nv labelled vertices and (approximately)ne edges </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/generator.jl#L36' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/generator.jl#L36' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.Graph-Tuple{SparseMatrixCSC}' href='#Graft.Graph-Tuple{SparseMatrixCSC}'>#</a>
 <strong><code>Graft.Graph</code></strong> &mdash; <em>Method</em>.</p>
 <p>Build a graph using the input adjacency matrix </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/generator.jl#L43' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/generator.jl#L43' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.completegraph' href='#Graft.completegraph'>#</a>
 <strong><code>Graft.completegraph</code></strong> &mdash; <em>Function</em>.</p>
 <p>Build a complete graph with nv vertices </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/generator.jl#L75' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/generator.jl#L75' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.randgraph' href='#Graft.randgraph'>#</a>
 <strong><code>Graft.randgraph</code></strong> &mdash; <em>Function</em>.</p>
 <p>Build a graph with nv vertices and (approximately)ne edges </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/generator.jl#L61' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/generator.jl#L61' class='documenter-source'>source</a><br></p>
 <p>Build a graph with nv vertices and a random number of edges </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/generator.jl#L64' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/generator.jl#L64' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.propgraph' href='#Graft.propgraph'>#</a>
 <strong><code>Graft.propgraph</code></strong> &mdash; <em>Function</em>.</p>
 <p>Returns a small completegraph with properties(for doc examples) </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/bb823a3569a79cbfb263791cf1a5729297c58006/src/generator.jl#L82' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/generator.jl#L82' class='documenter-source'>source</a><br></p>
           <aside class="copyright" role="note">
             
             Documentation built with
