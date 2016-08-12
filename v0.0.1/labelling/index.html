@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
     
       
-        <title>Hop Subgraphs - Graft.jl</title>
+        <title>Labelling - Graft.jl</title>
       
       
       
@@ -93,12 +93,12 @@
           <span class="path">
             
               
-                Query API <i class="icon icon-link"></i>
+                Graph API <i class="icon icon-link"></i>
               
             
           </span>
         
-        Hop Subgraphs
+        Labelling
       </div>
     </div>
     
@@ -209,9 +209,14 @@
       
         
   <li>
-    <a class="" title="Labelling" href="../labelling/">
+    <a class="current" title="Labelling" href="./">
       Labelling
     </a>
+    
+      
+        
+      
+      
     
   </li>
 
@@ -263,14 +268,9 @@
       
         
   <li>
-    <a class="current" title="Hop Subgraphs" href="./">
+    <a class="" title="Hop Subgraphs" href="../hopgraph/">
       Hop Subgraphs
     </a>
-    
-      
-        
-      
-      
     
   </li>
 
@@ -343,59 +343,67 @@
       <article class="article">
         <div class="wrapper">
           
-          <p><a id='Hop-Subgraphs-1'></a></p>
-<h1 id="hop-subgraphs">Hop Subgraphs</h1>
-<p>Graft provides methods to construct subgraphs using traversals. Consider the following example:</p>
+          <p><a id='Labelling-1'></a></p>
+<h1 id="labelling">Labelling</h1>
+<p>By default, a vertex is identified by its internal identifier. However, a user can assign labels of any arbitrary Julia type to identify vertices. However, these labels can be used only externally. Internally, the vertices will still be identified by their integer ids. This is done has vertex label resolution can impose a significant overhead.</p>
+<p>The following example demonstrates the Labelling API:</p>
 <div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="k">using</span> <span class="n">Graft</span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="n">g</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
-<span class="n">Graph</span><span class="p">(</span><span class="mi">20</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">68</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">g</span> <span class="o">=</span> <span class="n">completegraph</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">Graph</span><span class="p">(</span><span class="mi">10</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">90</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="n">setlabel!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">map</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">20</span><span class="p">))</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Set labels &quot;1&quot;, &quot;2&quot; ... &quot;10&quot; to the vertices</span>
+       <span class="n">setlabel!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">map</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">10</span><span class="p">))</span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Get a list of vertices, at a distance of 2-3 hops from vertex &quot;1&quot;</span>
-       <span class="n">hoplist</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">&quot;1&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="mi">12</span><span class="o">-</span><span class="n">element</span> <span class="n">Array</span><span class="p">{</span><span class="n">String</span><span class="p">,</span><span class="mi">1</span><span class="p">}:</span>
- <span class="s">&quot;3&quot;</span>
- <span class="s">&quot;14&quot;</span>
- <span class="s">&quot;20&quot;</span>
- <span class="s">&quot;9&quot;</span>
- <span class="s">&quot;13&quot;</span>
- <span class="s">&quot;15&quot;</span>
- <span class="s">&quot;7&quot;</span>
- <span class="s">&quot;8&quot;</span>
- <span class="s">&quot;10&quot;</span>
- <span class="s">&quot;11&quot;</span>
- <span class="s">&quot;12&quot;</span>
- <span class="s">&quot;18&quot;</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Translate labels into vertex identifiers</span>
+       <span class="n">decode</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">&quot;1&quot;</span><span class="p">)</span>
+<span class="mi">1</span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Get a BFS tree starting from the input vertex</span>
-       <span class="c"># and terminating at 3 hops distance. Can be used to visualize</span>
-       <span class="c"># a BFS traversal</span>
-       <span class="n">hoptree</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">&quot;1&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="n">Graph</span><span class="p">(</span><span class="mi">14</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">13</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Decode a labelled edge</span>
+       <span class="n">decode</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">&quot;1&quot;</span><span class="o">=&gt;</span><span class="s">&quot;2&quot;</span><span class="p">)</span>
+<span class="mi">1</span><span class="o">=&gt;</span><span class="mi">2</span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Get a subgraph containing all vertices within 3 hops distance,</span>
-       <span class="c"># and all edges between them. Can be used to construct the</span>
-       <span class="c"># neighborhood of a vertex</span>
-       <span class="n">hopgraph</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">&quot;1&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="n">Graph</span><span class="p">(</span><span class="mi">14</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">42</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Translate vertex identifiers into labels</span>
+       <span class="n">encode</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="s">&quot;1&quot;</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Encode an edge</span>
+       <span class="n">encode</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">2</span><span class="p">)</span>
+<span class="s">&quot;1&quot;</span><span class="o">=&gt;</span><span class="s">&quot;2&quot;</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Relabel a vertex</span>
+       <span class="n">relabel!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;ONE&quot;</span><span class="p">)</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Remove all vertex labels (Use vertex identifiers instead)</span>
+       <span class="n">setlabel!</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Display all vertex labels (defaults to vertex identifiers in this case)</span>
+       <span class="n">encode</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="mi">10</span><span class="o">-</span><span class="n">element</span> <span class="n">Array</span><span class="p">{</span><span class="kt">Int64</span><span class="p">,</span><span class="mi">1</span><span class="p">}:</span>
+  <span class="mi">1</span>
+  <span class="mi">2</span>
+  <span class="mi">3</span>
+  <span class="mi">4</span>
+  <span class="mi">5</span>
+  <span class="mi">6</span>
+  <span class="mi">7</span>
+  <span class="mi">8</span>
+  <span class="mi">9</span>
+ <span class="mi">10</span>
 </pre></div>
 
 
 <p>Detailed documentation:</p>
-<p><a id='Graft.hoplist' href='#Graft.hoplist'>#</a>
-<strong><code>Graft.hoplist</code></strong> &mdash; <em>Function</em>.</p>
-<p>Get a list of vertices at a certain hop distance from a labelled vertex</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/algorithms.jl#L103-L105' class='documenter-source'>source</a><br></p>
-<p><a id='Graft.hoptree' href='#Graft.hoptree'>#</a>
-<strong><code>Graft.hoptree</code></strong> &mdash; <em>Function</em>.</p>
-<p>Get the bfs tree starting from the input labelled vertex, and ending at a certain hop distance</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/algorithms.jl#L134-L136' class='documenter-source'>source</a><br></p>
-<p><a id='Graft.hopgraph' href='#Graft.hopgraph'>#</a>
-<strong><code>Graft.hopgraph</code></strong> &mdash; <em>Function</em>.</p>
-<p>Get a subgraph containing vertices and edges within a certain hop distance from the input labelled vertex</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/algorithms.jl#L152-L155' class='documenter-source'>source</a><br></p>
+<div class="codehilite"><pre><span></span>setlabel!(::Graph, ::Vector)
+setlabel!(::Graph)
+decode(::Graph, ::Any)
+decode(::Graph, ::Pair)
+encode(::Graph, ::Int)
+encode(::Graph, ::Pair{Int,Int})
+encode(::Graph)
+relabel!(::Graph, ::Int, ::Any)
+relabel!(::Graph, ::AbstractVector{Int}, ::Vector)
+</pre></div>
           <aside class="copyright" role="note">
             
             Documentation built with
@@ -412,7 +420,7 @@
   <nav class="pagination" aria-label="Footer">
     <div class="previous">
       
-        <a href="../queries/" title="Query Macro">
+        <a href="../mutation/" title="Mutation">
           <span class="direction">
             Previous
           </span>
@@ -422,7 +430,7 @@
             </div>
             <div class="stretch">
               <div class="title">
-                Query Macro
+                Mutation
               </div>
             </div>
           </div>
@@ -431,14 +439,14 @@
     </div>
     <div class="next">
       
-        <a href="../graphio/" title="File IO">
+        <a href="../vdata/" title="Vertex Metadata">
           <span class="direction">
             Next
           </span>
           <div class="page">
             <div class="stretch">
               <div class="title">
-                File IO
+                Vertex Metadata
               </div>
             </div>
             <div class="button button-next" role="button" aria-label="Next">

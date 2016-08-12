@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
     
       
-        <title>Hop Subgraphs - Graft.jl</title>
+        <title>Edge Iteration - Graft.jl</title>
       
       
       
@@ -93,12 +93,12 @@
           <span class="path">
             
               
-                Query API <i class="icon icon-link"></i>
+                Internal <i class="icon icon-link"></i>
               
             
           </span>
         
-        Hop Subgraphs
+        Edge Iteration
       </div>
     </div>
     
@@ -263,14 +263,9 @@
       
         
   <li>
-    <a class="current" title="Hop Subgraphs" href="./">
+    <a class="" title="Hop Subgraphs" href="../hopgraph/">
       Hop Subgraphs
     </a>
-    
-      
-        
-      
-      
     
   </li>
 
@@ -313,9 +308,14 @@
       
         
   <li>
-    <a class="" title="Edge Iteration" href="../edgeiter/">
+    <a class="current" title="Edge Iteration" href="./">
       Edge Iteration
     </a>
+    
+      
+        
+      
+      
     
   </li>
 
@@ -343,59 +343,94 @@
       <article class="article">
         <div class="wrapper">
           
-          <p><a id='Hop-Subgraphs-1'></a></p>
-<h1 id="hop-subgraphs">Hop Subgraphs</h1>
-<p>Graft provides methods to construct subgraphs using traversals. Consider the following example:</p>
+          <p><a id='EdgeIteration-1'></a></p>
+<h1 id="edgeiteration">EdgeIteration</h1>
+<p>Graft provides the <code>EdgeIter</code> type for fast, alloc-free edge iteration. This type simplifies the indexing and construction of sparse matrices.</p>
+<p>The following example demonstrates the usage of <code>EdgeIter</code>:</p>
 <div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="k">using</span> <span class="n">Graft</span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="n">g</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
-<span class="n">Graph</span><span class="p">(</span><span class="mi">20</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">68</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">g</span> <span class="o">=</span> <span class="n">completegraph</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">Graph</span><span class="p">(</span><span class="mi">3</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">6</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="n">setlabel!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">map</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">20</span><span class="p">))</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Build an iterator for all edges in the graph</span>
+       <span class="n">eit</span> <span class="o">=</span> <span class="n">edges</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="mi">6</span><span class="o">-</span><span class="n">element</span> <span class="n">Graft</span><span class="o">.</span><span class="n">EdgeIter</span><span class="p">:</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">2</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">1</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">3</span><span class="o">=&gt;</span><span class="mi">1</span>
+ <span class="mi">3</span><span class="o">=&gt;</span><span class="mi">2</span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Get a list of vertices, at a distance of 2-3 hops from vertex &quot;1&quot;</span>
-       <span class="n">hoplist</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">&quot;1&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="mi">12</span><span class="o">-</span><span class="n">element</span> <span class="n">Array</span><span class="p">{</span><span class="n">String</span><span class="p">,</span><span class="mi">1</span><span class="p">}:</span>
- <span class="s">&quot;3&quot;</span>
- <span class="s">&quot;14&quot;</span>
- <span class="s">&quot;20&quot;</span>
- <span class="s">&quot;9&quot;</span>
- <span class="s">&quot;13&quot;</span>
- <span class="s">&quot;15&quot;</span>
- <span class="s">&quot;7&quot;</span>
- <span class="s">&quot;8&quot;</span>
- <span class="s">&quot;10&quot;</span>
- <span class="s">&quot;11&quot;</span>
- <span class="s">&quot;12&quot;</span>
- <span class="s">&quot;18&quot;</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Iterate through edges</span>
+       <span class="k">for</span> <span class="n">e</span> <span class="k">in</span> <span class="n">eit</span>
+          <span class="c"># Do something here</span>
+       <span class="k">end</span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Get a BFS tree starting from the input vertex</span>
-       <span class="c"># and terminating at 3 hops distance. Can be used to visualize</span>
-       <span class="c"># a BFS traversal</span>
-       <span class="n">hoptree</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">&quot;1&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="n">Graph</span><span class="p">(</span><span class="mi">14</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">13</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Use in list comprehensions</span>
+       <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="k">in</span> <span class="n">eit</span><span class="p">]</span>
+<span class="mi">6</span><span class="o">-</span><span class="n">element</span> <span class="n">Array</span><span class="p">{</span><span class="n">Pair</span><span class="p">{</span><span class="kt">Int64</span><span class="p">,</span><span class="kt">Int64</span><span class="p">},</span><span class="mi">1</span><span class="p">}:</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">2</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">1</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">3</span><span class="o">=&gt;</span><span class="mi">1</span>
+ <span class="mi">3</span><span class="o">=&gt;</span><span class="mi">2</span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Get a subgraph containing all vertices within 3 hops distance,</span>
-       <span class="c"># and all edges between them. Can be used to construct the</span>
-       <span class="c"># neighborhood of a vertex</span>
-       <span class="n">hopgraph</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">&quot;1&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="n">Graph</span><span class="p">(</span><span class="mi">14</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">42</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Get the third edge in the graph</span>
+       <span class="n">eit</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+<span class="mi">2</span><span class="o">=&gt;</span><span class="mi">1</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Get a subset of the edges in the graph (returns a new iterator)</span>
+       <span class="n">eit</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+<span class="mi">3</span><span class="o">-</span><span class="n">element</span> <span class="n">Graft</span><span class="o">.</span><span class="n">EdgeIter</span><span class="p">:</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">2</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">1</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Concatenate two iterators</span>
+       <span class="n">vcat</span><span class="p">(</span><span class="n">eit</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">],</span> <span class="n">eit</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+<span class="mi">6</span><span class="o">-</span><span class="n">element</span> <span class="n">Graft</span><span class="o">.</span><span class="n">EdgeIter</span><span class="p">:</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">3</span><span class="o">=&gt;</span><span class="mi">1</span>
+ <span class="mi">3</span><span class="o">=&gt;</span><span class="mi">2</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">2</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">1</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Edge iterator implements the AbstractVector{Pair{Int,Int}} interface</span>
+       <span class="n">sort</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+<span class="mi">6</span><span class="o">-</span><span class="n">element</span> <span class="n">Array</span><span class="p">{</span><span class="n">Pair</span><span class="p">{</span><span class="kt">Int64</span><span class="p">,</span><span class="kt">Int64</span><span class="p">},</span><span class="mi">1</span><span class="p">}:</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">2</span>
+ <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">1</span>
+ <span class="mi">2</span><span class="o">=&gt;</span><span class="mi">3</span>
+ <span class="mi">3</span><span class="o">=&gt;</span><span class="mi">1</span>
+ <span class="mi">3</span><span class="o">=&gt;</span><span class="mi">2</span>
 </pre></div>
 
 
 <p>Detailed documentation:</p>
-<p><a id='Graft.hoplist' href='#Graft.hoplist'>#</a>
-<strong><code>Graft.hoplist</code></strong> &mdash; <em>Function</em>.</p>
-<p>Get a list of vertices at a certain hop distance from a labelled vertex</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/algorithms.jl#L103-L105' class='documenter-source'>source</a><br></p>
-<p><a id='Graft.hoptree' href='#Graft.hoptree'>#</a>
-<strong><code>Graft.hoptree</code></strong> &mdash; <em>Function</em>.</p>
-<p>Get the bfs tree starting from the input labelled vertex, and ending at a certain hop distance</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/algorithms.jl#L134-L136' class='documenter-source'>source</a><br></p>
-<p><a id='Graft.hopgraph' href='#Graft.hopgraph'>#</a>
-<strong><code>Graft.hopgraph</code></strong> &mdash; <em>Function</em>.</p>
-<p>Get a subgraph containing vertices and edges within a certain hop distance from the input labelled vertex</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/algorithms.jl#L152-L155' class='documenter-source'>source</a><br></p>
+<p><a id='Graft.EdgeIter' href='#Graft.EdgeIter'>#</a>
+<strong><code>Graft.EdgeIter</code></strong> &mdash; <em>Type</em>.</p>
+<p>An abstraction for alloc-free, fast edge iteration</p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/edgeiter.jl#L9-L11' class='documenter-source'>source</a><br></p>
+<p><a id='Base.getindex-Tuple{Graft.EdgeIter,Int64}' href='#Base.getindex-Tuple{Graft.EdgeIter,Int64}'>#</a>
+<strong><code>Base.getindex</code></strong> &mdash; <em>Method</em>.</p>
+<p>Get the ith edge in the iterator </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/edgeiter.jl#L116' class='documenter-source'>source</a><br></p>
+<p><a id='Base.getindex-Tuple{Graft.EdgeIter,AbstractArray{Int64,1}}' href='#Base.getindex-Tuple{Graft.EdgeIter,AbstractArray{Int64,1}}'>#</a>
+<strong><code>Base.getindex</code></strong> &mdash; <em>Method</em>.</p>
+<p>Get a new iterator containing a subset of the edges </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/edgeiter.jl#L119' class='documenter-source'>source</a><br></p>
+<p><a id='Base.getindex-Tuple{Graft.EdgeIter,Colon}' href='#Base.getindex-Tuple{Graft.EdgeIter,Colon}'>#</a>
+<strong><code>Base.getindex</code></strong> &mdash; <em>Method</em>.</p>
+<p>Get a copy of the iterator </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/edgeiter.jl#L124' class='documenter-source'>source</a><br></p>
+<p><a id='Base.vcat-Tuple{Graft.EdgeIter,Graft.EdgeIter}' href='#Base.vcat-Tuple{Graft.EdgeIter,Graft.EdgeIter}'>#</a>
+<strong><code>Base.vcat</code></strong> &mdash; <em>Method</em>.</p>
+<p>Concatenate two iterators </p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/32aa2edf641258a2f4de1735e3327f046ac18709/src/edgeiter.jl#L137' class='documenter-source'>source</a><br></p>
           <aside class="copyright" role="note">
             
             Documentation built with
@@ -412,7 +447,7 @@
   <nav class="pagination" aria-label="Footer">
     <div class="previous">
       
-        <a href="../queries/" title="Query Macro">
+        <a href="../export/" title="Export">
           <span class="direction">
             Previous
           </span>
@@ -422,7 +457,7 @@
             </div>
             <div class="stretch">
               <div class="title">
-                Query Macro
+                Export
               </div>
             </div>
           </div>
@@ -431,14 +466,14 @@
     </div>
     <div class="next">
       
-        <a href="../graphio/" title="File IO">
+        <a href="../internal/" title="Internal Docs">
           <span class="direction">
             Next
           </span>
           <div class="page">
             <div class="stretch">
               <div class="title">
-                File IO
+                Internal Docs
               </div>
             </div>
             <div class="button button-next" role="button" aria-label="Next">
