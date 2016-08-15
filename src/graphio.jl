@@ -73,37 +73,98 @@ function loadheader(io::IO)
    return(Nv, Ne, ltype, vprops, vtypes, eprops, etypes)
 end
 
+convertarg{T<:Number}(::Type{T}, x::SubString{String}) = parse(x)
+convertarg(::Type{Any}, x::SubString{String}) = x
+convertarg(::Type{Char}, x::SubString{String}) = x[1]
+
+function convertarg(::Type{String}, x::SubString{String})
+   if x == ""
+      NA
+   else
+      join(x)
+   end
+end
+
+function readvdata(io::IO, nv::Int, ltype::DataType, vprops::Vector, vtypes::Array{DataType})
+   vdata = Vector{Any}()
+   labels = Array{ltype}(nv)
+
+   for vtype in vtypes
+      push!(vdata, DataArrays.DataArray(vtype, nv))
+   end
+
+   p = Progress(nv, 1)
+   for v in 1 : nv
+      line = rstrip(readline(io), '\n')
+      args = split(line, ',')
+      labels[v] = convertarg(ltype, args[1])
+
+      for i in eachindex(vdata)
+         vdata[i][v] = convertarg(vtypes[i], args[1+i])
+      end
+
+      update!(p, v)
+   end
+
+   DataFrame(vdata, map(Symbol, vprops)), LabelMap(labels)
+end
+
+function readedata(io::IO, ne::Int, lmap::LabelMap, eprops::Vector, etypes::Array{DataType})
+   edata = Vector{Any}()
+
+   ltype = eltype(lmap)
+
+   us = Vector{VertexID}(ne)
+   vs = Vector{VertexID}(ne)
+
+   for etype in etypes
+      push!(edata, DataArrays.DataArray(etype, ne))
+   end
+
+   p = Progress(ne, 1)
+   for e in 1 : ne
+      line = rstrip(readline(io), '\n')
+      args = split(line, ',')
+
+      us[e] = decode(lmap, convertarg(ltype, args[1]))
+      vs[e] = decode(lmap, convertarg(ltype, args[2]))
+
+      for i in eachindex(edata)
+         edata[i][e] = convertarg(etypes[i], args[2+i])
+      end
+
+      update!(p, e)
+   end
+
+   DataFrame(edata, map(Symbol, eprops)), EdgeIter(ne, us, vs)
+end
 
 function loadgraph(io::IO, verbose=false)
    printif(verbose, "Fetching Graph Header")
    Nv, Ne, ltype, vprops, vtypes, eprops, etypes = loadheader(io)
 
-   printif(verbose, "Reading File")
-   dims = (Nv + Ne, max(1 + length(vprops), 2 + length(eprops)))
-   arr = readcsv(io; dims=dims)
+   if verbose
+      println("Graph with $Nv vertices, and $Ne edges")
+      println("Vertex properties")
+      for (vprop,vtype) in zip(vprops,vtypes)
+         println("$vprop => $vtype")
+      end
+      println()
 
-   printif(verbose, "Fetching Vertex Labels")
-   Lm = LabelMap(promote_vector(ltype, arr[1:Nv, 1]))
-
-   printif(verbose, "Fetching Vertex Data")
-   Vdata = DataFrame()
-   for (i,prop) in enumerate(vprops)
-      vals = promote_vector(vtypes[i], arr[1:Nv,i+1])
-      insert!(Vdata, i, vals, Symbol(prop))
+      println("Edge properties")
+      for (eprop,etype) in zip(eprops,etypes)
+         println("$eprop => $etype")
+      end
+      println()
    end
 
-   printif(verbose, "Fetching Edges")
-   us = decode(Lm, arr[(Nv+1):(Nv+Ne),1])
-   vs = decode(Lm, arr[(Nv+1):(Nv+Ne),2])
-   Sv = SparseMatrixCSC(Nv, EdgeIter(Ne, us, vs))
+   printif(verbose, "Loading Vertex Data")
+   Vdata, Lm = readvdata(io, Nv::Int, ltype, vprops, vtypes)
+
+   printif(verbose, "Loading Edge Data")
+   Edata, eit = readedata(io, Ne, Lm, eprops, etypes)
+   Sv = SparseMatrixCSC(Nv, eit)
    reorder!(Sv)
-
-   printif(verbose, "Fetching Edge Data")
-   Edata = DataFrame()
-   for (i,prop) in enumerate(eprops)
-      vals = promote_vector(etypes[i], arr[(Nv+1):(Nv+Ne),i+2])
-      insert!(Edata, i, vals, Symbol(prop))
-   end
 
    printif(verbose, "Constructing Graph")
    Graph(Nv, Ne, Sv, Vdata, Edata, Lm)

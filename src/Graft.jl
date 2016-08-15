@@ -3,6 +3,7 @@ __precompile__(true)
 module Graft
 
 using DataFrames
+using ProgressMeter
 
 import Base: deepcopy, ==, +, -, |>
 
