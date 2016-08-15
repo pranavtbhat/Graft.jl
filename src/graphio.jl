@@ -104,7 +104,7 @@ function readvdata(io::IO, nv::Int, ltype::DataType, vprops::Vector, vtypes::Vec
          try
             vdata[i][v] = convertarg(vtypes[i], args[1+i])
          catch
-            error(string(v, " ", vtypes[i]," ", args[1+i]))
+            vdata[i][v] = NA
          end
       end
 
@@ -135,7 +135,11 @@ function readedata(io::IO, ne::Int, lmap::LabelMap, eprops::Vector, etypes::Vect
       vs[e] = decode(lmap, convertarg(ltype, args[2]))
 
       for i in eachindex(edata)
-         edata[i][e] = convertarg(etypes[i], args[2+i])
+         try
+            edata[i][e] = convertarg(etypes[i], args[2+i])
+         catch
+            edata[i][e] = NA
+         end
       end
 
       update!(p, e)
