@@ -4,21 +4,21 @@
 # However currently, only a GraphCSV supported. The format is described below
 #
 # The input file should contain data in the following format:
-# <num_vertices>,<num_edges>,<label_type>(1)
-# <vprop1>,<vprop2>,<vprop3>... (2)
-# <vproptype1>,<vproptype2>,<vproptype3>... (3)
-# <eprop1>,<eprop2>,<eprop3>... (4)
-# <eproptype1>,<eproptype2>,<eproptype3>... (5)
-# <vertex_label>,<val_1>,<val_2>,<val_3> ... (6)
+# <num_vertices>  <num_edges>   <label_type>(1)
+# <vprop1>  <vprop2>   <vprop3>... (2)
+# <vproptype1>   <vproptype2>   <vproptype3>... (3)
+# <eprop1>   <eprop2>   <eprop3>... (4)
+# <eproptype1>   <eproptype2>    <eproptype3>... (5)
+# <vertex_label>   <val_1>   <val_2>   <val_3> ... (6)
 # .
 # .
 # .
-# <vertex_label>,<val_1>,<val_2>,<val_3> ... (Nv + 5)
-# <from_vertex_label>,<to_vertex_label>,<val_1>,<val_2> ... (Nv + 6)
+# <vertex_label>   <val_1>   <val_2>   <val_3> ... (Nv + 5)
+# <from_vertex_label>   <to_vertex_label>   <val_1>   <val_2> ... (Nv + 6)
 # .
 # .
 # .
-# <from_vertex_label>,<to_vertex_label>,<val_1>,<val_2> ... (Nv + Ne + 5)
+# <from_vertex_label>   <to_vertex_label>   <val_1>   <val_2> ... (Nv + Ne + 5)
 # EOF
 
 ################################################# IMPORT/EXPORT ############################################################
@@ -54,11 +54,11 @@ end
 ################################################# READ GRAPHS ##############################################################
 
 function loadheader(io::IO)
-   header_line = split(rstrip(readline(io)), ',')
-   vprops_line = split(rstrip(readline(io)), ',')
-   vtypes_line = split(rstrip(readline(io)), ',')
-   eprops_line = split(rstrip(readline(io)), ',')
-   etype_line = split(rstrip(readline(io)), ',')
+   header_line = split(rstrip(readline(io)), '\t')
+   vprops_line = split(rstrip(readline(io)), '\t')
+   vtypes_line = split(rstrip(readline(io)), '\t')
+   eprops_line = split(rstrip(readline(io)), '\t')
+   etype_line = split(rstrip(readline(io)), '\t')
 
    Nv = parse(header_line[1])
    Ne = parse(header_line[2])
@@ -96,11 +96,15 @@ function readvdata(io::IO, nv::Int, ltype::DataType, vprops::Vector, vtypes::Arr
    p = Progress(nv, 1)
    for v in 1 : nv
       line = rstrip(readline(io), '\n')
-      args = split(line, ',')
+      args = split(line, '\t')
       labels[v] = convertarg(ltype, args[1])
 
       for i in eachindex(vdata)
-         vdata[i][v] = convertarg(vtypes[i], args[1+i])
+         try
+            vdata[i][v] = convertarg(vtypes[i], args[1+i])
+         catch
+            vdata[i][v] = NA
+         end
       end
 
       update!(p, v)
@@ -124,7 +128,7 @@ function readedata(io::IO, ne::Int, lmap::LabelMap, eprops::Vector, etypes::Arra
    p = Progress(ne, 1)
    for e in 1 : ne
       line = rstrip(readline(io), '\n')
-      args = split(line, ',')
+      args = split(line, '\t')
 
       us[e] = decode(lmap, convertarg(ltype, args[1]))
       vs[e] = decode(lmap, convertarg(ltype, args[2]))
@@ -202,14 +206,14 @@ function storegraph(g::Graph, io::IO)
 
    Edata = hcat(uls, vls, [collect(geteprop(g, :, prop)) for prop in Eprops]...)
 
-   println(io, "$Nv,$Ne,$Ltype")
-   println(io, join(Vprops, ','))
-   println(io, join(Vtypes, ','))
-   println(io, join(Eprops, ','))
-   println(io, join(Etypes, ','))
+   println(io, "$Nv\t$Ne\t$Ltype")
+   println(io, join(Vprops, '\t'))
+   println(io, join(Vtypes, '\t'))
+   println(io, join(Eprops, '\t'))
+   println(io, join(Etypes, '\t'))
 
-   writedlm(io, Vdata, ',')
-   writedlm(io, Edata, ',')
+   writedlm(io, Vdata, '\t')
+   writedlm(io, Edata, '\t')
    nothing
 end
 
