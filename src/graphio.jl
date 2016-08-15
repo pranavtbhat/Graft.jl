@@ -31,7 +31,7 @@ storegraph
 ################################################# HELPERS ##################################################################
 
 parseprops(x::SubString) = Symbol(x)
-parseprops(props::Vector) = map(parseprops, props)
+parseprops(props::Vector) = [parseprops(prop) for prop in props]
 parseprops(x) = error("Invalid property name $x")
 
 parsetypes(x::SubString) = eval(parse(x))
@@ -55,22 +55,23 @@ end
 
 function loadheader(io::IO)
    header_line = split(rstrip(readline(io)), '\t')
-   vprops_line = split(rstrip(readline(io)), '\t')
-   vtypes_line = split(rstrip(readline(io)), '\t')
-   eprops_line = split(rstrip(readline(io)), '\t')
-   etype_line = split(rstrip(readline(io)), '\t')
-
    Nv = parse(header_line[1])
    Ne = parse(header_line[2])
-   ltype = eval(parse(header_line[3]))
+   Ltype = eval(parse(header_line[3]))
 
-   vprops = parseprops(vprops_line)
-   vtypes = parsetypes(vtypes_line)
+   vprops_line = rstrip(readline(io))
+   Vprops = vprops_line == "" ? Symbol[] : parseprops(split(vprops_line, '\t'))
 
-   eprops = parseprops(eprops_line)
-   etypes = parsetypes(etype_line)
+   vtypes_line = rstrip(readline(io))
+   Vtypes = vtypes_line == "" ? DataType[] : parsetypes(split(vtypes_line, '\t'))
 
-   return(Nv, Ne, ltype, vprops, vtypes, eprops, etypes)
+   eprops_line = rstrip(readline(io))
+   Eprops = eprops_line == "" ? Symbol[] : parseprops(split(eprops_line, '\t'))
+
+   etype_line = rstrip(readline(io))
+   Etypes = etype_line == "" ? DataType[] : parsetypes(split(etype_line, '\t'))
+
+   return(Nv, Ne, Ltype, Vprops, Vtypes, Eprops, Etypes)
 end
 
 convertarg{T<:Number}(::Type{T}, x::SubString{String}) = parse(x)
@@ -85,7 +86,7 @@ function convertarg(::Type{String}, x::SubString{String})
    end
 end
 
-function readvdata(io::IO, nv::Int, ltype::DataType, vprops::Vector, vtypes::Array{DataType})
+function readvdata(io::IO, nv::Int, ltype::DataType, vprops::Vector, vtypes::Vector{DataType})
    vdata = Vector{Any}()
    labels = Array{ltype}(nv)
 
@@ -103,7 +104,7 @@ function readvdata(io::IO, nv::Int, ltype::DataType, vprops::Vector, vtypes::Arr
          try
             vdata[i][v] = convertarg(vtypes[i], args[1+i])
          catch
-            vdata[i][v] = NA
+            error(string(v, " ", vtypes[i]," ", args[1+i]))
          end
       end
 
@@ -113,7 +114,7 @@ function readvdata(io::IO, nv::Int, ltype::DataType, vprops::Vector, vtypes::Arr
    DataFrame(vdata, map(Symbol, vprops)), LabelMap(labels)
 end
 
-function readedata(io::IO, ne::Int, lmap::LabelMap, eprops::Vector, etypes::Array{DataType})
+function readedata(io::IO, ne::Int, lmap::LabelMap, eprops::Vector, etypes::Vector{DataType})
    edata = Vector{Any}()
 
    ltype = eltype(lmap)
