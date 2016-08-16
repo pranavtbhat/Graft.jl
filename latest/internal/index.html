@@ -346,15 +346,15 @@
           <p><a id='Internal-Documentation-1'></a></p>
 <h1 id="internal-documentation">Internal Documentation</h1>
 <ul>
+<li><a href="./#Graft.DictLM-Tuple{Graft.IdentityLM}"><code>Graft.DictLM</code></a></li>
 <li><a href="./#Graft.DictLM-Tuple{AbstractArray{T,1}}"><code>Graft.DictLM</code></a></li>
 <li><a href="./#Graft.DictLM"><code>Graft.DictLM</code></a></li>
-<li><a href="./#Graft.DictLM-Tuple{Graft.IdentityLM}"><code>Graft.DictLM</code></a></li>
 <li><a href="../edgeiter/#Graft.EdgeIter"><code>Graft.EdgeIter</code></a></li>
-<li><a href="../generator/#Graft.Graph-Tuple{Int64}"><code>Graft.Graph</code></a></li>
-<li><a href="../generator/#Graft.Graph-Tuple{Int64,Int64}"><code>Graft.Graph</code></a></li>
-<li><a href="../generator/#Graft.Graph-Tuple{Int64,Array{T,1},Int64}"><code>Graft.Graph</code></a></li>
-<li><a href="../generator/#Graft.Graph-Tuple{SparseMatrixCSC}"><code>Graft.Graph</code></a></li>
 <li><a href="../generator/#Graft.Graph-Tuple{Int64,Array{T,1}}"><code>Graft.Graph</code></a></li>
+<li><a href="../generator/#Graft.Graph-Tuple{SparseMatrixCSC}"><code>Graft.Graph</code></a></li>
+<li><a href="../generator/#Graft.Graph-Tuple{Int64,Array{T,1},Int64}"><code>Graft.Graph</code></a></li>
+<li><a href="../generator/#Graft.Graph-Tuple{Int64,Int64}"><code>Graft.Graph</code></a></li>
+<li><a href="../generator/#Graft.Graph-Tuple{Int64}"><code>Graft.Graph</code></a></li>
 <li><a href="./#Graft.IdentityLM"><code>Graft.IdentityLM</code></a></li>
 <li><a href="./#Graft.LabelMap"><code>Graft.LabelMap</code></a></li>
 <li><a href="../mutation/#Graft.addedge!-Tuple{Graft.Graph,Pair{Int64,Int64}}"><code>Graft.addedge!</code></a></li>
@@ -390,13 +390,13 @@
 <li><a href="../generator/#Graft.propgraph"><code>Graft.propgraph</code></a></li>
 <li><a href="../generator/#Graft.randgraph"><code>Graft.randgraph</code></a></li>
 <li><a href="./#Graft.randindxs-Tuple{Int64,Int64}"><code>Graft.randindxs</code></a></li>
-<li><a href="../labelling/#Graft.relabel!-Tuple{Graft.Graph,AbstractArray{Int64,1},Array{T,1}}"><code>Graft.relabel!</code></a></li>
 <li><a href="../labelling/#Graft.relabel!-Tuple{Graft.Graph,Int64,Any}"><code>Graft.relabel!</code></a></li>
+<li><a href="../labelling/#Graft.relabel!-Tuple{Graft.Graph,AbstractArray{Int64,1},Array{T,1}}"><code>Graft.relabel!</code></a></li>
 <li><a href="./#Graft.reorder!-Tuple{DataFrames.AbstractDataFrame,Array{Int64,1}}"><code>Graft.reorder!</code></a></li>
 <li><a href="./#Graft.reorder!-Tuple{SparseMatrixCSC}"><code>Graft.reorder!</code></a></li>
 <li><a href="../mutation/#Graft.rmedge!-Tuple{Graft.Graph,Pair{Int64,Int64}}"><code>Graft.rmedge!</code></a></li>
-<li><a href="../mutation/#Graft.rmvertex!-Tuple{Graft.Graph,AbstractArray{Int64,1}}"><code>Graft.rmvertex!</code></a></li>
 <li><a href="../mutation/#Graft.rmvertex!-Tuple{Graft.Graph,Int64}"><code>Graft.rmvertex!</code></a></li>
+<li><a href="../mutation/#Graft.rmvertex!-Tuple{Graft.Graph,AbstractArray{Int64,1}}"><code>Graft.rmvertex!</code></a></li>
 <li><a href="../edata/#Graft.seteprop!"><code>Graft.seteprop!</code></a></li>
 <li><a href="../labelling/#Graft.setlabel!-Tuple{Graft.Graph,Array{T,1}}"><code>Graft.setlabel!</code></a></li>
 <li><a href="../labelling/#Graft.setlabel!-Tuple{Graft.Graph}"><code>Graft.setlabel!</code></a></li>
@@ -406,130 +406,130 @@
 <p><a id='Base.SparseArrays.SparseMatrixCSC-Tuple{Int64,Graft.EdgeIter}' href='#Base.SparseArrays.SparseMatrixCSC-Tuple{Int64,Graft.EdgeIter}'>#</a>
 <strong><code>Base.SparseArrays.SparseMatrixCSC</code></strong> &mdash; <em>Method</em>.</p>
 <p>Build an adjacency matrix from an edge iterator </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/sparsematrix.jl#L24' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/sparsematrix.jl#L24' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.DictLM' href='#Graft.DictLM'>#</a>
 <strong><code>Graft.DictLM</code></strong> &mdash; <em>Type</em>.</p>
 <p>This label map is used when vertices are assigned meaningful labels. This type uses a dictionary to map labels onto vertex identifies, and a vector to map vertex identifiers onto labels.</p>
 <p>Labels can be of any user defined type.</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/labelmap.jl#L55-L61' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/labelmap.jl#L55-L61' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.DictLM-Tuple{AbstractArray{T,1}}' href='#Graft.DictLM-Tuple{AbstractArray{T,1}}'>#</a>
 <strong><code>Graft.DictLM</code></strong> &mdash; <em>Method</em>.</p>
 <p>Construct a label map from a list of labels </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/labelmap.jl#L68' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/labelmap.jl#L68' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.DictLM-Tuple{Graft.IdentityLM}' href='#Graft.DictLM-Tuple{Graft.IdentityLM}'>#</a>
 <strong><code>Graft.DictLM</code></strong> &mdash; <em>Method</em>.</p>
 <p>Construct a label map from the internally used vertex identifiers.</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/labelmap.jl#L75-L77' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/labelmap.jl#L75-L77' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.IdentityLM' href='#Graft.IdentityLM'>#</a>
 <strong><code>Graft.IdentityLM</code></strong> &mdash; <em>Type</em>.</p>
 <p>The default label map, that indicates the absence of meaningful vertex labels. The usage of this type incurs zero overhead in label resolution.</p>
 <p>Since vertices are referred to by their internally used indices, the usage of this labelling scheme can be problematic when vertices are deleted.</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/labelmap.jl#L40-L46' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/labelmap.jl#L40-L46' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.LabelMap' href='#Graft.LabelMap'>#</a>
 <strong><code>Graft.LabelMap</code></strong> &mdash; <em>Type</em>.</p>
 <p>A type that forward maps labels into internally used vertex identifiers, and reverse maps vertex identifiers into labels.</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/labelmap.jl#L26-L29' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/labelmap.jl#L26-L29' class='documenter-source'>source</a><br></p>
 <p><a id='Base.:+-Tuple{Graft.Graph,AbstractArray{T,1}}' href='#Base.:+-Tuple{Graft.Graph,AbstractArray{T,1}}'>#</a>
 <strong><code>Base.:+</code></strong> &mdash; <em>Method</em>.</p>
 <p>Shorthand notation for adding multiple lablled vertices </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/mutation.jl#L39' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/mutation.jl#L39' class='documenter-source'>source</a><br></p>
 <p><a id='Base.:+-Tuple{Graft.Graph,Any}' href='#Base.:+-Tuple{Graft.Graph,Any}'>#</a>
 <strong><code>Base.:+</code></strong> &mdash; <em>Method</em>.</p>
 <p>Shorthand notation for adding a labelled vertex to the graph </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/mutation.jl#L34' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/mutation.jl#L34' class='documenter-source'>source</a><br></p>
 <p><a id='Base.:--Tuple{Graft.Graph,Any}' href='#Base.:--Tuple{Graft.Graph,Any}'>#</a>
 <strong><code>Base.:-</code></strong> &mdash; <em>Method</em>.</p>
 <p>Remove a labelled vertex from the graph </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/mutation.jl#L132' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/mutation.jl#L132' class='documenter-source'>source</a><br></p>
 <p><a id='Base.:--Tuple{Graft.Graph,Array{T,1}}' href='#Base.:--Tuple{Graft.Graph,Array{T,1}}'>#</a>
 <strong><code>Base.:-</code></strong> &mdash; <em>Method</em>.</p>
 <p>Remove a list of labelled vertices from the graph </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/mutation.jl#L135' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/mutation.jl#L135' class='documenter-source'>source</a><br></p>
 <p><a id='Base.getindex-Tuple{Graft.Graph,Any}' href='#Base.getindex-Tuple{Graft.Graph,Any}'>#</a>
 <strong><code>Base.getindex</code></strong> &mdash; <em>Method</em>.</p>
 <p>Shorcut to vertex v's out-neighbors in the graph </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/combinatorial.jl#L54' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/combinatorial.jl#L54' class='documenter-source'>source</a><br></p>
 <p><a id='Base.getindex-Tuple{SparseMatrixCSC{Int64,Ti<:Integer},AbstractArray{Pair{Int64,Int64},1}}' href='#Base.getindex-Tuple{SparseMatrixCSC{Int64,Ti<:Integer},AbstractArray{Pair{Int64,Int64},1}}'>#</a>
 <strong><code>Base.getindex</code></strong> &mdash; <em>Method</em>.</p>
 <p>Retrieve the edge dataframe indices for a list of edges </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/sparsematrix.jl#L59' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/sparsematrix.jl#L59' class='documenter-source'>source</a><br></p>
 <p><a id='Base.getindex-Tuple{SparseMatrixCSC{Int64,Ti<:Integer},Graft.EdgeIter}' href='#Base.getindex-Tuple{SparseMatrixCSC{Int64,Ti<:Integer},Graft.EdgeIter}'>#</a>
 <strong><code>Base.getindex</code></strong> &mdash; <em>Method</em>.</p>
 <p>Retrieve the edge dataframe indices for all edges in an edge iterator </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/sparsematrix.jl#L70' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/sparsematrix.jl#L70' class='documenter-source'>source</a><br></p>
 <p><a id='Base.getindex-Tuple{SparseMatrixCSC{Int64,Ti<:Integer},Pair{Int64,Int64}}' href='#Base.getindex-Tuple{SparseMatrixCSC{Int64,Ti<:Integer},Pair{Int64,Int64}}'>#</a>
 <strong><code>Base.getindex</code></strong> &mdash; <em>Method</em>.</p>
 <p>Retrieve an edges' index in the ddge dataframe </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/sparsematrix.jl#L55' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/sparsematrix.jl#L55' class='documenter-source'>source</a><br></p>
 <p><a id='Base.merge-Tuple{Graft.Graph,Graft.Graph}' href='#Base.merge-Tuple{Graft.Graph,Graft.Graph}'>#</a>
 <strong><code>Base.merge</code></strong> &mdash; <em>Method</em>.</p>
 <p>Merge two graphs into one. Currently this method assumes that both graphs have the same vertices, and doesn't combine their data, but does a union on their edges.</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/operations/merging.jl#L8-L11' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/operations/merging.jl#L8-L11' class='documenter-source'>source</a><br></p>
 <p><a id='Base.setindex!-Tuple{Graft.Graph,Any,Any}' href='#Base.setindex!-Tuple{Graft.Graph,Any,Any}'>#</a>
 <strong><code>Base.setindex!</code></strong> &mdash; <em>Method</em>.</p>
 <p>Shorthand notation for adding an edge between labelled vertices </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/mutation.jl#L59' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/mutation.jl#L59' class='documenter-source'>source</a><br></p>
 <p><a id='Base.setindex!-Tuple{Graft.Graph,Array{T,1},Any}' href='#Base.setindex!-Tuple{Graft.Graph,Array{T,1},Any}'>#</a>
 <strong><code>Base.setindex!</code></strong> &mdash; <em>Method</em>.</p>
 <p>Shorthand notation for adding multiple edges between labelled vertices </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/mutation.jl#L64' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/mutation.jl#L64' class='documenter-source'>source</a><br></p>
 <p><a id='Base.setindex!-Tuple{SparseMatrixCSC{Int64,Ti<:Integer},AbstractArray{Int64,1},AbstractArray{Pair{Int64,Int64},1}}' href='#Base.setindex!-Tuple{SparseMatrixCSC{Int64,Ti<:Integer},AbstractArray{Int64,1},AbstractArray{Pair{Int64,Int64},1}}'>#</a>
 <strong><code>Base.setindex!</code></strong> &mdash; <em>Method</em>.</p>
 <p>Change the edge dataframe indices for a list of edges </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/sparsematrix.jl#L98' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/sparsematrix.jl#L98' class='documenter-source'>source</a><br></p>
 <p><a id='Base.setindex!-Tuple{SparseMatrixCSC{Int64,Ti<:Integer},AbstractArray{Int64,1},Graft.EdgeIter}' href='#Base.setindex!-Tuple{SparseMatrixCSC{Int64,Ti<:Integer},AbstractArray{Int64,1},Graft.EdgeIter}'>#</a>
 <strong><code>Base.setindex!</code></strong> &mdash; <em>Method</em>.</p>
 <p>Change the edge dataframe indices for all edges in an iterator </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/sparsematrix.jl#L118' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/sparsematrix.jl#L118' class='documenter-source'>source</a><br></p>
 <p><a id='Base.setindex!-Tuple{SparseMatrixCSC{Int64,Ti<:Integer},Any,AbstractArray{Pair{Int64,Int64},1}}' href='#Base.setindex!-Tuple{SparseMatrixCSC{Int64,Ti<:Integer},Any,AbstractArray{Pair{Int64,Int64},1}}'>#</a>
 <strong><code>Base.setindex!</code></strong> &mdash; <em>Method</em>.</p>
 <p>Change the edge dataframe indices for a list of edges </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/sparsematrix.jl#L90' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/sparsematrix.jl#L90' class='documenter-source'>source</a><br></p>
 <p><a id='Base.setindex!-Tuple{SparseMatrixCSC{Int64,Ti<:Integer},Int64,Graft.EdgeIter}' href='#Base.setindex!-Tuple{SparseMatrixCSC{Int64,Ti<:Integer},Int64,Graft.EdgeIter}'>#</a>
 <strong><code>Base.setindex!</code></strong> &mdash; <em>Method</em>.</p>
 <p>Change the edge dataframe indices for all edges in an iterator </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/sparsematrix.jl#L108' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/sparsematrix.jl#L108' class='documenter-source'>source</a><br></p>
 <p><a id='Base.setindex!-Tuple{SparseMatrixCSC{Int64,Ti<:Integer},Int64,Pair{Int64,Int64}}' href='#Base.setindex!-Tuple{SparseMatrixCSC{Int64,Ti<:Integer},Int64,Pair{Int64,Int64}}'>#</a>
 <strong><code>Base.setindex!</code></strong> &mdash; <em>Method</em>.</p>
 <p>Change an edge's index in the edge dataframe </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/sparsematrix.jl#L84' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/sparsematrix.jl#L84' class='documenter-source'>source</a><br></p>
 <p><a id='Base.size-Tuple{Graft.Graph}' href='#Base.size-Tuple{Graft.Graph}'>#</a>
 <strong><code>Base.size</code></strong> &mdash; <em>Method</em>.</p>
 <p>Return nv(g) x ne(g) </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/combinatorial.jl#L11' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/combinatorial.jl#L11' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.bfs' href='#Graft.bfs'>#</a>
 <strong><code>Graft.bfs</code></strong> &mdash; <em>Function</em>.</p>
 <p>Standard BFS implementation that returns a parent vector </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/algorithms.jl#L11' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/algorithms.jl#L11' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.bfs_list' href='#Graft.bfs_list'>#</a>
 <strong><code>Graft.bfs_list</code></strong> &mdash; <em>Function</em>.</p>
 <p>Get the list of vertices at a certain distance from the seed </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/algorithms.jl#L54' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/algorithms.jl#L54' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.bfs_subgraph' href='#Graft.bfs_subgraph'>#</a>
 <strong><code>Graft.bfs_subgraph</code></strong> &mdash; <em>Function</em>.</p>
 <p>Returns a BFS subgraph, containing explored vertices and all edges between them</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/algorithms.jl#L143-L146' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/algorithms.jl#L143-L146' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.bfs_tree' href='#Graft.bfs_tree'>#</a>
 <strong><code>Graft.bfs_tree</code></strong> &mdash; <em>Function</em>.</p>
 <p>Returns a BFS tree, containing explored vertices and only tree edges.</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/algorithms.jl#L112-L114' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/algorithms.jl#L112-L114' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.completeindxs-Tuple{Int64}' href='#Graft.completeindxs-Tuple{Int64}'>#</a>
 <strong><code>Graft.completeindxs</code></strong> &mdash; <em>Method</em>.</p>
 <p>Spawn a random sparse matrix denoting a complete graph without self loops. The returned matrix resembles a non-sparse matrix, so it'd be unwise to use this for a large number of vertices</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/sparsematrix.jl#L42-L46' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/sparsematrix.jl#L42-L46' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.randindxs-Tuple{Int64,Int64}' href='#Graft.randindxs-Tuple{Int64,Int64}'>#</a>
 <strong><code>Graft.randindxs</code></strong> &mdash; <em>Method</em>.</p>
 <p>Spawn a random sparse matrix, sort indices and remove self loops</p>
 <p>The number of edges in the sparse matrix may not equal the input ne, and is more likely to be an approximate</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/sparsematrix.jl#L29-L34' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/sparsematrix.jl#L29-L34' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.reorder!-Tuple{DataFrames.AbstractDataFrame,Array{Int64,1}}' href='#Graft.reorder!-Tuple{DataFrames.AbstractDataFrame,Array{Int64,1}}'>#</a>
 <strong><code>Graft.reorder!</code></strong> &mdash; <em>Method</em>.</p>
 <p>Reorder the edge dataframe to match the order of edges in the index table </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/edata.jl#L11' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/edata.jl#L11' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.reorder!-Tuple{SparseMatrixCSC}' href='#Graft.reorder!-Tuple{SparseMatrixCSC}'>#</a>
 <strong><code>Graft.reorder!</code></strong> &mdash; <em>Method</em>.</p>
 <p>Sort the index entries </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/abf42f994088422f8d52445fe87771b81cb6b674/src/sparsematrix.jl#L7' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/279f25794f918299d339dcc93034683b0a270fc6/src/sparsematrix.jl#L7' class='documenter-source'>source</a><br></p>
           <aside class="copyright" role="note">
             
             Documentation built with
