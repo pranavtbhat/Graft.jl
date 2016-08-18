@@ -1,38 +1,23 @@
-###
+# ##
 # This file contains a detailed example, demonstrating the typical workflow
 # Graft aims to support.
-# The dataset used here was constructed by splicing together two separate datasets:
+# The dataset used here was obtained form the Stanford Network Analysis Platform.
+# Google+ - http://snap.stanford.edu/data/egonets-Gplus.html
+# References :
+# 1. J. McAuley and J. Leskovec. Learning to Discover Social Circles in Ego Networks. NIPS, 2012.
 #
-# 1. `SOCR Data MLB HeightsWeights`: Heights, ages and weights of Baseball players (Vertex Data). References:
-#   * Jarron M. Saint Onge, Patrick M. Krueger, Richard G. Rogers. (2008) Historical trends in height,
-#   weight, and body mass: Data from U.S. Major League Baseball players, 1869-1983, Economics & Human
-#   Biology, Volume 6, Issue 3, Symposium on the Economics of Obesity, December 2008, Pages 482-488,
-#   ISSN 1570-677X, DOI: 10.1016/j.ehb.2008.06.008.
-#   * Jarron M. Saint Onge, Richard G. Rogers, Patrick M. Krueger. (2008) Major League Baseball Players'
-#   Life Expectancies, Southwestern Social Science Association, Volume 89, Issue 3, pages 817–830,
-#   DOI: 10.1111/j.1540-6237.2008.00562.x.
-# 2. Advogato Trust Network : Edge weights between 0 and 1. References:
-#   * Advogato network dataset -- KONECT, July 2016. [http](http://konect.uni-koblenz.de/networks/advogato)
-#   * Paolo Massa, Martino Salvetti, and Danilo Tomasoni. Bowling alone and trust decline in social network
-#   sites. In Proc. Int. Conf. Dependable, Autonomic and Secure Computing, pages 658--663, 2009.
-#
-# The dataset has 6541 vertices, 51127 edges.
-# Vertex properties: Age, Height(cm), Weight(kg)
-# Edge properties  : Trust(float)
-###
+# DataSet summary:
+# vertices : 107614
+# edges : 13673453
+# vertex properties: gender, institute, job_title, last_name, place, university
+# ##
 
 using Graft
 using StatsBase
 import LightGraphs
 
-## Load and summarize the graph.
-
-# Load the graph
-download(
- "https://raw.githubusercontent.com/pranavtbhat/Graft.jl/gh-pages/Datasets/graph.txt",
- joinpath(Pkg.dir("Graft"), "examples/graph.txt")
-)
-g = loadgraph(joinpath(Pkg.dir("Graft"), "examples/graph.txt"))
+## Load and summarize the graph
+g = loadgraph(joinpath(Pkg.dir("Graft"), "examples/Graph.txt"))
 
 # Get the graph's size
 size(g)
@@ -43,14 +28,8 @@ edges(g)
 # List vertex labels
 encode(g)
 
-# Split the graph into vertex and edge descriptors
-V,E = g;
-
-# Display the vertex table
-V
-
-# Display the edge table
-E
+# List vertex properties
+listvprops(g)
 
 ## Run some metadata queries
 
