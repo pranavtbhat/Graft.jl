@@ -7,4 +7,5 @@
 docs/build/
 docs/site/
 
-graph.txt
+*.txt
+gplus

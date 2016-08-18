@@ -17,7 +17,7 @@ julia> Pkg.clone("https://github.com/pranavtbhat/Graft.jl.git")
 ```
 
 ## Examples
-- [Baseball player analysis](https://github.com/pranavtbhat/Graft.jl/blob/master/examples/graphapi.md)
+- [Google Plus](https://github.com/pranavtbhat/Graft.jl/blob/master/examples/graphapi.md)
 
 ## Acknowledgements
 This project is supported by `Google Summer of Code` and mentored by [Viral Shah](https://github.com/ViralBShah) and [Shashi Gowda](https://github.com/shashi).

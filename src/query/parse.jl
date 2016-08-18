@@ -119,7 +119,8 @@ const vectorize = Dict(
    :<=   =>   .<=,
    :>    =>   .>,
    :>=   =>   .>=,
-   :^    =>   .^
+   :^    =>   .^,
+   :in   =>   (item,xs) -> [in(item, x) for x in xs]
 )
 
 function parse_exp(cache::Dict, graph::GraphNode, x::Symbol)

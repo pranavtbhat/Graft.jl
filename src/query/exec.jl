@@ -35,7 +35,17 @@ exec(cache::Dict, x::TableNode) = exec(cache, x.graph, x.prop)
 function exec(cache::Dict, x::GraphNode, y::VertexProperty)
    g = exec(cache, x)
    prop = exec(cache, y)
-   get!(cache[x]["VDATA"], y, getvprop(g, :, prop))
+
+   # Check for special tokens
+   if prop == :indegree
+      indegree(g)
+   elseif prop == :outdegree
+      outdegree(g)
+   elseif prop == :label
+      encode(g)
+   else
+      getvprop(g, :, prop)
+   end
 end
 
 ###
@@ -44,7 +54,16 @@ end
 function exec(cache::Dict, x::GraphNode, y::EdgeProperty)
    g = exec(cache, x)
    prop = exec(cache, y)
-   get!(cache[x]["EDATA"], y, geteprop(g, :, exec(cache, y)))
+
+   if prop == :source
+      eit = edges(g)
+      encode(g, eit.us)
+   elseif prop == :target
+      eit = edges(g)
+      encode(g, eit.vs)
+   else
+      geteprop(g, :, prop)
+   end
 end
 
 ###
@@ -53,27 +72,37 @@ end
 function exec(cache::Dict, x::GraphNode, y::EdgeSourceProperty)
    g = exec(cache, x)
    prop = exec(cache, y)
+   eit = edges(g)
 
-   if haskey(cache[x]["EDATA"], y)
-      cache[x]["EDATA"][y]
+   # Check for special tokens
+   if prop == :indegree
+      indegree(g, eit.us)
+   elseif prop == :outdegree
+      outdegree(g, eit.us)
+   elseif prop == :label
+      encode(g, eit.us)
    else
-      eit = get!(cache[x], "EIT", edges(g))
-      cache[x]["EDATA"][y] = getvprop(g, eit.us, prop)
+      getvprop(g, eit.us, prop)
    end
 end
 
 ###
-# Fetch edge source property
+# Fetch edge target property
 ###
 function exec(cache::Dict, x::GraphNode, y::EdgeTargetProperty)
    g = exec(cache, x)
    prop = exec(cache, y)
+   eit = edges(g)
 
-   if haskey(cache[x]["EDATA"], y)
-      cache[x]["EDATA"][y]
+   # Check for special tokens
+   if prop == :indegree
+      indegree(g, eit.vs)
+   elseif prop == :outdegree
+      outdegree(g, eit.vs)
+   elseif prop == :label
+      encode(g, eit.vs)
    else
-      eit = get!(cache[x], "EIT", edges(g))
-      cache[x]["EDATA"][y] = getvprop(g, eit.vs, prop)
+      getvprop(g, eit.vs, prop)
    end
 end
 
@@ -81,15 +110,16 @@ end
 # Execute Vector Operation
 ###
 function exec(cache::Dict, x::VectorOperation)
+   # Check if given node has already been executed
    if haskey(cache, x)
-      cache[x]
-   else
-      # Recursively execute arguments
-      args = map(arg->exec(cache, arg), x.args)
-
-      # Execute queries
-      cache[x] = x.op(args...)
+      return cache[x]
    end
+
+   # Recursively execute arguments
+   args = map(arg->exec(cache, arg), x.args)
+
+   # Execute queries
+   cache[x] = x.op(args...)
 end
 
 ###
@@ -120,7 +150,7 @@ function exec(cache::Dict, x::FilterNode)
       sg = subgraph(g, find(bools))
 
       # Register this FilterNode
-      cache[x] = Dict("OBJ"=>sg, "VDATA"=>Dict(), "EDATA"=>Dict())
+      cache[x] = Dict("OBJ"=>sg)
 
       return sg
    end
@@ -128,13 +158,13 @@ function exec(cache::Dict, x::FilterNode)
    # It must be an edge query then
    if length(bools) == ne(g)
       # Fetch input graph's edges
-      eit = get!(cache[x.graph], "EIT", edges(g))
+      eit = edges(g)
 
       # Execute subgraph operation
       sg = subgraph(g, eit[find(bools)])
 
       # Register this FilterNode
-      cache[x] = Dict("OBJ"=>sg, "VDATA"=>Dict(), "EDATA"=>Dict())
+      cache[x] = Dict("OBJ"=>sg)
 
       return sg
    end
@@ -166,7 +196,7 @@ function exec(cache::Dict, x::SelectNode)
    sg = subgraph(subgraph(g, :, :, eprops), :, vprops)
 
    # Register this SelectNode
-   cache[x] = Dict("OBJ"=>sg, "VDATA"=>Dict(), "EDATA"=>Dict())
+   cache[x] = Dict("OBJ"=>sg)
 
    return sg
 end

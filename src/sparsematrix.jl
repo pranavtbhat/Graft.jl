@@ -143,7 +143,7 @@ Retrieve a list of vertices connect to vertex v.
 This method copies the adjacencies onto the input array,
 and is comparitively faster, and causes no mallocs.
 """
-# TODO: Replace this functionaly with subarrays, once that gets out.
+# TODO: Replace this functionaly with fast subarrays, once that gets out.
 function fadj!(x::SparseMatrixCSC{Int,Int}, v::VertexID, adj::Vector{Int})
    @inbounds p1 = x.colptr[v]
    @inbounds p2 = x.colptr[v+1]
@@ -159,13 +159,51 @@ function outdegree(x::SparseMatrixCSC{Int}, v::VertexID)
    return p2 - p1
 end
 
+""" Compute outdegrees for a list of vertices """
+function outdegree(x::SparseMatrixCSC{Int}, vs::VertexList)
+   [outdegree(x, v) for v in vs]
+end
+
+""" Compute outdegrees for all vertices in the graph """
+function outdegree(x::SparseMatrixCSC{Int})
+   degs = Vector{Int}(nv(x))
+   for v in 1 : nv(x)
+      degs[v] = x.colptr[v+1] - x.colptr[v]
+   end
+   return degs
+end
+
 
 """
 Compute the indegree of a vertex. This method is slow
 since reverse adjacencies are not stored
 """
 function indegree(x::SparseMatrixCSC{Int}, v::VertexID)
-   count(k->k == v, x.rowval)
+   count = 0
+   for i in x.rowval
+      if i == v
+         count += 1
+      end
+   end
+   return count
+end
+
+""" Compute the indegrees for a list of vertices. Note that the list may not be unique! """
+function indegree(x::SparseMatrixCSC{Int}, vs::VertexList)
+   degs = zeros(Int, nv(x))
+   for i in x.rowval
+      degs[i] += 1
+   end
+   return degs[vs]
+end
+
+""" Compute the indegrees for all vertices in the graph """
+function indegree(x::SparseMatrixCSC{Int})
+   degs = zeros(Int, nv(x))
+   for i in x.rowval
+      degs[i] += 1
+   end
+   return degs
 end
 
 ################################################# ADDVERTEX ###############################################################

@@ -46,9 +46,21 @@ fadj!(g::Graph, v::VertexID, adj::Vector{Int}) = fadj!(indxs(g), v, adj)
 """ Vertex v's outdegree in the graph """
 outdegree(g::Graph, v::VertexID) = outdegree(indxs(g), v)
 
+""" Outdegree of vertex v for v in vs """
+outdegree(g::Graph, vs::VertexList) = outdegree(indxs(g), vs)
+
+""" Outdegrees of all the vertices in the graph """
+outdegree(g::Graph) = outdegree(indxs(g))
+
 
 """ Vertex v's indegree in the graph """
 indegree(g::Graph, v::VertexID) = indegree(indxs(g), v)
+
+""" Indegree of vertex v for v in vs """
+indegree(g::Graph, vs::VertexList) = indegree(indxs(g), vs)
+
+""" Indegrees of all the vertices in the graph """
+indegree(g::Graph) = indegree(indxs(g))
 
 
 """ Shorcut to vertex v's out-neighbors in the graph """

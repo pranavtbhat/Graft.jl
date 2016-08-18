@@ -43,7 +43,7 @@ macro query(x)
       # TODO: This is a runtime hack to translate input symbol
       # into graph. Need something smoother
       ###
-      cache[ks[1]] = Dict("OBJ"=>$(esc(syms[1].gs)), "VDATA"=>Dict(), "EDATA"=>Dict())
+      cache[ks[1]] = Dict("OBJ"=>$(esc(syms[1].gs)))
 
       exec(cache, $(esc(dag)))
    end

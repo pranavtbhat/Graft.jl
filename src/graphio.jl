@@ -74,7 +74,7 @@ function loadheader(io::IO)
    return(Nv, Ne, Ltype, Vprops, Vtypes, Eprops, Etypes)
 end
 
-convertarg{T<:Number}(::Type{T}, x::SubString{String}) = parse(x)
+convertarg{T<:Number}(::Type{T}, x::SubString{String}) = parse(T, x)
 convertarg(::Type{Any}, x::SubString{String}) = x
 convertarg(::Type{Char}, x::SubString{String}) = x[1]
 
@@ -85,6 +85,9 @@ function convertarg(::Type{String}, x::SubString{String})
       join(x)
    end
 end
+
+convertarg(::DataType, x::SubString{String}) = eval(parse(x))
+
 
 function readvdata(io::IO, nv::Int, ltype::DataType, vprops::Vector, vtypes::Vector{DataType})
    vdata = Vector{Any}()
@@ -101,11 +104,7 @@ function readvdata(io::IO, nv::Int, ltype::DataType, vprops::Vector, vtypes::Vec
       labels[v] = convertarg(ltype, args[1])
 
       for i in eachindex(vdata)
-         try
-            vdata[i][v] = convertarg(vtypes[i], args[1+i])
-         catch
-            vdata[i][v] = NA
-         end
+         vdata[i][v] = convertarg(vtypes[i], args[1+i])
       end
 
       update!(p, v)
@@ -135,11 +134,7 @@ function readedata(io::IO, ne::Int, lmap::LabelMap, eprops::Vector, etypes::Vect
       vs[e] = decode(lmap, convertarg(ltype, args[2]))
 
       for i in eachindex(edata)
-         try
-            edata[i][e] = convertarg(etypes[i], args[2+i])
-         catch
-            edata[i][e] = NA
-         end
+         edata[i][e] = convertarg(etypes[i], args[2+i])
       end
 
       update!(p, e)
@@ -151,21 +146,6 @@ end
 function loadgraph(io::IO, verbose=false)
    printif(verbose, "Fetching Graph Header")
    Nv, Ne, ltype, vprops, vtypes, eprops, etypes = loadheader(io)
-
-   if verbose
-      println("Graph with $Nv vertices, and $Ne edges")
-      println("Vertex properties")
-      for (vprop,vtype) in zip(vprops,vtypes)
-         println("$vprop => $vtype")
-      end
-      println()
-
-      println("Edge properties")
-      for (eprop,etype) in zip(eprops,etypes)
-         println("$eprop => $etype")
-      end
-      println()
-   end
 
    printif(verbose, "Loading Vertex Data")
    Vdata, Lm = readvdata(io, Nv::Int, ltype, vprops, vtypes)

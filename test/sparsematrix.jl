@@ -52,13 +52,19 @@ end
 @testset "SparseMatrixCSC Adjacency" begin
    x = completeindxs(10)
    v = rand(1:10)
+   vs = rand(1:10, 5)
    adj = setdiff(1:10, v)
 
    @test fadj(x, v) == adj
    @test fadj!(x, v, zeros(Int, 9)) == adj
 
    @test indegree(x, v) == 9
+   @test indegree(x, vs) == [indegree(x, v) for v in vs]
+   @test indegree(x) == fill(9, 10)
+
    @test outdegree(x, v) == 9
+   @test outdegree(x, vs) == [outdegree(x, v) for v in vs]
+   @test outdegree(x) == fill(9, 10)
 end
 
 @testset "SparseMatrixCSC Mutation" begin

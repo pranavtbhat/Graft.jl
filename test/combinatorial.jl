@@ -24,8 +24,13 @@
    @test fadj!(g, 10, zeros(Int, 9)) == collect(1:9)
 
    @test outdegree(g, rand(1:10)) == 9
-   @test indegree(g, rand(1:10)) == 9
+   @test outdegree(g, [1,2,3]) == [9,9,9]
+   @test outdegree(g) == fill(9, 10)
 
+   @test indegree(g, rand(1:10)) == 9
+   @test indegree(g, [1,2,3]) == [9,9,9]
+   @test indegree(g) == fill(9, 10)
+   
    v = rand(vertices(g))
    @test g[v] == fadj(g, v)
 end
