@@ -17,7 +17,8 @@ julia> Pkg.add("Graft")
 ```
 
 ## Examples
-- [Google Plus](https://github.com/pranavtbhat/Graft.jl/blob/master/examples/graphapi.md)
+- [Baseball Players](https://github.com/pranavtbhat/Graft.jl/blob/master/examples/baseball.ipynb)
+- [Google Plus](https://github.com/pranavtbhat/Graft.jl/blob/master/examples/google+.ipynb)
 
 ## Acknowledgements
 This project is supported by `Google Summer of Code` and mentored by [Viral Shah](https://github.com/ViralBShah) and [Shashi Gowda](https://github.com/shashi).
