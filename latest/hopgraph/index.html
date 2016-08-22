@@ -349,32 +349,35 @@
 <div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="k">using</span> <span class="n">Graft</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="n">g</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
-<span class="n">Graph</span><span class="p">(</span><span class="mi">20</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">52</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">Graph</span><span class="p">(</span><span class="mi">20</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">73</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="n">setlabel!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">map</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">20</span><span class="p">))</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Get a list of vertices, at a distance of 2-3 hops from vertex &quot;1&quot;</span>
        <span class="n">hoplist</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">&quot;1&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="mi">7</span><span class="o">-</span><span class="n">element</span> <span class="n">Array</span><span class="p">{</span><span class="n">String</span><span class="p">,</span><span class="mi">1</span><span class="p">}:</span>
- <span class="s">&quot;2&quot;</span>
+<span class="mi">10</span><span class="o">-</span><span class="n">element</span> <span class="n">Array</span><span class="p">{</span><span class="n">String</span><span class="p">,</span><span class="mi">1</span><span class="p">}:</span>
  <span class="s">&quot;5&quot;</span>
- <span class="s">&quot;18&quot;</span>
- <span class="s">&quot;7&quot;</span>
- <span class="s">&quot;6&quot;</span>
+ <span class="s">&quot;8&quot;</span>
+ <span class="s">&quot;9&quot;</span>
+ <span class="s">&quot;14&quot;</span>
  <span class="s">&quot;20&quot;</span>
- <span class="s">&quot;15&quot;</span>
+ <span class="s">&quot;11&quot;</span>
+ <span class="s">&quot;13&quot;</span>
+ <span class="s">&quot;16&quot;</span>
+ <span class="s">&quot;19&quot;</span>
+ <span class="s">&quot;4&quot;</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Get a BFS tree starting from the input vertex</span>
        <span class="c"># and terminating at 3 hops distance. Can be used to visualize</span>
        <span class="c"># a BFS traversal</span>
        <span class="n">hoptree</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">&quot;1&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="n">Graph</span><span class="p">(</span><span class="mi">10</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">9</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">Graph</span><span class="p">(</span><span class="mi">12</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">11</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Get a subgraph containing all vertices within 3 hops distance,</span>
        <span class="c"># and all edges between them. Can be used to construct the</span>
        <span class="c"># neighborhood of a vertex</span>
        <span class="n">hopgraph</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">&quot;1&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="n">Graph</span><span class="p">(</span><span class="mi">10</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">19</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">Graph</span><span class="p">(</span><span class="mi">12</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">33</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
 </pre></div>
 
 
@@ -382,15 +385,15 @@
 <p><a id='Graft.hoplist' href='#Graft.hoplist'>#</a>
 <strong><code>Graft.hoplist</code></strong> &mdash; <em>Function</em>.</p>
 <p>Get a list of vertices at a certain hop distance from a labelled vertex</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/172359c5fe772f3e81c187573858e2bfe82b155d/src/algorithms.jl#L103-L105' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/1e666edd04096fb358fba66f66c0f92b7e2a53b4/src/algorithms.jl#L103-L105' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.hoptree' href='#Graft.hoptree'>#</a>
 <strong><code>Graft.hoptree</code></strong> &mdash; <em>Function</em>.</p>
 <p>Get the bfs tree starting from the input labelled vertex, and ending at a certain hop distance</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/172359c5fe772f3e81c187573858e2bfe82b155d/src/algorithms.jl#L134-L136' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/1e666edd04096fb358fba66f66c0f92b7e2a53b4/src/algorithms.jl#L134-L136' class='documenter-source'>source</a><br></p>
 <p><a id='Graft.hopgraph' href='#Graft.hopgraph'>#</a>
 <strong><code>Graft.hopgraph</code></strong> &mdash; <em>Function</em>.</p>
 <p>Get a subgraph containing vertices and edges within a certain hop distance from the input labelled vertex</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/172359c5fe772f3e81c187573858e2bfe82b155d/src/algorithms.jl#L152-L155' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/1e666edd04096fb358fba66f66c0f92b7e2a53b4/src/algorithms.jl#L152-L155' class='documenter-source'>source</a><br></p>
           <aside class="copyright" role="note">
             
             Documentation built with
