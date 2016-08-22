@@ -29,10 +29,10 @@ import LightGraphs
 
 # Load the graph
 download(
- "https://raw.githubusercontent.com/pranavtbhat/Graft.jl/gh-pages/Datasets/graph.txt",
- joinpath(Pkg.dir("Graft"), "examples/graph.txt")
+ "https://raw.githubusercontent.com/pranavtbhat/Graft.jl/gh-pages/Datasets/baseball.txt",
+ joinpath(Pkg.dir("Graft"), "examples/baseball.txt")
 )
-g = loadgraph(joinpath(Pkg.dir("Graft"), "examples/graph.txt"))
+g = loadgraph(joinpath(Pkg.dir("Graft"), "examples/baseball.txt"))
 
 # Get the graph's size
 size(g)

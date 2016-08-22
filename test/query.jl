@@ -29,6 +29,9 @@
 
    # Special tokens
    setlabel!(g, map(string, 1 : 10))
+   @test @query(g |> eachvertex(v.id)) == collect(vertices(g))
+   @test @query(g |> eachvertex(v.adj)) == [fadj(g, v) for v in vertices(g)]
+   @test @query(g |> eachvertex(v.nbors)) == [g[v] for v in encode(g)]
    @test @query(g |> eachvertex(v.indegree)) == indegree(g)
    @test @query(g |> eachvertex(v.outdegree)) == outdegree(g)
    @test @query(g |> eachvertex(v.label)) == encode(g)
@@ -72,8 +75,20 @@ end
    # Special tokens
    setlabel!(g, map(string, 1 : 10))
    eit = edges(g)
+   @test @query(g |> eachedge(s.id)) == eit.us
+   @test @query(g |> eachedge(t.id)) == eit.vs
+
+   @test @query(g |> eachedge(s.label)) == encode(g, eit.us)
+   @test @query(g |> eachedge(t.label)) == encode(g, eit.vs)
+
    @test @query(g |> eachedge(e.source)) == @query(g |> eachedge(s.label)) == encode(g, eit.us)
    @test @query(g |> eachedge(e.target)) == @query(g |> eachedge(t.label)) == encode(g, eit.vs)
+
+   @test @query(g |> eachedge(s.adj)) == [fadj(g, v) for v in eit.us]
+   @test @query(g |> eachedge(t.adj)) == [fadj(g, v) for v in eit.vs]
+
+   @test @query(g |> eachedge(s.nbors)) == [g[v] for v in encode(g, eit.us)]
+   @test @query(g |> eachedge(t.nbors)) == [g[v] for v in encode(g, eit.vs)]
 
    @test @query(g |> eachedge(s.indegree)) == indegree(g, eit.us)
    @test @query(g |> eachedge(s.outdegree)) == outdegree(g, eit.us)

@@ -45,4 +45,12 @@
    g6 = hopgraph(g, "1", 2)
    @test nv(g6) == 4
    @test ne(g6) == 8
+
+   ###
+   # Mutual friends
+   ###
+   g = completegraph(10)
+   setlabel!(g, map(string, 1:10))
+   @test mutualcount(g, "1", "2") == 8
+   @test mutual(g, "1", "2") == map(string, [3,4,5,6,7,8,9,10])
 end

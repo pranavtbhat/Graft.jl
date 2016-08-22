@@ -37,7 +37,13 @@ function exec(cache::Dict, x::GraphNode, y::VertexProperty)
    prop = exec(cache, y)
 
    # Check for special tokens
-   if prop == :indegree
+   if prop == :id
+      collect(vertices(g))
+   elseif prop == :adj
+      [fadj(g, v) for v in vertices(g)]
+   elseif prop == :nbors
+      [g[v] for v in encode(g)]        # TODO: Optimize all nbors
+   elseif prop == :indegree
       indegree(g)
    elseif prop == :outdegree
       outdegree(g)
@@ -61,6 +67,12 @@ function exec(cache::Dict, x::GraphNode, y::EdgeProperty)
    elseif prop == :target
       eit = edges(g)
       encode(g, eit.vs)
+   elseif prop == :mutualcount
+      eit = edges(g)
+      [count_mutual_adj(g, u, v) for (u,v) in eit]
+   elseif prop == :mutual
+      eit = edges(g)
+      [encode(g, mutual_adj(g, e...)) for e in eit]
    else
       geteprop(g, :, prop)
    end
@@ -75,7 +87,13 @@ function exec(cache::Dict, x::GraphNode, y::EdgeSourceProperty)
    eit = edges(g)
 
    # Check for special tokens
-   if prop == :indegree
+   if prop == :id
+      eit.us
+   elseif prop == :adj
+      [fadj(g, v) for v in eit.us]
+   elseif prop == :nbors
+      [g[v] for v in encode(g, eit.us)]        # TODO: Optimize all nbors
+   elseif prop == :indegree
       indegree(g, eit.us)
    elseif prop == :outdegree
       outdegree(g, eit.us)
@@ -95,7 +113,13 @@ function exec(cache::Dict, x::GraphNode, y::EdgeTargetProperty)
    eit = edges(g)
 
    # Check for special tokens
-   if prop == :indegree
+   if prop == :id
+      eit.vs
+   elseif prop == :adj
+      [fadj(g, v) for v in eit.vs]
+   elseif prop == :nbors
+      [g[v] for v in encode(g, eit.vs)]        # TODO: Optimize all nbors
+   elseif prop == :indegree
       indegree(g, eit.vs)
    elseif prop == :outdegree
       outdegree(g, eit.vs)

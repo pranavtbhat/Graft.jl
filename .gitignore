@@ -9,3 +9,4 @@ docs/site/
 
 *.txt
 gplus
+.ipynb_checkpoints
