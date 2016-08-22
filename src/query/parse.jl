@@ -125,7 +125,9 @@ const vectorize = Dict(
 
 function parse_exp(cache::Dict, graph::GraphNode, x::Symbol)
    if haskey(vectorize, x)
-      return vectorize[x]
+      vectorize[x]
+   elseif isa(eval(x), Function)
+      (args...) -> map(eval(x), args...)
    else
       error("Couldn't parse (sub)expression $x")
    end
