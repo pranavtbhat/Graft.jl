@@ -5,7 +5,7 @@
 ################################################# IMPORT/EXPORT ############################################################
 export
 # External interfaces
-hoplist, hoptree, hopgraph
+hoplist, hoptree, hopgraph, mutualcount, mutual
 ################################################# BFSLIST ##################################################################
 
 """ Standard BFS implementation that returns a parent vector """
@@ -156,3 +156,65 @@ vertex
 function hopgraph(g::Graph, x, hopend::Number=Inf)
    bfs_subgraph(g, decode(g, x), hopend)
 end
+
+################################################# MUTUAL FRIENDS ###########################################################
+
+# Hacky to ensure performance
+function count_mutual_adj(g::Graph, u::VertexID, v::VertexID)
+   x = indxs(g)
+
+   i = x.colptr[u]
+   j = x.colptr[v]
+
+   ei = x.colptr[u+1] - 1
+   ej = x.colptr[v+1] - 1
+
+   count = 0
+
+   while i <= ei && j <= ej
+      @inbounds vi = x.rowval[i]
+      @inbounds vj = x.rowval[j]
+
+      if vi < vj
+         i += 1
+      elseif vi == vj
+         count += 1
+         i += 1
+         j += 1
+      else
+         j += 1
+      end
+   end
+
+   return count
+end
+
+mutualcount(g::Graph, ul, vl) = count_mutual_adj(g, decode(g, ul), decode(g, vl))
+
+function mutual_adj(g::Graph, u::VertexID, v::VertexID)
+   x = indxs(g)
+
+   aru = nzrange(x, u)
+   arv = nzrange(x, v)
+
+   i = start(aru)
+   j = start(arv)
+
+   res = sizehint!(Int[], count_mutual_adj(g, u, v))
+
+   while i in aru && j in arv
+      if x.rowval[i] < x.rowval[j]
+         i += 1
+      elseif x.rowval[i] == x.rowval[j]
+         push!(res, x.rowval[i])
+         i += 1
+         j += 1
+      else
+         j += 1
+      end
+   end
+
+   return res
+end
+
+mutual(g::Graph, ul, vl) = encode(g, mutual_adj(g, decode(g, ul), decode(g, vl)))
