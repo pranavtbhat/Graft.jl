@@ -5,7 +5,7 @@
 ################################################# IMPORT/EXPORT ############################################################
 export
 # Types
-emptygraph, randgraph, completegraph, propgraph
+emptygraph, randgraph, completegraph, propgraph, samplegraph
 
 ################################################# CONSTRUCTION #############################################################
 
@@ -92,4 +92,11 @@ function propgraph(nv::Int, vprops::Vector{Symbol}, eprops::Vector{Symbol})
    end
 
    return g
+end
+################################################# SAMPLE GRAPHS ############################################################
+
+_graph_text = IOBuffer("10\t28\tString\nage\toccupation\nInt\tString\nrelationship\nString\nAbel\t32\tArchitect\nBharath\t35\tBanker\nCamila\t21\tChef\nDalia\t59\tDentist\nEduardo\t24\tEconomist\nFabiola\t37\tFlorist\nGaurav\t46\tGeologist\nHector\t31\tHistorian\nIgnacio\t28\tInterpreter\nJanardan\t59\tJudge\nAbel	Bharath	father\nBharath	Abel	son\nAbel	Camila	friend\nCamila	Abel	friend\nBharath	Camila	familyfriend\nCamila	Bharath	familyfriend\nCamila	Dalia	wife\nDalia	Camila	husband\nDalia	Eduardo	friend\nEduardo	Dalia	friend\nDalia	Fabiola	neighbor\nFabiola	Dalia	neighbor\nDalia	Gaurav	teacher\nGaurav	Dalia	student\nDalia	Hector	father\nHector	Dalia	son\nDalia	Ignacio	daughter\nIgnacio	Dalia	mother\nDalia	Janardan	aunt\nJanardan	Dalia	nephew\nEduardo	Fabiola	friend\nFabiola	Eduardo\tfriend\nFabiola	Gaurav	friend\nGaurav	Fabiola	friend\nHector	Ignacio	granddaughter\nIgnacio	Hector	grandmother\nIgnacio	Janardan	sister\nJanardan	Ignacio	sister")
+
+function samplegraph()
+   loadgraph(_graph_text)
 end
