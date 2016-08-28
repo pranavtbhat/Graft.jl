@@ -382,61 +382,61 @@
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Run a filter using vertex properties</span>
        <span class="p">@</span><span class="n">query</span> <span class="n">g</span> <span class="o">|&gt;</span> <span class="n">filter</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">&lt;=</span> <span class="n">v</span><span class="o">.</span><span class="n">p1</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">p1</span> <span class="o">&lt;</span> <span class="n">v</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span>
-<span class="n">Graph</span><span class="p">(</span><span class="mi">3</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">6</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">,:</span><span class="n">p2</span><span class="p">]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">,:</span><span class="n">p2</span><span class="p">]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">Graph</span><span class="p">(</span><span class="mi">2</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">2</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">,:</span><span class="n">p2</span><span class="p">]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">,:</span><span class="n">p2</span><span class="p">]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Run a filter using source and target properties</span>
        <span class="p">@</span><span class="n">query</span> <span class="n">g</span> <span class="o">|&gt;</span> <span class="n">filter</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">p1</span> <span class="o">&lt;</span> <span class="n">t</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span>
-<span class="n">Graph</span><span class="p">(</span><span class="mi">10</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">28</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">,:</span><span class="n">p2</span><span class="p">]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">,:</span><span class="n">p2</span><span class="p">]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">Graph</span><span class="p">(</span><span class="mi">10</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">60</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">,:</span><span class="n">p2</span><span class="p">]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">,:</span><span class="n">p2</span><span class="p">]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Run filter using edge properties</span>
        <span class="p">@</span><span class="n">query</span> <span class="n">g</span> <span class="o">|&gt;</span> <span class="n">filter</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">p1</span> <span class="o">&lt;</span> <span class="mf">0.7</span><span class="p">)</span>
-<span class="n">Graph</span><span class="p">(</span><span class="mi">10</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">67</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">,:</span><span class="n">p2</span><span class="p">]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">,:</span><span class="n">p2</span><span class="p">]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">Graph</span><span class="p">(</span><span class="mi">10</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">60</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">,:</span><span class="n">p2</span><span class="p">]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">,:</span><span class="n">p2</span><span class="p">]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Chain filter expressions</span>
        <span class="p">@</span><span class="n">query</span> <span class="n">g</span> <span class="o">|&gt;</span> <span class="n">filter</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">p1</span> <span class="o">&lt;</span> <span class="n">v</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="n">filter</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">p1</span> <span class="o">&lt;</span> <span class="n">e</span><span class="o">.</span><span class="n">p1</span><span class="p">)</span>
-<span class="n">Graph</span><span class="p">(</span><span class="mi">5</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">0</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">,:</span><span class="n">p2</span><span class="p">]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">,:</span><span class="n">p2</span><span class="p">]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">Graph</span><span class="p">(</span><span class="mi">8</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">0</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">,:</span><span class="n">p2</span><span class="p">]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">,:</span><span class="n">p2</span><span class="p">]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Select properties</span>
        <span class="p">@</span><span class="n">query</span> <span class="n">g</span> <span class="o">|&gt;</span> <span class="n">filter</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">p1</span> <span class="o">&lt;</span> <span class="n">v</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="n">select</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">p2</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">p1</span><span class="p">)</span>
-<span class="n">Graph</span><span class="p">(</span><span class="mi">5</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">20</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p2</span><span class="p">]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
+<span class="n">Graph</span><span class="p">(</span><span class="mi">8</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">56</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p2</span><span class="p">]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[:</span><span class="n">p1</span><span class="p">]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Run an expression on each vertex</span>
        <span class="p">@</span><span class="n">query</span> <span class="n">g</span> <span class="o">|&gt;</span> <span class="n">eachvertex</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">p1</span> <span class="o">+</span> <span class="n">v</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span>
 <span class="mi">10</span><span class="o">-</span><span class="n">element</span> <span class="n">DataArrays</span><span class="o">.</span><span class="n">DataArray</span><span class="p">{</span><span class="kt">Float64</span><span class="p">,</span><span class="mi">1</span><span class="p">}:</span>
- <span class="mf">1.12736</span>
- <span class="mf">1.23416</span>
- <span class="mf">0.106099</span>
- <span class="mf">0.155433</span>
- <span class="mf">1.61994</span>
- <span class="mf">1.06225</span>
- <span class="mf">1.13486</span>
- <span class="mf">1.77176</span>
- <span class="mf">1.46834</span>
- <span class="mf">1.23731</span>
+ <span class="mf">1.55313</span>
+ <span class="mf">0.808734</span>
+ <span class="mf">1.0568</span>
+ <span class="mf">0.946784</span>
+ <span class="mf">1.65421</span>
+ <span class="mf">0.42016</span>
+ <span class="mf">1.11269</span>
+ <span class="mf">0.610503</span>
+ <span class="mf">0.916043</span>
+ <span class="mf">1.00555</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Run an expression on each edge</span>
        <span class="p">@</span><span class="n">query</span> <span class="n">g</span> <span class="o">|&gt;</span> <span class="n">filter</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">p1</span> <span class="o">&lt;</span> <span class="n">e</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="n">eachedge</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">p1</span> <span class="o">+</span> <span class="n">e</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span>
-<span class="mi">47</span><span class="o">-</span><span class="n">element</span> <span class="n">DataArrays</span><span class="o">.</span><span class="n">DataArray</span><span class="p">{</span><span class="kt">Float64</span><span class="p">,</span><span class="mi">1</span><span class="p">}:</span>
- <span class="mf">0.789149</span>
- <span class="mf">0.56604</span>
- <span class="mf">0.174153</span>
- <span class="mf">1.3643</span>
- <span class="mf">0.827498</span>
- <span class="mf">1.13499</span>
- <span class="mf">0.702235</span>
- <span class="mf">1.46742</span>
- <span class="mf">1.52444</span>
- <span class="mf">0.485986</span>
+<span class="mi">46</span><span class="o">-</span><span class="n">element</span> <span class="n">DataArrays</span><span class="o">.</span><span class="n">DataArray</span><span class="p">{</span><span class="kt">Float64</span><span class="p">,</span><span class="mi">1</span><span class="p">}:</span>
+ <span class="mf">0.330884</span>
+ <span class="mf">0.693706</span>
+ <span class="mf">1.4346</span>
+ <span class="mf">1.24209</span>
+ <span class="mf">1.38838</span>
+ <span class="mf">1.04681</span>
+ <span class="mf">1.1461</span>
+ <span class="mf">0.540661</span>
+ <span class="mf">1.00263</span>
+ <span class="mf">1.38607</span>
  <span class="n">⋮</span>
- <span class="mf">0.978921</span>
- <span class="mf">0.892566</span>
- <span class="mf">0.931627</span>
- <span class="mf">1.16634</span>
- <span class="mf">1.4138</span>
- <span class="mf">0.877504</span>
- <span class="mf">0.984907</span>
- <span class="mf">1.13986</span>
- <span class="mf">0.200123</span>
+ <span class="mf">1.45028</span>
+ <span class="mf">0.36366</span>
+ <span class="mf">1.24063</span>
+ <span class="mf">1.61596</span>
+ <span class="mf">0.605898</span>
+ <span class="mf">0.850466</span>
+ <span class="mf">1.24623</span>
+ <span class="mf">1.39533</span>
+ <span class="mf">1.39946</span>
 </pre></div>
 
 
