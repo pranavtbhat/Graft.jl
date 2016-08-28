@@ -9,41 +9,43 @@
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
     
       
-        <title>File IO - Graft.jl</title>
+        <title>Graft.jl - Graph Toolkit for Julia</title>
       
+      
+        <meta name="description" content="Graph Toolkit for Julia">
       
       
       
     
     <meta property="og:url" content="None">
     <meta property="og:title" content="Graft.jl">
-    <meta property="og:image" content="None/../">
+    <meta property="og:image" content="None/./">
     <meta name="apple-mobile-web-app-title" content="Graft.jl">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     
-    <link rel="shortcut icon" type="image/x-icon" href="../assets/images/favicon-e565ddfa3b.ico">
-    <link rel="icon" type="image/x-icon" href="../assets/images/favicon-e565ddfa3b.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="./assets/images/favicon-e565ddfa3b.ico">
+    <link rel="icon" type="image/x-icon" href="./assets/images/favicon-e565ddfa3b.ico">
     <style>
       @font-face {
       	font-family: 'Icon';
-      	src: url('../assets/fonts/icon.eot?52m981');
-      	src: url('../assets/fonts/icon.eot?#iefix52m981')
+      	src: url('./assets/fonts/icon.eot?52m981');
+      	src: url('./assets/fonts/icon.eot?#iefix52m981')
                format('embedded-opentype'),
-      		   url('../assets/fonts/icon.woff?52m981')
+      		   url('./assets/fonts/icon.woff?52m981')
                format('woff'),
-      		   url('../assets/fonts/icon.ttf?52m981')
+      		   url('./assets/fonts/icon.ttf?52m981')
                format('truetype'),
-      		   url('../assets/fonts/icon.svg?52m981#icon')
+      		   url('./assets/fonts/icon.svg?52m981#icon')
                format('svg');
       	font-weight: normal;
       	font-style: normal;
       }
     </style>
-    <link rel="stylesheet" href="../assets/stylesheets/application-a422ff04cc.css">
+    <link rel="stylesheet" href="./assets/stylesheets/application-a422ff04cc.css">
     
-      <link rel="stylesheet" href="../assets/stylesheets/palettes-05ab2406df.css">
+      <link rel="stylesheet" href="./assets/stylesheets/palettes-05ab2406df.css">
     
     
       
@@ -60,9 +62,9 @@
       </style>
     
     
-      <link rel="stylesheet" href="../assets/Documenter.css">
+      <link rel="stylesheet" href="./assets/Documenter.css">
     
-    <script src="../assets/javascripts/modernizr-4ab42b99fd.js"></script>
+    <script src="./assets/javascripts/modernizr-4ab42b99fd.js"></script>
     
   </head>
   
@@ -92,13 +94,9 @@
         
           <span class="path">
             
-              
-                Graph IO <i class="icon icon-link"></i>
-              
-            
           </span>
         
-        File IO
+        Graft.jl
       </div>
     </div>
     
@@ -168,9 +166,24 @@
           
             
   <li>
-    <a class="" title="Introduction" href="..">
+    <a class="current" title="Introduction" href=".">
       Introduction
     </a>
+    
+      
+        
+      
+      
+        <ul>
+          
+            <li class="anchor">
+              <a title="The Graph Type" href="#the-graph-type">
+                The Graph Type
+              </a>
+            </li>
+          
+        </ul>
+      
     
   </li>
 
@@ -182,7 +195,7 @@
       
         
   <li>
-    <a class="" title="Generation" href="../generator/">
+    <a class="" title="Generation" href="generator/">
       Generation
     </a>
     
@@ -191,7 +204,7 @@
       
         
   <li>
-    <a class="" title="Combinatorial" href="../combinatorial/">
+    <a class="" title="Combinatorial" href="combinatorial/">
       Combinatorial
     </a>
     
@@ -200,7 +213,7 @@
       
         
   <li>
-    <a class="" title="Mutation" href="../mutation/">
+    <a class="" title="Mutation" href="mutation/">
       Mutation
     </a>
     
@@ -209,7 +222,7 @@
       
         
   <li>
-    <a class="" title="Labelling" href="../labelling/">
+    <a class="" title="Labelling" href="labelling/">
       Labelling
     </a>
     
@@ -227,7 +240,7 @@
       
         
   <li>
-    <a class="" title="Vertex Metadata" href="../vdata/">
+    <a class="" title="Vertex Metadata" href="vdata/">
       Vertex Metadata
     </a>
     
@@ -236,7 +249,7 @@
       
         
   <li>
-    <a class="" title="Edge Metadata" href="../edata/">
+    <a class="" title="Edge Metadata" href="edata/">
       Edge Metadata
     </a>
     
@@ -254,7 +267,7 @@
       
         
   <li>
-    <a class="" title="Query Macro" href="../queries/">
+    <a class="" title="Query Macro" href="queries/">
       Query Macro
     </a>
     
@@ -263,7 +276,7 @@
       
         
   <li>
-    <a class="" title="Hop Subgraphs" href="../hopgraph/">
+    <a class="" title="Hop Subgraphs" href="hopgraph/">
       Hop Subgraphs
     </a>
     
@@ -281,21 +294,16 @@
       
         
   <li>
-    <a class="current" title="File IO" href="./">
+    <a class="" title="File IO" href="graphio/">
       File IO
     </a>
-    
-      
-        
-      
-      
     
   </li>
 
       
         
   <li>
-    <a class="" title="Export" href="../export/">
+    <a class="" title="Export" href="export/">
       Export
     </a>
     
@@ -313,7 +321,7 @@
       
         
   <li>
-    <a class="" title="Edge Iteration" href="../edgeiter/">
+    <a class="" title="Edge Iteration" href="edgeiter/">
       Edge Iteration
     </a>
     
@@ -322,7 +330,7 @@
       
         
   <li>
-    <a class="" title="Internal Docs" href="../internal/">
+    <a class="" title="Internal Docs" href="internal/">
       Internal Docs
     </a>
     
@@ -343,44 +351,19 @@
       <article class="article">
         <div class="wrapper">
           
-          <p><a id='Graph-IO-1'></a></p>
-<h1 id="graph-io">Graph IO</h1>
-<p>Graft will eventually support several file formats for reading and writing graphs. However currently, only a GraphCSV supported. The format is described below</p>
-<div class="codehilite"><pre><span></span>The input file should contain data in the following format:
-<span class="nt">&lt;num_vertices&gt;</span>,<span class="nt">&lt;num_edges&gt;</span>,<span class="nt">&lt;label_type&gt;</span>(1)
-<span class="nt">&lt;vprop1&gt;</span>,<span class="nt">&lt;vprop2&gt;</span>,<span class="nt">&lt;vprop3&gt;</span>... (2)
-<span class="nt">&lt;vproptype1&gt;</span>,<span class="nt">&lt;vproptype2&gt;</span>,<span class="nt">&lt;vproptype3&gt;</span>... (3)
-<span class="nt">&lt;eprop1&gt;</span>,<span class="nt">&lt;eprop2&gt;</span>,<span class="nt">&lt;eprop3&gt;</span>... (4)
-<span class="nt">&lt;eproptype1&gt;</span>,<span class="nt">&lt;eproptype2&gt;</span>,<span class="nt">&lt;eproptype3&gt;</span>... (5)
-<span class="nt">&lt;vertex_label&gt;</span>,<span class="nt">&lt;val_1&gt;</span>,<span class="nt">&lt;val_2&gt;</span>,<span class="nt">&lt;val_3&gt;</span> ... (6)
-.
-.
-.
-<span class="nt">&lt;vertex_label&gt;</span>,<span class="nt">&lt;val_1&gt;</span>,<span class="nt">&lt;val_2&gt;</span>,<span class="nt">&lt;val_3&gt;</span> ... (Nv + 5)
-<span class="nt">&lt;from_vertex_label&gt;</span>,<span class="nt">&lt;to_vertex_label&gt;</span>,<span class="nt">&lt;val_1&gt;</span>,<span class="nt">&lt;val_2&gt;</span> ... (Nv + 6)
-.
-.
-.
-<span class="nt">&lt;from_vertex_label&gt;</span>,<span class="nt">&lt;to_vertex_label&gt;</span>,<span class="nt">&lt;val_1&gt;</span>,<span class="nt">&lt;val_2&gt;</span> ... (Nv + Ne + 5)
-EOF
-</pre></div>
-
-
-<div class="codehilite"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">loadgraph</span><span class="p">(</span><span class="s">&quot;graph.txt&quot;</span><span class="p">)</span>
-
-<span class="n">storegraph</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">&quot;graph.txt&quot;</span><span class="p">)</span>
-</pre></div>
-
-
-<p>Detailed documentation:</p>
-<p><a id='Graft.loadgraph' href='#Graft.loadgraph'>#</a>
-<strong><code>Graft.loadgraph</code></strong> &mdash; <em>Function</em>.</p>
-<p>Parse a text file GraphCSV format</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/1e7e638f22598f46aaa0b16ee081c260d4d34356/src/graphio.jl#L162' class='documenter-source'>source</a><br></p>
-<p><a id='Graft.storegraph' href='#Graft.storegraph'>#</a>
-<strong><code>Graft.storegraph</code></strong> &mdash; <em>Function</em>.</p>
-<p>Write a graph to file </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/1e7e638f22598f46aaa0b16ee081c260d4d34356/src/graphio.jl#L172' class='documenter-source'>source</a><br></p>
+          <p><a id='Introduction-1'></a></p>
+<h1 id="introduction">Introduction</h1>
+<p><a id='The-Graph-Type-1'></a></p>
+<h2 id="the-graph-type">The Graph Type</h2>
+<p>The Graph datatype is the core data-structure used in Graft.jl. The Graph datatype has the following fields:</p>
+<ul>
+<li><code>nv</code>     : The number of vertices in the graph.</li>
+<li><code>ne</code>     : The number of edges int he graph.</li>
+<li><code>indxs</code>  : The adjacency matrix for the graph. The SparseMatrixCSC type is used here, both            as an adjacency matrix and as an index table, that maps edges onto their entries in the            edge dataframe.</li>
+<li><code>vdata</code>  : A dataframe used to store vertex data. This dataframe is indexed by the internally used            vertex identifiers.</li>
+<li><code>edata</code>  : An edge dataframe used to store edge data. This dataframe is indexed by indxs datastructure.</li>
+<li><code>lmap</code>   : A label map that maps externally used labels onto the internally used vertex identifiers and vice versa.</li>
+</ul>
           <aside class="copyright" role="note">
             
             Documentation built with
@@ -397,33 +380,17 @@ EOF
   <nav class="pagination" aria-label="Footer">
     <div class="previous">
       
-        <a href="../hopgraph/" title="Hop Subgraphs">
-          <span class="direction">
-            Previous
-          </span>
-          <div class="page">
-            <div class="button button-previous" role="button" aria-label="Previous">
-              <i class="icon icon-back"></i>
-            </div>
-            <div class="stretch">
-              <div class="title">
-                Hop Subgraphs
-              </div>
-            </div>
-          </div>
-        </a>
-      
     </div>
     <div class="next">
       
-        <a href="../export/" title="Export">
+        <a href="generator/" title="Generation">
           <span class="direction">
             Next
           </span>
           <div class="page">
             <div class="stretch">
               <div class="title">
-                Export
+                Generation
               </div>
             </div>
             <div class="button button-next" role="button" aria-label="Next">
@@ -449,14 +416,14 @@ EOF
       </div>
     </main>
     <script>
-      var base_url = '..';
+      var base_url = '.';
       var repo_id  = 'pranavtbhat/Graft.jl';
     </script>
-    <script src="../assets/javascripts/application-997097ee0c.js"></script>
+    <script src="./assets/javascripts/application-997097ee0c.js"></script>
     
       <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
     
-      <script src="../assets/mathjaxhelper.js"></script>
+      <script src="./assets/mathjaxhelper.js"></script>
     
     
   </body>

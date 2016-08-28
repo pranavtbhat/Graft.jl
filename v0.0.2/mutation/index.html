@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
     
       
-        <title>File IO - Graft.jl</title>
+        <title>Mutation - Graft.jl</title>
       
       
       
@@ -93,12 +93,12 @@
           <span class="path">
             
               
-                Graph IO <i class="icon icon-link"></i>
+                Graph API <i class="icon icon-link"></i>
               
             
           </span>
         
-        File IO
+        Mutation
       </div>
     </div>
     
@@ -200,9 +200,14 @@
       
         
   <li>
-    <a class="" title="Mutation" href="../mutation/">
+    <a class="current" title="Mutation" href="./">
       Mutation
     </a>
+    
+      
+        
+      
+      
     
   </li>
 
@@ -281,14 +286,9 @@
       
         
   <li>
-    <a class="current" title="File IO" href="./">
+    <a class="" title="File IO" href="../graphio/">
       File IO
     </a>
-    
-      
-        
-      
-      
     
   </li>
 
@@ -343,44 +343,48 @@
       <article class="article">
         <div class="wrapper">
           
-          <p><a id='Graph-IO-1'></a></p>
-<h1 id="graph-io">Graph IO</h1>
-<p>Graft will eventually support several file formats for reading and writing graphs. However currently, only a GraphCSV supported. The format is described below</p>
-<div class="codehilite"><pre><span></span>The input file should contain data in the following format:
-<span class="nt">&lt;num_vertices&gt;</span>,<span class="nt">&lt;num_edges&gt;</span>,<span class="nt">&lt;label_type&gt;</span>(1)
-<span class="nt">&lt;vprop1&gt;</span>,<span class="nt">&lt;vprop2&gt;</span>,<span class="nt">&lt;vprop3&gt;</span>... (2)
-<span class="nt">&lt;vproptype1&gt;</span>,<span class="nt">&lt;vproptype2&gt;</span>,<span class="nt">&lt;vproptype3&gt;</span>... (3)
-<span class="nt">&lt;eprop1&gt;</span>,<span class="nt">&lt;eprop2&gt;</span>,<span class="nt">&lt;eprop3&gt;</span>... (4)
-<span class="nt">&lt;eproptype1&gt;</span>,<span class="nt">&lt;eproptype2&gt;</span>,<span class="nt">&lt;eproptype3&gt;</span>... (5)
-<span class="nt">&lt;vertex_label&gt;</span>,<span class="nt">&lt;val_1&gt;</span>,<span class="nt">&lt;val_2&gt;</span>,<span class="nt">&lt;val_3&gt;</span> ... (6)
-.
-.
-.
-<span class="nt">&lt;vertex_label&gt;</span>,<span class="nt">&lt;val_1&gt;</span>,<span class="nt">&lt;val_2&gt;</span>,<span class="nt">&lt;val_3&gt;</span> ... (Nv + 5)
-<span class="nt">&lt;from_vertex_label&gt;</span>,<span class="nt">&lt;to_vertex_label&gt;</span>,<span class="nt">&lt;val_1&gt;</span>,<span class="nt">&lt;val_2&gt;</span> ... (Nv + 6)
-.
-.
-.
-<span class="nt">&lt;from_vertex_label&gt;</span>,<span class="nt">&lt;to_vertex_label&gt;</span>,<span class="nt">&lt;val_1&gt;</span>,<span class="nt">&lt;val_2&gt;</span> ... (Nv + Ne + 5)
-EOF
-</pre></div>
+          <p><a id='Mutation-API-1'></a></p>
+<h1 id="mutation-api">Mutation API</h1>
+<p>The following example demonstrates the use of the combinatorial API:Graphs can be modified using the following methods:</p>
+<div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="k">using</span> <span class="n">Graft</span>
 
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">g</span> <span class="o">=</span> <span class="n">completegraph</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">Graph</span><span class="p">(</span><span class="mi">10</span> <span class="n">vertices</span><span class="p">,</span> <span class="mi">90</span> <span class="n">edges</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">vertex</span> <span class="n">properties</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">[]</span> <span class="n">edge</span> <span class="n">properties</span><span class="p">)</span>
 
-<div class="codehilite"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">loadgraph</span><span class="p">(</span><span class="s">&quot;graph.txt&quot;</span><span class="p">)</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">setlabel!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">map</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">10</span><span class="p">))</span>
 
-<span class="n">storegraph</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">&quot;graph.txt&quot;</span><span class="p">)</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Add a labelled vertex to the graph. Returns the new</span>
+       <span class="c"># vertex&#39;s internal identifier</span>
+       <span class="n">addvertex!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">&quot;11&quot;</span><span class="p">)</span>
+<span class="mi">11</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Add a new edge to the graph, using vertex identifiers</span>
+       <span class="n">addedge!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">true</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Add a new edge to the graph, using vertex labels</span>
+       <span class="n">g</span><span class="p">[</span><span class="s">&quot;2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;11&quot;</span>
+<span class="s">&quot;11&quot;</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Remove an edge from the graph, using vertex identifiers</span>
+       <span class="n">rmedge!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="mi">1</span><span class="o">=&gt;</span><span class="mi">11</span><span class="p">)</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Remove a vertex from the graph, using its vertex identifier</span>
+       <span class="n">rmvertex!</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="c"># Remove a vertex from the graph using its label</span>
+       <span class="n">g</span> <span class="o">-</span> <span class="s">&quot;5&quot;</span>
 </pre></div>
 
 
 <p>Detailed documentation:</p>
-<p><a id='Graft.loadgraph' href='#Graft.loadgraph'>#</a>
-<strong><code>Graft.loadgraph</code></strong> &mdash; <em>Function</em>.</p>
-<p>Parse a text file GraphCSV format</p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/1e7e638f22598f46aaa0b16ee081c260d4d34356/src/graphio.jl#L162' class='documenter-source'>source</a><br></p>
-<p><a id='Graft.storegraph' href='#Graft.storegraph'>#</a>
-<strong><code>Graft.storegraph</code></strong> &mdash; <em>Function</em>.</p>
-<p>Write a graph to file </p>
-<p><a target='_blank' href='https://github.com/pranavtbhat/Graft.jl/tree/1e7e638f22598f46aaa0b16ee081c260d4d34356/src/graphio.jl#L172' class='documenter-source'>source</a><br></p>
+<div class="codehilite"><pre><span></span>addvertex!(::Graph, ::Any)
+addvertex!(::Graph, ::Any)
+addedge!(::Graph, ::Pair{Int,Int})
+rmvertex!(::Graph, ::Int)
+rmvertex!(::Graph, ::AbstractVector{Int})
+rmedge!(::Graph, ::Pair{Int,Int})
+</pre></div>
           <aside class="copyright" role="note">
             
             Documentation built with
@@ -397,7 +401,7 @@ EOF
   <nav class="pagination" aria-label="Footer">
     <div class="previous">
       
-        <a href="../hopgraph/" title="Hop Subgraphs">
+        <a href="../combinatorial/" title="Combinatorial">
           <span class="direction">
             Previous
           </span>
@@ -407,7 +411,7 @@ EOF
             </div>
             <div class="stretch">
               <div class="title">
-                Hop Subgraphs
+                Combinatorial
               </div>
             </div>
           </div>
@@ -416,14 +420,14 @@ EOF
     </div>
     <div class="next">
       
-        <a href="../export/" title="Export">
+        <a href="../labelling/" title="Labelling">
           <span class="direction">
             Next
           </span>
           <div class="page">
             <div class="stretch">
               <div class="title">
-                Export
+                Labelling
               </div>
             </div>
             <div class="button button-next" role="button" aria-label="Next">
